@@ -1,0 +1,141 @@
+# Caddyfile Template for Caddy with Coraza WAF
+# ===============================================
+# This is a template configuration with WAF in DetectionOnly mode.
+# Replace placeholders and adjust for your production environment.
+# Documentation: https://github.com/Miguel-DevOps/caddy-waf
+
+# Global configuration
+{
+    # Email for Let's Encrypt certificates
+    email {$ACME_EMAIL}
+    
+    # Security order - WAF must be first
+    order coraza_waf first
+    order rate_limit before basicauth
+    
+    # Structured JSON logging for observability
+    log {
+        output stdout
+        format json {
+            time_format "iso8601"
+            level "info"
+        }
+    }
+}
+
+# WAF Configuration Block
+# -----------------------
+# By default, WAF runs in DetectionOnly mode to prevent false positives.
+# Change to 'SecRuleEngine On' after monitoring and tuning.
+(waf) {
+    coraza_waf {
+        directives `
+            # 1. Base Coraza configuration
+            Include /etc/caddy/coraza.conf
+
+            # 2. OWASP CRS setup configuration
+            Include /etc/caddy/owasp-crs/crs-setup.conf
+
+            # 3. OWASP CRS protection rules
+            Include /etc/caddy/owasp-crs/rules/*.conf
+
+            # 4. WAF Engine Mode
+            # Options: On, Off, DetectionOnly
+            # Start with DetectionOnly, monitor logs, then switch to On
+            SecRuleEngine DetectionOnly
+
+            # 5. Audit logging configuration
+            SecAuditEngine RelevantOnly
+            SecAuditLog /dev/stdout
+            SecAuditLogFormat JSON
+            SecAuditLogParts ABCDEFGHIJKZ
+        `
+    }
+}
+
+# Example 1: Simple static site with WAF
+# ---------------------------------------
+example.com, www.example.com {
+    import waf
+
+    tls {
+        protocols tls1.2 tls1.3
+    }
+
+    header {
+        Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+        X-Content-Type-Options "nosniff"
+        X-Frame-Options "DENY"
+        Referrer-Policy "strict-origin-when-cross-origin"
+    }
+
+    respond "Caddy with Coraza WAF is working!" 200
+}
+
+# Example 2: Reverse proxy to a backend service with WAF
+# -------------------------------------------------------
+api.example.com {
+    import waf
+
+    tls {
+        protocols tls1.2 tls1.3
+    }
+
+    header {
+        Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+        X-Content-Type-Options "nosniff"
+        X-Frame-Options "DENY"
+        Referrer-Policy "strict-origin-when-cross-origin"
+    }
+
+    reverse_proxy example-app:80 {
+        # Configure trusted proxies explicitly if there is an upstream LB.
+        # trusted_proxies static private_ranges
+    }
+}
+
+# Example 3: Static file server with WAF
+# ---------------------------------------
+assets.example.com {
+    import waf
+
+    tls {
+        protocols tls1.2 tls1.3
+    }
+
+    root * /usr/share/caddy
+    file_server
+}
+
+# Example 4: PHP application with WAF (adjust for your stack)
+# ------------------------------------------------------------
+app.example.com {
+    import waf
+
+    tls {
+        protocols tls1.2 tls1.3
+    }
+
+    root * /var/www/html
+    php_fastcgi php-fpm:9000
+    file_server
+}
+
+# Example 5: WebSocket support with WAF exceptions (if needed)
+# -------------------------------------------------------------
+# Some WebSocket applications may trigger false positives
+ws.example.com {
+    # For WebSockets, you might need to adjust CRS rules
+    # or create specific exceptions in crs-setup.conf
+    import waf
+
+    tls {
+        protocols tls1.2 tls1.3
+    }
+
+    reverse_proxy websocket-backend:8080 {
+        # WebSocket specific headers
+        header_up Connection {>Connection}
+        header_up Upgrade {>Upgrade}
+    }
+}

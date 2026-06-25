@@ -1,0 +1,46 @@
+[Unit]
+Description=Caddy WAF Service
+Documentation=https://caddyserver.com/docs/
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=notify
+User=caddy-waf
+Group=caddy-waf
+
+ExecStart=/usr/bin/caddy run --environ --config /etc/caddy/Caddyfile
+ExecReload=/usr/bin/caddy reload --config /etc/caddy/Caddyfile --force
+ExecStop=/usr/bin/caddy stop
+
+AmbientCapabilities=CAP_NET_BIND_SERVICE
+CapabilityBoundingSet=CAP_NET_BIND_SERVICE
+NoNewPrivileges=true
+
+WorkingDirectory=/var/lib/caddy-waf
+StateDirectory=caddy-waf
+LogsDirectory=caddy-waf
+RuntimeDirectory=caddy-waf
+
+ReadWritePaths=/var/lib/caddy-waf /run/caddy-waf /var/log/caddy-waf
+ReadOnlyPaths=/etc/caddy
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+LockPersonality=true
+MemoryDenyWriteExecute=true
+RestrictSUIDSGID=true
+RestrictNamespaces=true
+SystemCallArchitectures=native
+SystemCallFilter=@system-service
+UMask=0027
+
+Restart=on-failure
+RestartSec=5s
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,65 @@
+# Build artifacts
+*.tar.gz
+*.tar
+.DS_Store
+Thumbs.db
+
+# Local test files
+test-*
+temp-*
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Docker
+docker-compose.override.yml
+
+# Environment files (keep only template in repo)
+.env
+.env.*
+!.env.example
+
+# Runtime config (keep only template in repo)
+Caddyfile
+!Caddyfile.example
+
+# Security & supply chain
+*.pem
+*.key
+*.p12
+*.pfx
+*.crt
+*.log
+logs/
+cosign.key
+sbom.*.json
+*.attestation
+
+# Python (just in case)
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+venv/
+.uv/
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+htmlcov/
+.coverage
+coverage.xml
+
+# Node (just in case)
+node_modules/
+.pnpm-store/
+.pnpm-debug.log
+.next/
+.nuxt/
+.output/

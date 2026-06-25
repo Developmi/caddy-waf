@@ -1,0 +1,51 @@
+# Git & CI
+.git
+.gitignore
+.github/
+.DS_Store
+Thumbs.db
+
+# Local env files (keep example)
+.env
+.env.*
+!.env.example
+
+# Documentation & large artifacts
+README.md
+README.es.md
+TUNING.md
+LICENSE
+ROADMAP.md
+docs/
+deploy/
+
+# Build artifacts and OS files
+*.log
+logs/
+tmp/
+.cache/
+
+# Caddy & runtime configuration (do not include in image builds; mount at runtime)
+Caddyfile
+
+# Compose and Docker build files
+docker-compose.yml
+Dockerfile*
+
+# Language/runtime caches (if added later)
+__pycache__/
+*.pyc
+.venv/
+venv/
+*.egg-info/
+dist/
+build/
+
+# IDE / Editor
+.vscode/
+.idea/
+
+# Supply chain artifacts (should never be in image builds)
+cosign.key
+*.attestation
+sbom.*.json
