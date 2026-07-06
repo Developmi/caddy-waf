@@ -9,29 +9,32 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: miguel-devops/caddy-waf
+  IMAGE_NAME: developmi/caddy-waf
 
 permissions:
   contents: read
   packages: write
   id-token: write         # required for keyless Cosign
   attestations: write
+  security-events: write  # required for SARIF upload to GitHub Security tab
 
 jobs:
   build-scan-sign:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4
+        with:
+          persist-credentials: false
 
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
+        uses: docker/setup-qemu-action@c7c53464625b32c7a7e944ae62b3e17d2b600130  # v3
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f  # v3
 
       - name: Login to GHCR
-        uses: docker/login-action@v3
+        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9  # v3
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
@@ -39,16 +42,15 @@ jobs:
 
       - name: Extract metadata
         id: meta
-        uses: docker/metadata-action@v5
+        uses: docker/metadata-action@c299e40c65443455700f0fdfc63efafe5b349051  # v5
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
             type=ref,event=tag
-            type=sha,prefix=sha-
 
       - name: Build image for local scan (load into docker daemon)
         id: build-scan
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@ca052bb54ab0790a636c9b5f226502c73d547a25  # v5
         with:
           context: .
           push: false
@@ -57,23 +59,29 @@ jobs:
           tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}-scan
           labels: ${{ steps.meta.outputs.labels }}
 
-      - name: Scan built image with Trivy (fail on CRITICAL)
-        uses: aquasecurity/trivy-action@master
+      # ponytail: amd64-only scan. CRITICAL/HIGH vulns are arch-independent
+      - name: Scan built image with Trivy (fail on CRITICAL/HIGH)
+        uses: aquasecurity/trivy-action@57a97c7e7821a5776cebc9bb87c984fa69cba8f1  # v0.35.0
         with:
           image-ref: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}-scan
-          format: table
+          format: sarif
+          output: trivy-results.sarif
           exit-code: 1
           severity: CRITICAL,HIGH
           ignore-unfixed: true
 
-      - name: Generate SBOM with Syft
-        run: |
-          curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b /usr/local/bin
-          syft ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}-scan -o cyclonedx-json=sbom.cdx.json
+      - name: Upload Trivy SARIF
+        if: (!cancelled()) && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
+        continue-on-error: true
+        uses: github/codeql-action/upload-sarif@e8e8e51caba890f74f97e228d00b0b81b666ee4c  # v3
+        with:
+          sarif_file: trivy-results.sarif
+          category: trivy
 
       - name: Build and push multi-arch (only after scan passes)
+        if: github.event_name != 'pull_request'
         id: build-push
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@ca052bb54ab0790a636c9b5f226502c73d547a25  # v5
         with:
           context: .
           push: true
@@ -83,17 +91,60 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
+      - name: Generate SBOM (CycloneDX JSON)
+        id: sbom
+        if: github.event_name != 'pull_request'
+        uses: anchore/sbom-action@e22c389904149dbc22b58101806040fa8d37a610  # v0
+        with:
+          image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.ref_name }}
+          format: cyclonedx-json
+          output-file: sbom.cdx.json
+
       - name: Install Cosign
-        uses: sigstore/cosign-installer@v3
+        uses: sigstore/cosign-installer@f713795cb21599bc4e5c4b58cbad1da852d7eeb9  # v3
 
-      - name: Sign image (keyless OIDC)
-        if: github.event_name != 'pull_request'
+      - name: Sign image by digest (keyless OIDC)
+        if: github.event_name != 'pull_request' && steps.build-push.outputs.digest != ''
+        env:
+          DIGEST: ${{ steps.build-push.outputs.digest }}
+          REGISTRY: ${{ env.REGISTRY }}
+          IMAGE_NAME: ${{ env.IMAGE_NAME }}
         run: |
-          IMAGE=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.ref_name }}
-          cosign sign --yes ${IMAGE}
+          IMAGE="${REGISTRY}/${IMAGE_NAME}@${DIGEST}"
+          cosign sign --yes "${IMAGE}"
 
-      - name: Attach SBOM attestation
-        if: github.event_name != 'pull_request'
+      - name: Attach SBOM attestation by digest
+        if: github.event_name != 'pull_request' && steps.build-push.outputs.digest != ''
+        env:
+          DIGEST: ${{ steps.build-push.outputs.digest }}
+          REGISTRY: ${{ env.REGISTRY }}
+          IMAGE_NAME: ${{ env.IMAGE_NAME }}
         run: |
-          IMAGE=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.ref_name }}
-          cosign attest --type cyclonedx --predicate sbom.cdx.json --yes ${IMAGE}
+          IMAGE="${REGISTRY}/${IMAGE_NAME}@${DIGEST}"
+          cosign attest --type cyclonedx --predicate sbom.cdx.json --yes "${IMAGE}"
+
+      - name: Attest build provenance (SLSA)
+        if: github.event_name != 'pull_request'
+        uses: actions/attest-build-provenance@96b4a1ef7235a096b17240c259729fdd70c83d45  # v2
+        with:
+          subject-name: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          subject-digest: ${{ steps.build-push.outputs.digest }}
+          push-to-registry: true
+
+      - name: Build summary
+        if: github.event_name != 'pull_request'
+        env:
+          REF_NAME: ${{ github.ref_name }}
+          REGISTRY: ${{ env.REGISTRY }}
+          IMAGE_NAME: ${{ env.IMAGE_NAME }}
+        run: |
+          echo "## 🎉 Build Successful!" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Version:** \`${REF_NAME}\`" >> $GITHUB_STEP_SUMMARY
+          echo "**Image:** \`${REGISTRY}/${IMAGE_NAME}:${REF_NAME}\`" >> $GITHUB_STEP_SUMMARY
+          echo "**Platforms:** \`linux/amd64\`, \`linux/arm64\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 🐳 Pull Command" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`bash" >> $GITHUB_STEP_SUMMARY
+          echo "docker pull ${REGISTRY}/${IMAGE_NAME}:${REF_NAME}" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
