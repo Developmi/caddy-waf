@@ -49,3 +49,14 @@ build/
 cosign.key
 *.attestation
 sbom.*.json
+
+# AI Agent artifacts
+.atl*
+
+# Dev tooling
+tools/
+Makefile
+pyproject.toml
+uv.lock
+.yamllint.yml
+.python-version

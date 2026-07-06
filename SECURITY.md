@@ -15,7 +15,7 @@ The image is rebuilt with updated base images and plugin versions on a regular c
 **Do not open a public GitHub issue for security vulnerabilities.**
 
 Report vulnerabilities privately via one of these channels:
-- **GitHub Security Advisories:** [Report a vulnerability](https://github.com/Miguel-DevOps/caddy-waf/security/advisories/new)
+- **GitHub Security Advisories:** [Report a vulnerability](https://github.com/Developmi/caddy-waf/security/advisories/new)
 - **Email:** miguel@developmi.com — encrypt with PGP if the finding is critical.
 
 Include in your report:
@@ -49,7 +49,7 @@ Verify the image signature before pulling in production:
 
 ```bash
 cosign verify \
-  --certificate-identity "https://github.com/Miguel-DevOps/caddy-waf/.github/workflows/docker-build-scan-sign.yml@refs/heads/main" \
+  --certificate-identity "https://github.com/Developmi/caddy-waf/.github/workflows/docker-build-scan-sign.yml@refs/heads/main" \
   --certificate-oidc-issuer "https://token.actions.githubusercontent.com" \
-  ghcr.io/miguel-devops/caddy-waf@sha256:<digest>
+  ghcr.io/developmi/caddy-waf@sha256:<digest>
 ```

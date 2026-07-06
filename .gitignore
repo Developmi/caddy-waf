@@ -63,3 +63,12 @@ node_modules/
 .next/
 .nuxt/
 .output/
+
+# Internal AI Agents
+.aider*
+.codegraph*
+.atl*
+graphify-out/
+
+# Bin Tools for linting
+tools/bin/

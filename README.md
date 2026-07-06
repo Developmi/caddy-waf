@@ -6,17 +6,16 @@
 
 _Protect your web applications with enterprise-grade WAF in under 5 minutes — eliminate false-positive risk during deployment and slash SOC2 audit prep time._
 
-[![Tech](https://img.shields.io/badge/Caddy_v2.11_|_Coraza_v2.2.0-green?style=for-the-badge&logo=caddy&logoColor=white)](https://caddyserver.com)
+[![Tech](https://img.shields.io/badge/Caddy_v2.11.4_|_Coraza_v2.5.0-green?style=for-the-badge&logo=caddy&logoColor=white)](https://caddyserver.com)
 [![Docker](https://img.shields.io/badge/Docker_|_READY-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://hub.docker.com)
-[![CI](https://img.shields.io/badge/CI-Passing-brightgreen?style=for-the-badge&logo=githubactions&logoColor=white)](https://github.com/Miguel-DevOps/caddy-waf/actions)
-[![Supply Chain](https://img.shields.io/badge/Supply_Chain-Cosign_|_Trivy-4A90D9?style=for-the-badge)](https://github.com/Miguel-DevOps/caddy-waf/actions)
-[![Status](https://img.shields.io/badge/Status-Production_Active-brightgreen?style=for-the-badge)](https://github.com/Miguel-DevOps/caddy-waf/pkgs/container/caddy-waf)
+[![CI](https://img.shields.io/badge/CI-Passing-brightgreen?style=for-the-badge&logo=githubactions&logoColor=white)](https://github.com/developmi/caddy-waf/actions)
+[![Supply Chain](https://img.shields.io/badge/Supply_Chain-Cosign_|_Trivy-4A90D9?style=for-the-badge)](https://github.com/developmi/caddy-waf/actions)
+[![Status](https://img.shields.io/badge/Status-Production_Active-brightgreen?style=for-the-badge)](https://github.com/developmi/caddy-waf/pkgs/container/caddy-waf)
 [![License](https://img.shields.io/badge/License-MIT_©_Miguel_Lozano_|_Developmi-blue?style=for-the-badge)](LICENSE)
 [![OpenSSF Best Practices](https://img.shields.io/badge/OpenSSF-Best_Practices_In_Progress-orange?style=for-the-badge)](https://www.bestpractices.dev/en/criteria)
+![Maintainer](https://img.shields.io/badge/Maintainer-Miguel_Lozano_|_Cloud_&_Infrastructure_Engineer-black?style=for-the-badge)
 
-![Maintainer](https://img.shields.io/badge/Maintainer-Miguel_Lozano-black?style=for-the-badge)![Role](https://img.shields.io/badge/Cloud_&_Infrastructure_Engineer-333?style=for-the-badge)
-
-> **Developmi Enterprise Edition** • Curated by [Miguel Lozano](https://developmi.com) • [GitHub](https://github.com/Miguel-DevOps) • [Container Registry](https://github.com/Miguel-DevOps/caddy-waf/pkgs/container/caddy-waf)
+> Curated by [Miguel Lozano](https://developmi.com) • [GitHub](https://github.com/developmi) • [Container Registry](https://github.com/developmi/caddy-waf/pkgs/container/caddy-waf)
 
 </div>
 
@@ -32,6 +31,7 @@ _Protect your web applications with enterprise-grade WAF in under 5 minutes — 
 - [Testing & Validation](#-testing--validation)
 - [Monitoring & Observability](#-monitoring--observability)
 - [Security](#-security)
+- [Security Advisory](#-security-advisory)
 - [Changelog](#-changelog)
 - [Contributing](#-contributing)
 - [License](#-license)
@@ -45,6 +45,8 @@ _Protect your web applications with enterprise-grade WAF in under 5 minutes — 
 
 **This project solves that.** It packages Caddy — the web server that automatically provisions TLS — with Coraza WAF and the OWASP Core Rule Set into a single hardened container. The WAF defaults to **DetectionOnly mode**, giving you a safe observation window before enforcement. You get 290+ protection rules covering SQL injection, XSS, command injection, and the entire OWASP Top 10 — without blocking a single legitimate request until you're ready.
 
+Starting from v3.0.0, the image ships with updated Caddy 2.11.4, official upstream rate limiting and DNS plugins, and native security header support — giving the project full control over maintenance cadence, security patches, and feature development.
+
 ### ✨ Features
 
 #### 🔒 Security First
@@ -55,11 +57,12 @@ _Protect your web applications with enterprise-grade WAF in under 5 minutes — 
 - **Structured logging**: JSON logs for SIEM integration
 
 #### 🛡️ WAF Capabilities
-- **Coraza WAF v2.2.0**: Modern, high-performance web application firewall engine
-- **OWASP CRS v4.23.0**: Latest Core Rule Set with 290+ protection rules
+- **Coraza WAF v2.5.0**: Modern, high-performance web application firewall engine
+- **OWASP CRS v4.28.0**: Latest Core Rule Set with 290+ protection rules
 - **DetectionOnly by default**: Prevents false positives in new deployments
 - **Audit logging**: JSON audit logs to stdout for easy monitoring
-- **Rate limiting**: Built-in rate limiting plugin for DDoS protection
+- **Rate limiting**: Built-in rate limiting via `mholt/caddy-ratelimit`
+- **Security headers**: Automated security header injection via Caddy's native `header` directive
 
 #### 🚀 Production Ready
 - **Optimized Alpine base**: Small footprint (~45MB compressed)
@@ -78,7 +81,7 @@ _Protect your web applications with enterprise-grade WAF in under 5 minutes — 
 
 ### 1. Pull the Image
 ```bash
-docker pull ghcr.io/miguel-devops/caddy-waf:v2.0.0
+docker pull ghcr.io/developmi/caddy-waf:v3.0.0
 ```
 
 ### 2. Create Environment File
@@ -96,7 +99,7 @@ cp Caddyfile.example Caddyfile
 ### 4. Build Your Custom Image (Recommended for your own distribution)
 ```bash
 docker build -t your-registry/your-caddy-waf:custom \
-  --build-arg CORAZA_CADDY_REF=v2.2.0 \
+  --build-arg CORAZA_CADDY_REF=v2.5.0 \
   --build-arg CADDY_RATELIMIT_REF=v0.1.0 \
   --build-arg CADDY_DNS_CLOUDFLARE_REF=v0.2.3 \
   .
@@ -140,6 +143,7 @@ caddy-waf/
 ├── CHANGELOG.md              # Version history (Keep a Changelog)
 ├── CONTRIBUTING.md           # Contribution guidelines
 ├── SECURITY.md               # Vulnerability disclosure policy
+├── SECURITY_ADVISORY.md      # CVE advisories and fixed versions
 └── LICENSE                   # MIT License
 ```
 
@@ -147,9 +151,9 @@ caddy-waf/
 
 ```mermaid
 flowchart LR
-    Client[Client] -->|HTTPS :443| Caddy[Caddy v2.11]
-    Caddy -->|WAF layer| Coraza[Coraza WAF v2.2.0]
-    Coraza -->|OWASP CRS v4.23.0| Rules[290+ Rules]
+    Client[Client] -->|HTTPS :443| Caddy[Caddy v2.11.4]
+    Caddy -->|WAF layer| Coraza[Coraza WAF v2.5.0]
+    Coraza -->|OWASP CRS v4.28.0| Rules[290+ Rules]
     Coraza -->|Decision| Action{Allow?}
     Action -->|Yes| Backend[Upstream Backend]
     Action -->|No| Block[Block + Audit Log]
@@ -223,7 +227,7 @@ volumes:
 ### Environment Variables
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `CADDY_WAF_IMAGE` | `ghcr.io/miguel-devops/caddy-waf:v2.0.0` | Caddy WAF image reference |
+| `CADDY_WAF_IMAGE` | `ghcr.io/developmi/caddy-waf:v3.0.0` | Caddy WAF image reference |
 | `EXAMPLE_APP_IMAGE` | `containous/whoami:latest` | Demo backend image |
 | `SITE_ADDRESS` | `localhost` | Site address/server name used by Caddy |
 | `BACKEND_UPSTREAM` | `example-app:80` | Reverse proxy backend upstream |
@@ -231,9 +235,14 @@ volumes:
 | `CADDY_ADAPTER` | `caddyfile` | Configuration adapter to use |
 
 ### Plugins Included
-- `github.com/corazawaf/coraza-caddy/v2@v2.2.0` — Coraza WAF integration
+- `github.com/corazawaf/coraza-caddy/v2@v2.5.0` — Coraza WAF integration
 - `github.com/mholt/caddy-ratelimit@v0.1.0` — Rate limiting (DDoS protection)
+
+> **Note:** `caddy-ratelimit` has no release tags beyond `v0.1.0`. This image pins the module by commit SHA (`5625512`) to track the latest verified code. See [Dockerfile](./Dockerfile) for the pinned reference.
+
 - `github.com/caddy-dns/cloudflare@v0.2.3` — Cloudflare DNS for ACME challenges
+
+> **Security headers** are handled via Caddy's native `header` directive — no external plugin needed.
 
 ---
 
@@ -250,7 +259,7 @@ docker compose up -d
 ### Build from source
 ```bash
 docker build \
-  --build-arg CORAZA_CADDY_REF=v2.2.0 \
+  --build-arg CORAZA_CADDY_REF=v2.5.0 \
   --build-arg CADDY_RATELIMIT_REF=v0.1.0 \
   --build-arg CADDY_DNS_CLOUDFLARE_REF=v0.2.3 \
   -t caddy-waf:custom .
@@ -270,9 +279,9 @@ Verify the image signature before pulling in production:
 
 ```bash
 cosign verify \
-  --certificate-identity "https://github.com/Miguel-DevOps/caddy-waf/.github/workflows/docker-build-scan-sign.yml@refs/heads/main" \
+  --certificate-identity "https://github.com/developmi/caddy-waf/.github/workflows/docker-build-scan-sign.yml@refs/heads/main" \
   --certificate-oidc-issuer "https://token.actions.githubusercontent.com" \
-  ghcr.io/miguel-devops/caddy-waf@sha256:<digest>
+  ghcr.io/developmi/caddy-waf@sha256:<digest>
 ```
 
 > **Tip:** Use immutable image digests (`@sha256:...`) instead of version tags in production for deterministic deployments.
@@ -296,10 +305,10 @@ curl -I https://yourdomain.com
 ### Security Scanning
 ```bash
 # Scan image with Trivy
-docker run --rm aquasec/trivy image ghcr.io/miguel-devops/caddy-waf:v2.0.0
+docker run --rm aquasec/trivy image ghcr.io/developmi/caddy-waf:v3.0.0
 
 # Scan with Docker Scout
-docker scout quickview ghcr.io/miguel-devops/caddy-waf:v2.0.0
+docker scout quickview ghcr.io/developmi/caddy-waf:v3.0.0
 ```
 
 ---
@@ -345,8 +354,15 @@ See [SECURITY.md](./SECURITY.md) for:
 
 | Version | Supported |
 |---------|-----------|
-| 2.0.x   | ✅ Yes    |
+| 3.0.x   | ✅ Yes    |
+| 2.0.x   | ❌ No     |
 | 1.0.x   | ❌ No     |
+
+---
+
+## 📋 Security Advisory
+
+See [SECURITY_ADVISORY.md](./SECURITY_ADVISORY.md) for details on CVEs resolved in this release.
 
 ---
 
@@ -357,7 +373,7 @@ The project follows [Keep a Changelog](https://keepachangelog.com/) and [Semanti
 
 | Version | Date | Highlights |
 |---------|------|------------|
-| [Unreleased] | — | Cosign signing, Trivy scanning, audit improvements |
+| [3.0.0](./CHANGELOG.md#300--2026-07-01) | 2026-07-01 | Caddy 2.11.4 upgrade, Official upstream plugins, CVE fixes, security headers plugin |
 | [2.0.0](./CHANGELOG.md#200--2026-03-14) | 2026-03-14 | Security hardening, systemd, OCI labels, CI updates |
 | [1.0.0](./CHANGELOG.md#100--2026-02-09) | 2026-02-09 | Initial release with Coraza WAF + OWASP CRS |
 
@@ -369,7 +385,7 @@ Contributions are welcome. Please read [CONTRIBUTING.md](./CONTRIBUTING.md) befo
 This project follows [Conventional Commits](https://www.conventionalcommits.org/) and the Developmi engineering standard.
 
 ### Quick links
-- **Report a bug or request a feature:** [GitHub Issues](https://github.com/Miguel-DevOps/caddy-waf/issues)
+- **Report a bug or request a feature:** [GitHub Issues](https://github.com/developmi/caddy-waf/issues)
 - **Advanced configuration:** [TUNING.md](TUNING.md)
 - **Roadmap:** [ROADMAP.md](ROADMAP.md)
 
@@ -377,7 +393,7 @@ This project follows [Conventional Commits](https://www.conventionalcommits.org/
 For enterprise support, custom configurations, or security consulting:
 - **Website:** [developmi.com](https://developmi.com)
 - **Email:** miguel@developmi.com
-- **GitHub:** [Miguel-DevOps](https://github.com/Miguel-DevOps)
+- **GitHub:** [developmi](https://github.com/developmi)
 
 ---
 
@@ -402,7 +418,7 @@ Licensed under the [MIT License](./LICENSE).
 - **Role:** Cloud & Infrastructure Engineer | FinOps & Bare Metal Specialist | AI Sovereignty Strategist under NIST/DORA Standards
 - **Philosophy:** _Security is not a feature; it is the baseline._
 - **Website:** [developmi.com](https://developmi.com)
-- **GitHub:** [Miguel-DevOps](https://github.com/Miguel-DevOps)
+- **GitHub:** [developmi](https://github.com/developmi)
 - **LinkedIn:** [Miguel Lozano](https://www.linkedin.com/in/miguel-dev-ops)
 
 ---

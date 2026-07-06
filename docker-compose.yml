@@ -1,9 +1,9 @@
 # Docker Compose example for Caddy WAF
-# Documentation: https://github.com/Miguel-DevOps/caddy-waf
+# Documentation: https://github.com/Developmi/caddy-waf
 
 services:
   caddy-waf:
-    image: ${CADDY_WAF_IMAGE:-ghcr.io/miguel-devops/caddy-waf:v1.0.0}
+    image: ${CADDY_WAF_IMAGE:-ghcr.io/developmi/caddy-waf:v3.0.0}
     container_name: caddy-waf
     user: "1337:1337"
     restart: unless-stopped

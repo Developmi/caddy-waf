@@ -6,7 +6,7 @@ Thank you for your interest in contributing. This project follows the Developmi 
 
 ```bash
 # Clone the repository
-git clone https://github.com/Miguel-DevOps/caddy-waf.git
+git clone https://github.com/Developmi/caddy-waf.git
 cd caddy-waf
 
 # Copy the environment template
@@ -54,7 +54,7 @@ ci/update-workflow
 
 ## Reporting issues
 
-Use [GitHub Issues](https://github.com/Miguel-DevOps/caddy-waf/issues). Include:
+Use [GitHub Issues](https://github.com/Developmi/caddy-waf/issues). Include:
 - Steps to reproduce
 - Expected vs. actual behavior
 - Caddy version, Docker version, and platform (linux/amd64, linux/arm64)

@@ -2,7 +2,7 @@
 # ===============================================
 # This is a template configuration with WAF in DetectionOnly mode.
 # Replace placeholders and adjust for your production environment.
-# Documentation: https://github.com/Miguel-DevOps/caddy-waf
+# Documentation: https://github.com/Developmi/caddy-waf
 
 # Global configuration
 {
