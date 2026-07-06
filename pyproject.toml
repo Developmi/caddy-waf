@@ -1,0 +1,13 @@
+[project]
+name = "caddy-waf"
+version = "3.0.0"
+description = "Production-ready Caddy image with Coraza WAF and OWASP CRS."
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = []
+
+[dependency-groups]
+dev = [
+    "yamllint>=1.38.0",
+    "zizmor>=1.26.1",
+]
