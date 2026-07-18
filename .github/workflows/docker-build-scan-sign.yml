@@ -59,16 +59,33 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
 
       # ponytail: amd64-only scan. CRITICAL/HIGH vulns are arch-independent
-      - name: Scan built image with Trivy (fail on CRITICAL/HIGH)
-        uses: aquasecurity/trivy-action@a9c7b0f06e461e9d4b4d1711f154ee024b8d7ab8 # v0.36.0
+      - name: Install Trivy
+        uses: aquasecurity/setup-trivy@81e514348e19b6112ce2a7e3ecbafe19c1e1f567 # v0.3.1
         with:
-          image-ref: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}-scan
-          scanners: vuln
-          format: sarif
-          output: trivy-results.sarif
-          exit-code: 1
-          severity: CRITICAL,HIGH
-          ignore-unfixed: true
+          version: v0.72.0
+          cache: true
+
+      - name: Generate Trivy SARIF report
+        continue-on-error: true
+        run: |
+          trivy image \
+            --scanners vuln \
+            --severity CRITICAL,HIGH \
+            --ignore-unfixed \
+            --skip-version-check \
+            --format sarif \
+            --output trivy-results.sarif \
+            "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}-scan"
+
+      - name: Scan with Trivy (gate — fail on CRITICAL/HIGH)
+        run: |
+          trivy image \
+            --scanners vuln \
+            --severity CRITICAL,HIGH \
+            --ignore-unfixed \
+            --skip-version-check \
+            --exit-code 1 \
+            "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}-scan"
 
       - name: Upload Trivy SARIF
         if: (!cancelled()) && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
@@ -138,13 +155,16 @@ jobs:
           REGISTRY: ${{ env.REGISTRY }}
           IMAGE_NAME: ${{ env.IMAGE_NAME }}
         run: |
-          echo "## 🎉 Build Successful!" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Version:** \`${REF_NAME}\`" >> $GITHUB_STEP_SUMMARY
-          echo "**Image:** \`${REGISTRY}/${IMAGE_NAME}:${REF_NAME}\`" >> $GITHUB_STEP_SUMMARY
-          echo "**Platforms:** \`linux/amd64\`, \`linux/arm64\`" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### 🐳 Pull Command" >> $GITHUB_STEP_SUMMARY
-          echo "\`\`\`bash" >> $GITHUB_STEP_SUMMARY
-          echo "docker pull ${REGISTRY}/${IMAGE_NAME}:${REF_NAME}" >> $GITHUB_STEP_SUMMARY
-          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          SUMMARY="$GITHUB_STEP_SUMMARY"
+          {
+            echo "## 🎉 Build Successful!"
+            echo ""
+            echo "**Version:** \`${REF_NAME}\`"
+            echo "**Image:** \`${REGISTRY}/${IMAGE_NAME}:${REF_NAME}\`"
+            echo "**Platforms:** \`linux/amd64\`, \`linux/arm64\`"
+            echo ""
+            echo "### 🐳 Pull Command"
+            echo "\`\`\`bash"
+            echo "docker pull ${REGISTRY}/${IMAGE_NAME}:${REF_NAME}"
+            echo "\`\`\`"
+          } >> "$SUMMARY"
