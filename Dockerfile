@@ -33,6 +33,9 @@ LABEL waf.owasp-crs.version="4.28.0"
 # Copy the custom binary
 COPY --from=builder /usr/bin/caddy /usr/bin/caddy
 
+# Upgrade base image packages — fix CVEs in c-ares, curl, libcurl
+RUN apk upgrade --no-cache c-ares curl libcurl
+
 # --- WAF SETUP ---
 
 # Validate this checksum from Coraza upstream before each release.

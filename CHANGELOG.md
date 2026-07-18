@@ -10,6 +10,9 @@ Format: [Keep a Changelog](https://keepachangelog.com/) · Versioning: [SemVer](
 - Docker Compose test override (`docker-compose.test.yml`) - builds locally, runs on port 9090.
 - `make doctor` now reports go-ftw version.
 
+### Fixed
+- Upgraded `c-ares`, `curl`, `libcurl` in base image (5 HIGH CVEs: CVE-2026-33630, CVE-2026-5773, CVE-2026-6276).
+
 ### Changed
 - **caddy-dns/cloudflare**: upgraded from v0.2.3 to **v0.2.4** - fixes compatibility with Cloudflare API tokens using `cfut_` / `cfat_` prefix.
 - Unified SECURITY.md (policy + resolved CVEs). Removed SECURITY_ADVISORY.md.
