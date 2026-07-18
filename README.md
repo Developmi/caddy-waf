@@ -4,7 +4,7 @@
 
 # Caddy WAF | Developmi
 
-_Protect your web applications with enterprise-grade WAF in under 5 minutes — eliminate false-positive risk during deployment and slash SOC2 audit prep time._
+_Protect your web applications with enterprise-grade WAF in under 5 minutes - eliminate false-positive risk during deployment and slash SOC2 audit prep time._
 
 [![Tech](https://img.shields.io/badge/Caddy_v2.11.4_|_Coraza_v2.5.0-green?style=for-the-badge&logo=caddy&logoColor=white)](https://caddyserver.com)
 [![Docker](https://img.shields.io/badge/Docker_|_READY-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://hub.docker.com)
@@ -31,7 +31,6 @@ _Protect your web applications with enterprise-grade WAF in under 5 minutes — 
 - [Testing & Validation](#-testing--validation)
 - [Monitoring & Observability](#-monitoring--observability)
 - [Security](#-security)
-- [Security Advisory](#-security-advisory)
 - [Changelog](#-changelog)
 - [Contributing](#-contributing)
 - [License](#-license)
@@ -43,14 +42,14 @@ _Protect your web applications with enterprise-grade WAF in under 5 minutes — 
 
 **Problem:** Deploying a web application firewall typically requires weeks of tuning, dedicated appliances, and specialized security expertise. Most WAF solutions block legitimate traffic on day one, disrupting your users and forcing you to disable protections you just deployed.
 
-**This project solves that.** It packages Caddy — the web server that automatically provisions TLS — with Coraza WAF and the OWASP Core Rule Set into a single hardened container. The WAF defaults to **DetectionOnly mode**, giving you a safe observation window before enforcement. You get 290+ protection rules covering SQL injection, XSS, command injection, and the entire OWASP Top 10 — without blocking a single legitimate request until you're ready.
+**This project solves that.** It packages Caddy - the web server that automatically provisions TLS - with Coraza WAF and the OWASP Core Rule Set into a single hardened container. The WAF defaults to **DetectionOnly mode**, giving you a safe observation window before enforcement. You get 290+ protection rules covering SQL injection, XSS, command injection, and the entire OWASP Top 10 - without blocking a single legitimate request until you're ready.
 
-Starting from v3.0.0, the image ships with updated Caddy 2.11.4, official upstream rate limiting and DNS plugins, and native security header support — giving the project full control over maintenance cadence, security patches, and feature development.
+Starting from v3.0.0, the image ships with updated Caddy 2.11.4, official upstream rate limiting and DNS plugins, and native security header support - giving the project full control over maintenance cadence, security patches, and feature development.
 
 ### ✨ Features
 
 #### 🔒 Security First
-- **Non-root execution**: Runs as `caddy` user (UID 1337) — no root privileges
+- **Non-root execution**: Runs as `caddy` user (UID 1337) - no root privileges
 - **Supply chain security**: Pinned versions, SHA256 verification of OWASP CRS rules, Cosign-signed images, SBOM attestations
 - **Multi-stage builds**: Minimal attack surface, optimized layers
 - **Health monitoring**: Process verification healthcheck at both image and compose level
@@ -100,8 +99,8 @@ cp Caddyfile.example Caddyfile
 ```bash
 docker build -t your-registry/your-caddy-waf:custom \
   --build-arg CORAZA_CADDY_REF=v2.5.0 \
-  --build-arg CADDY_RATELIMIT_REF=v0.1.0 \
-  --build-arg CADDY_DNS_CLOUDFLARE_REF=v0.2.3 \
+  --build-arg CADDY_RATELIMIT_REF=5625512 \
+  --build-arg CADDY_DNS_CLOUDFLARE_REF=v0.2.4 \
   .
 ```
 
@@ -143,7 +142,6 @@ caddy-waf/
 ├── CHANGELOG.md              # Version history (Keep a Changelog)
 ├── CONTRIBUTING.md           # Contribution guidelines
 ├── SECURITY.md               # Vulnerability disclosure policy
-├── SECURITY_ADVISORY.md      # CVE advisories and fixed versions
 └── LICENSE                   # MIT License
 ```
 
@@ -168,8 +166,8 @@ flowchart LR
 ### WAF Modes
 The WAF operates in three modes (configured in Caddyfile):
 
-1. **DetectionOnly** (Default): Logs attacks without blocking — perfect for initial deployment
-2. **On**: Active protection — blocks malicious requests
+1. **DetectionOnly** (Default): Logs attacks without blocking - perfect for initial deployment
+2. **On**: Active protection - blocks malicious requests
 3. **Off**: Disables WAF completely
 
 > **Recommended rollout:** Keep `SecRuleEngine DetectionOnly` for a 7–14 day observation window. Review audit logs, tune CRS exclusions, then switch to `SecRuleEngine On` only after establishing a stable false-positive baseline.
@@ -235,14 +233,14 @@ volumes:
 | `CADDY_ADAPTER` | `caddyfile` | Configuration adapter to use |
 
 ### Plugins Included
-- `github.com/corazawaf/coraza-caddy/v2@v2.5.0` — Coraza WAF integration
-- `github.com/mholt/caddy-ratelimit@v0.1.0` — Rate limiting (DDoS protection)
+- `github.com/corazawaf/coraza-caddy/v2@v2.5.0` - Coraza WAF integration
+- `github.com/mholt/caddy-ratelimit@v0.1.0` - Rate limiting (DDoS protection)
 
-> **Note:** `caddy-ratelimit` has no release tags beyond `v0.1.0`. This image pins the module by commit SHA (`5625512`) to track the latest verified code. See [Dockerfile](./Dockerfile) for the pinned reference.
+> **Note:** `caddy-ratelimit` development is active but releases are not tagged beyond `v0.1.0`. This image pins the module by commit SHA (`5625512`) to include post-tag fixes. See [Dockerfile](./Dockerfile) for the pinned reference.
 
-- `github.com/caddy-dns/cloudflare@v0.2.3` — Cloudflare DNS for ACME challenges
+- `github.com/caddy-dns/cloudflare@v0.2.4` - Cloudflare DNS for ACME challenges
 
-> **Security headers** are handled via Caddy's native `header` directive — no external plugin needed.
+> **Security headers** are handled via Caddy's native `header` directive - no external plugin needed.
 
 ---
 
@@ -260,8 +258,8 @@ docker compose up -d
 ```bash
 docker build \
   --build-arg CORAZA_CADDY_REF=v2.5.0 \
-  --build-arg CADDY_RATELIMIT_REF=v0.1.0 \
-  --build-arg CADDY_DNS_CLOUDFLARE_REF=v0.2.3 \
+  --build-arg CADDY_RATELIMIT_REF=5625512 \
+  --build-arg CADDY_DNS_CLOUDFLARE_REF=v0.2.4 \
   -t caddy-waf:custom .
 ```
 
@@ -334,9 +332,9 @@ docker scout quickview ghcr.io/developmi/caddy-waf:v3.0.0
 ```
 
 ### WAF Metrics to Monitor
-- `coraza_waf_processed_total` — Total requests processed
-- `coraza_waf_blocked_total` — Requests blocked by WAF
-- `coraza_waf_rules_triggered` — Rules triggered (by ID)
+- `coraza_waf_processed_total` - Total requests processed
+- `coraza_waf_blocked_total` - Requests blocked by WAF
+- `coraza_waf_rules_triggered` - Rules triggered (by ID)
 
 ---
 
@@ -362,7 +360,11 @@ See [SECURITY.md](./SECURITY.md) for:
 
 ## 📋 Security Advisory
 
-See [SECURITY_ADVISORY.md](./SECURITY_ADVISORY.md) for details on CVEs resolved in this release.
+Security advisories and resolved CVEs are documented in [SECURITY.md](./SECURITY.md#resolved-cves).
+
+---
+
+
 
 ---
 
@@ -404,10 +406,10 @@ Licensed under the [MIT License](./LICENSE).
 
 ## 🙏 Acknowledgments
 
-- [Caddy Server](https://caddyserver.com) — Amazing web server with automatic HTTPS
-- [Coraza WAF](https://coraza.io) — Enterprise-grade WAF engine
-- [OWASP Core Rule Set](https://coreruleset.org) — Industry-standard protection rules
-- [Developmi](https://developmi.com) — DevOps & Security consulting
+- [Caddy Server](https://caddyserver.com) - Amazing web server with automatic HTTPS
+- [Coraza WAF](https://coraza.io) - Enterprise-grade WAF engine
+- [OWASP Core Rule Set](https://coreruleset.org) - Industry-standard protection rules
+- [Developmi](https://developmi.com) - DevOps & Security consulting
 
 ---
 

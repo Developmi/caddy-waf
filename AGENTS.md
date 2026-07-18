@@ -20,30 +20,29 @@
 - **CodeGraph indexed**: yes
 - **Graphify indexed**: yes (graphify-out/ present)
 - **Testing framework**: none (manual validation only)
-- **Strict TDD**: disabled — no test runner detected
+- **Strict TDD**: disabled - no test runner detected
 - **Quality tools**: Trivy (container scanning) | Cosign (signing) | Syft (SBOM)
 
 ## Security Posture
-- **License**: MIT — fully open source
+- **License**: MIT - fully open source
 - **Maintainer**: Miguel Lozano / Developmi
 - **User**: Non-root caddy (UID 1337)
 - **Hardening**: read_only rootfs, cap_drop ALL, no-new-privileges, tmpfs noexec
 - **Supply chain**: Cosign keyless signing, Trivy CRITICAL/HIGH gate, SBOM attestations
-- **⚠️ SHA256 verification**: placeholder `REPLACE_BEFORE_BUILD` in Dockerfile — not actually enforced
-- **CVEs resolved**: CVE-2026-27590 (9.1), CVE-2026-30851 (8.8), CVE-2026-27587 (9.1)
+- **⚠️ SHA256 verification**: placeholder `REPLACE_BEFORE_BUILD` in Dockerfile - not actually enforced
+- **CVEs resolved**: CVE-2026-27590 (9.1), CVE-2026-27587 (9.1), CVE-2026-27588 (8.8), CVE-2026-30851 (8.8), CVE-2026-52845 (8.1), CVE-2026-27586 (7.5), CVE-2026-52844 (7.5), CVE-2026-27585 (6.5), CVE-2026-27589 (6.1)
 
 ## CI/CD
-- **Primary**: `docker-build-scan-sign.yml` — scan → sign → push (multi-arch amd64+arm64)
-- **Legacy**: `build-push.yml` — direct push on tags (no security checks)
+- **Workflow**: `docker-build-scan-sign.yml` - scan → sign → push (multi-arch amd64+arm64, tag-triggered only)
 - **Registry**: `ghcr.io/developmi/caddy-waf`
-- **Triggers**: push to main, tags v*, PRs to main
+- **Triggers**: tags v* (releases) + PRs to main (validation)
 - **Scan gate**: Trivy fails build on CRITICAL/HIGH (ignores unfixed)
 
 ## Conventions
 - Commit style: Conventional Commits (`feat:`, `fix:`, `docs:`, `chore:`, `ci:`)
-- Versioning: Semantic Versioning (v3.0.0 current)
+- Versioning: Semantic Versioning (v3.1.0 current)
 - Branch naming: `feat/desc`, `fix/desc`, `docs/desc`, `chore/desc`, `ci/desc`
-- No tests — manual validation via `docker compose up`
+- No tests - manual validation via `docker compose up`
 - WAF default: DetectionOnly (change to On after 7-14 day observation window)
 
 ## Key Gotchas
@@ -51,7 +50,7 @@
 - Environment variables drive site address and backend upstream
 - Deployment modes: Docker Compose (default), systemd (bare-metal), Kubernetes (planned)
 - `caddy-ratelimit` pinned by commit SHA (no version tags beyond v0.1.0)
-- CI runs duplicate builds on tag push (both workflows trigger) — ponytail: consolidate
+- `caddy-dns/cloudflare` v0.2.4 fixes Cloudflare API token format (`cfut_`) - DO NOT use < v0.2.3 with new tokens
 
 ## Pre-Resolved Context (auto-populated by orchestrator)
 This section is populated by the orchestrator before launching sub-agents.

@@ -25,12 +25,19 @@ help:
 	@echo "  make lint-docker    Lint Dockerfile"
 	@echo "  make lint-security  Lint GitHub Actions security"
 	@echo ""
+	@echo "Testing"
+	@echo "-------"
+	@echo "  make test           Run all checks (lint + WAF integration)"
+	@echo "  make test-waf       Run WAF integration tests against live container"
+	@echo "  make test-clean     Clean up leftover test containers"
+	@echo ""
 
 .PHONY: tools
 tools:
 	@ACTIONLINT_VERSION=$(ACTIONLINT_VERSION) \
 	HADOLINT_VERSION=$(HADOLINT_VERSION) \
 	GOLANGCI_VERSION=$(GOLANGCI_VERSION) \
+	GOFTW_VERSION=$(GOFTW_VERSION) \
 	./tools/install.sh
 	@echo "✓ Development tools are ready."
 
@@ -53,6 +60,7 @@ doctor:
 	@printf "%-18s %s\n" "golangci-lint" "$$($(TOOLS)/golangci-lint version | awk '{print $$4}')"
 	@printf "%-18s %s\n" "yamllint" "$$(uv run yamllint --version | awk '{print $$2}')"
 	@printf "%-18s %s\n" "zizmor" "$$(uv run zizmor --version | awk '{print $$2}')"
+	@printf "%-18s %s\n" "go-ftw" "$$($(TOOLS)/go-ftw --version 2>/dev/null | head -1 | awk '{print $$3}' || echo 'not installed')"
 	@echo
 
 .PHONY: lint
@@ -86,3 +94,14 @@ lint-security:
 	@echo "==> Security"
 	@$(UV) zizmor .
 	@echo "✓ Security lint passed."
+
+
+.PHONY: test test-waf test-clean
+test: lint test-waf                # Run all checks (lint + WAF integration)
+	@echo "✓ All tests passed."
+
+test-waf: tools                    # Run WAF integration tests against live container
+	@tools/test-integration.sh
+
+test-clean:                        # Force cleanup any leftover test containers
+	@docker compose -f docker-compose.yml -f docker-compose.test.yml down -v 2>/dev/null || true

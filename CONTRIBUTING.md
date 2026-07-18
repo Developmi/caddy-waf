@@ -16,7 +16,7 @@ cp .env.example .env
 cp Caddyfile.example Caddyfile
 ```
 
-No additional dependencies are required — the project uses Docker and Docker Compose for all operations.
+No additional dependencies are required - the project uses Docker and Docker Compose for all operations.
 
 ## Commit standard
 
@@ -49,7 +49,7 @@ ci/update-workflow
 4. Ensure any new environment variables are documented in `.env.example`.
 5. Update documentation if your change affects public behavior.
 6. Open a PR with a clear title following the commit standard.
-7. CI will automatically build, scan, and sign the image on merge to `main`.
+7. CI will automatically build and scan the image on PR. For releases, CI runs on tag push (`v*`) - the full pipeline builds, scans, signs, and pushes to GHCR.
 8. A maintainer will review within 5 business days.
 
 ## Reporting issues
@@ -63,3 +63,15 @@ Use [GitHub Issues](https://github.com/Developmi/caddy-waf/issues). Include:
 ## Code of conduct
 
 This project adheres to the [Contributor Covenant](https://www.contributor-covenant.org/version/2/1/code_of_conduct/).
+
+## Testing
+
+Before submitting a PR, run the full test suite:
+
+```bash
+make test         # runs lint + WAF integration tests
+```
+
+The WAF integration tests (`make test-waf`) start a test container with WAF in blocking mode, verify that CRS rules block SQLi/XSS/path traversal, and tear down automatically.
+
+Requires Docker and `make tools` to install `go-ftw` (the OWASP CRS testing framework).

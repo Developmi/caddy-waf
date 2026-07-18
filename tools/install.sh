@@ -38,6 +38,21 @@ download() {
     curl -fsSL "$1" -o "$2"
 }
 
+install_goftw() {
+    [[ "${REINSTALL:-}" = "1" ]] && rm -f "$BIN/go-ftw"
+    [[ -x "$BIN/go-ftw" ]] && return
+
+    INSTALLED=1
+    echo "Installing go-ftw..."
+
+    TMP="$(mktemp -d)"
+
+    curl -fsSL "https://github.com/coreruleset/go-ftw/releases/download/v${GOFTW_VERSION}/ftw_${GOFTW_VERSION}_${OS}_${ARCH}.tar.gz" | tar -xz -C "$TMP"
+
+    install "$TMP/ftw" "$BIN/go-ftw"
+    rm -rf "$TMP"
+}
+
 install_actionlint() {
 
     [[ "${REINSTALL:-}" = "1" ]] && rm -f "$BIN/actionlint"
@@ -114,6 +129,7 @@ install_golangci() {
 install_actionlint
 install_hadolint
 install_golangci
+install_goftw
 
 if [[ "$INSTALLED" -eq 1 ]]; then
     echo

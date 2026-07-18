@@ -3,11 +3,11 @@ FROM caddy:2.11.4-builder AS builder
 
 # Build args for deterministic plugin references.
 # coraza-caddy: https://github.com/corazawaf/coraza-caddy/releases/tag/v2.5.0
-# caddy-ratelimit: https://github.com/mholt/caddy-ratelimit (no release tags beyond v0.1.0 — pinned by commit SHA)
-# caddy-dns/cloudflare: https://github.com/caddy-dns/cloudflare/releases/tag/v0.2.3
+# caddy-ratelimit: https://github.com/mholt/caddy-ratelimit (no release tags beyond v0.1.0 - pinned by commit SHA)
+# caddy-dns/cloudflare: https://github.com/caddy-dns/cloudflare/releases/tag/v0.2.4
 ARG CORAZA_CADDY_REF=v2.5.0
 ARG CADDY_RATELIMIT_REF=5625512
-ARG CADDY_DNS_CLOUDFLARE_REF=v0.2.3
+ARG CADDY_DNS_CLOUDFLARE_REF=v0.2.4
 
 # Build Caddy with fully pinned plugin refs.
 RUN xcaddy build \
@@ -26,7 +26,7 @@ LABEL org.opencontainers.image.description="Production-ready Caddy web server wi
 LABEL org.opencontainers.image.licenses="MIT"
 LABEL maintainer="Miguel Lozano"
 LABEL vendor="Developmi"
-LABEL version="3.0.0"
+LABEL version="3.1.0"
 LABEL waf.coraza.version="2.5.0"
 LABEL waf.owasp-crs.version="4.28.0"
 

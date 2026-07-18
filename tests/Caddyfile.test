@@ -1,0 +1,32 @@
+{
+    order coraza_waf first
+    log {
+        output stdout
+        format json
+    }
+}
+
+(waf) {
+    coraza_waf {
+        directives `
+            Include /etc/caddy/coraza.conf
+            Include /etc/caddy/owasp-crs/crs-setup.conf
+            Include /etc/caddy/owasp-crs/rules/*.conf
+
+            # Testing mode: WAF blocks to validate CRS rules
+            SecRuleEngine On
+
+            # Audit logging
+            SecAuditEngine RelevantOnly
+            SecAuditLog /dev/stdout
+            SecAuditLogFormat JSON
+        `
+    }
+}
+
+:80 {
+    import waf
+
+    # ponytail: static OK response for testing. No backend needed.
+    respond "OK" 200
+}

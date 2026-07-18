@@ -1,0 +1,3 @@
+# go-ftw configuration for caddy-waf integration tests
+# Uses cloud mode - no WAF log file needed.
+# Test files define dest_addr + port directly.

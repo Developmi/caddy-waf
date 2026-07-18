@@ -1,0 +1,77 @@
+---
+meta:
+  author: "Developmi"
+  description: "caddy-waf baseline integration tests"
+  enabled: true
+  name: "caddy-waf-baseline"
+
+rule_id: 999001
+
+tests:
+  - test_title: "Legitimate GET request - WAF should allow"
+    test_id: 1
+    description: "A clean GET request validates container is healthy and WAF doesn't block normal traffic."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/"
+            method: "GET"
+            headers:
+              User-Agent: "caddy-waf-test/1.0"
+              Host: "localhost"
+          output:
+            status: [200]
+
+  - test_title: "SQL Injection via URL parameter - WAF should block"
+    test_id: 2
+    description: "CRS rule 942100. Classic '1=1' tautology in query string should trigger a 403."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/?id=1'+OR+'1'='1"
+            method: "GET"
+            headers:
+              User-Agent: "caddy-waf-test/1.0"
+              Host: "localhost"
+          output:
+            status: [403]
+
+  - test_title: "Cross-Site Scripting (XSS) - WAF should block"
+    test_id: 3
+    description: "CRS rule 941100. A <script> tag in query string triggers 403."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/?q=<script>alert(document.cookie)</script>"
+            method: "GET"
+            headers:
+              User-Agent: "caddy-waf-test/1.0"
+              Host: "localhost"
+          output:
+            status: [403]
+
+  - test_title: "Path traversal attempt - WAF should block"
+    test_id: 4
+    description: "CRS rule 930110. '../etc/passwd' in URI should trigger 403."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/../../../etc/passwd"
+            method: "GET"
+            headers:
+              User-Agent: "caddy-waf-test/1.0"
+              Host: "localhost"
+          output:
+            status: [403]
