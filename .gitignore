@@ -72,3 +72,5 @@ graphify-out/
 
 # Bin Tools for linting
 tools/bin/
+# Local Pi runtime state
+.atl/

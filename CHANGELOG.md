@@ -3,17 +3,35 @@
 All notable changes to this project will be documented in this file.
 Format: [Keep a Changelog](https://keepachangelog.com/) · Versioning: [SemVer](https://semver.org/)
 
+## [3.2.0] - 2026-07-18
+
+### Added
+
+- **Lint workflow** (`.github/workflows/lint.yml`) — runs `yamllint`, `actionlint`, `hadolint`, and `zizmor` on PRs, main, and tags. All linters are blocking; failures prevent merge or release.
+
+### Fixed
+
+- **Trivy CI false positive**: scoped scan gate to vulnerability scanning only via `scanners: vuln`. Trivy v0.69.3+ enables secret scanning by default, which caused the pipeline to fail with exit code 1 even when no CRITICAL/HIGH vulnerabilities existed.
+
+### Changed
+
+- **aquasecurity/trivy-action**: upgraded from v0.35.0 to **v0.36.0**.
+- **github/codeql-action/upload-sarif**: upgraded from v3 to **v4** (v3 deprecated December 2026).
+
 ## [3.1.0] - 2026-07-18
 
 ### Added
+
 - Automated test suite with go-ftw (OWASP CRS framework). `make test` runs lint + WAF integration tests.
 - Docker Compose test override (`docker-compose.test.yml`) - builds locally, runs on port 9090.
 - `make doctor` now reports go-ftw version.
 
 ### Fixed
+
 - Upgraded `c-ares`, `curl`, `libcurl` in base image (5 HIGH CVEs: CVE-2026-33630, CVE-2026-5773, CVE-2026-6276).
 
 ### Changed
+
 - **caddy-dns/cloudflare**: upgraded from v0.2.3 to **v0.2.4** - fixes compatibility with Cloudflare API tokens using `cfut_` / `cfat_` prefix.
 - Unified SECURITY.md (policy + resolved CVEs). Removed SECURITY_ADVISORY.md.
 - Updated ROADMAP.md: moved completed items to ✅, added post-v3.0.0 priorities.
@@ -24,6 +42,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/) · Versioning: [SemVer](
 ## [3.0.0] - 2026-07-01
 
 ### Added
+
 - **Caddy 2.11.4 upgrade** - resolves 9 CVEs including 2 CRITICAL (CVE-2026-27590, CVE-2026-27587) and CVE-2026-52845.
 - **Coraza WAF v2.5.0** (from v2.2.0) - latest stable release.
 - **OWASP CRS v4.28.0** (from v4.23.0) - latest rule set.
@@ -37,6 +56,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/) · Versioning: [SemVer](
 - Structured JSON logging configuration in Caddyfile templates.
 
 ### Changed
+
 - **Dockerfile**:
   - Updated Caddy base image from `caddy:2.11` to `caddy:2.11.4`.
   - Updated Coraza WAF plugin from `v2.2.0` to `v2.5.0`.
@@ -58,6 +78,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/) · Versioning: [SemVer](
 - Migrated from `Miguel-DevOps` organization to `Developmi` organization.
 
 ### Security
+
 - **Caddy CVEs resolved** (via 2.11.4 upgrade):
   - CVE-2026-27590 - **9.1 CRITICAL** - RCE via FastCGI Unicode bypass
   - CVE-2026-27587 - **9.1 CRITICAL** - Path traversal via encoded URI
@@ -75,6 +96,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/) · Versioning: [SemVer](
 ## [2.0.0] - 2026-03-14 - Made in deprecated repo
 
 ### Added
+
 - Systemd service file for bare-metal deployments (`deploy/systemd/caddy-waf.service`).
 - Example environment configuration file (`.env.example`).
 - Security headers in Caddyfile.example: HSTS, X-Content-Type-Options, X-Frame-Options, Referrer-Policy.
@@ -83,6 +105,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/) · Versioning: [SemVer](
 - ROADMAP.md with planned supply chain, ratelimit fork, and compliance integrations.
 
 ### Changed
+
 - **Dockerfile**: Pinned plugin versions via build args (Coraza WAF v2.2.0, caddy-ratelimit v0.1.0, caddy-dns/cloudflare v0.2.3).
 - **Dockerfile**: SHA256 verification for OWASP CRS and Coraza configuration downloads.
 - **Dockerfile**: Non-root execution with UID/GID 1337, read-only container, capability dropping, tmpfs hardening.
@@ -95,11 +118,13 @@ Format: [Keep a Changelog](https://keepachangelog.com/) · Versioning: [SemVer](
 - Added container metadata labels (OCI standard).
 
 ### Fixed
+
 - GitHub License badge link in README files.
 
 ## [1.0.0] - 2026-02-09 - Made in deprecated repo
 
 ### Added
+
 - Initial release (Miguel-DevOps organization).
 - Caddy 2.x with Coraza WAF and OWASP CRS v4.23.0.
 - Dockerfile with Coraza WAF plugin integration.
@@ -108,6 +133,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/) · Versioning: [SemVer](
 - README.md and README.es.md with setup instructions.
 
 <!-- Version links for Keep a Changelog -->
+[3.2.0]: https://github.com/Developmi/caddy-waf/compare/v3.1.0...v3.2.0
 [3.1.0]: https://github.com/Developmi/caddy-waf/compare/v3.0.0...v3.1.0
 [3.0.0]: https://github.com/Developmi/caddy-waf/compare/v2.0.0...v3.0.0
 [2.0.0]: https://github.com/Miguel-DevOps/caddy-waf/compare/v1.0.0...v2.0.0
