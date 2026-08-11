@@ -26,15 +26,16 @@ LABEL org.opencontainers.image.description="Production-ready Caddy web server wi
 LABEL org.opencontainers.image.licenses="MIT"
 LABEL maintainer="Miguel Lozano"
 LABEL vendor="Developmi"
-LABEL version="3.1.0"
+LABEL version="3.3.0"
 LABEL waf.coraza.version="2.5.0"
 LABEL waf.owasp-crs.version="4.28.0"
 
 # Copy the custom binary
 COPY --from=builder /usr/bin/caddy /usr/bin/caddy
 
-# Upgrade base image packages — fix CVEs in c-ares, curl, libcurl
-RUN apk upgrade --no-cache c-ares curl libcurl
+# Upgrade all base image packages — pulls current Alpine 3.23 security fixes
+# (openssl/libssl, musl, busybox, zlib, ca-certificates, curl, c-ares, ...)
+RUN apk upgrade --no-cache
 
 # --- WAF SETUP ---
 
@@ -100,6 +101,6 @@ EXPOSE 80 443 443/udp
 # Define volumes for persistent data
 VOLUME ["/data", "/config"]
 
-# Health check - verify Caddy process is active
+# Health check - verify Caddy process is active (JSON form, DL3025 compliant)
 HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
-    CMD pgrep caddy || exit 1
+    CMD ["pgrep", "caddy"]
