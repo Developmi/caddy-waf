@@ -26,7 +26,7 @@ LABEL org.opencontainers.image.description="Production-ready Caddy web server wi
 LABEL org.opencontainers.image.licenses="MIT"
 LABEL maintainer="Miguel Lozano"
 LABEL vendor="Developmi"
-LABEL version="3.3.0"
+LABEL version="3.3.1"
 LABEL waf.coraza.version="2.5.0"
 LABEL waf.owasp-crs.version="4.28.0"
 
@@ -101,6 +101,7 @@ EXPOSE 80 443 443/udp
 # Define volumes for persistent data
 VOLUME ["/data", "/config"]
 
-# Health check - verify Caddy process is active (JSON form, DL3025 compliant)
+# Health check - verify Caddy admin /metrics endpoint responds (JSON form, DL3025 compliant)
+# Uses curl (present in the image) instead of busybox wget (resolves localhost to ::1 and fails)
 HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
-    CMD ["pgrep", "caddy"]
+    CMD ["curl", "-fs", "http://127.0.0.1:2019/metrics"]
