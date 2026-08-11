@@ -1,6 +1,6 @@
 [project]
 name = "caddy-waf"
-version = "3.0.0"
+version = "3.3.0"
 description = "Production-ready Caddy image with Coraza WAF and OWASP CRS."
 readme = "README.md"
 requires-python = ">=3.14"

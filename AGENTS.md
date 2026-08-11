@@ -5,13 +5,13 @@
 - **Base image**: Caddy 2.11.4 (Alpine-based)
 - **WAF Engine**: Coraza WAF 2.5.0 (via coraza-caddy plugin)
 - **Rule Set**: OWASP CRS 4.28.0
-- **Additional plugins**: caddy-ratelimit (0.1.0, pinned 5625512), caddy-dns/cloudflare (0.2.3)
+- **Additional plugins**: caddy-ratelimit (0.1.0, pinned 5625512), caddy-dns/cloudflare (0.2.4)
 - **Language**: Go (build-time only via xcaddy builder image)
 - **Orchestration**: Docker Compose
 
 ## Commands
 - **Run**: `docker compose up`
-- **Test**: `docker compose up` + manual validation (no automated test framework)
+- **Test**: `make test-waf` (go-ftw integration suite) + `docker compose up` manual validation
 - **Build**: `docker build -t caddy-waf .`
 - **Validate**: `docker compose config`
 - **Lint/Format**: N/A (no app source code)
@@ -19,7 +19,7 @@
 ## SDD Context
 - **CodeGraph indexed**: yes
 - **Graphify indexed**: yes (graphify-out/ present)
-- **Testing framework**: none (manual validation only)
+- **Testing framework**: go-ftw integration suite (tests/integration, run via `make test-waf`)
 - **Strict TDD**: disabled - no test runner detected
 - **Quality tools**: Trivy (container scanning) | Cosign (signing) | Syft (SBOM)
 
@@ -29,7 +29,7 @@
 - **User**: Non-root caddy (UID 1337)
 - **Hardening**: read_only rootfs, cap_drop ALL, no-new-privileges, tmpfs noexec
 - **Supply chain**: Cosign keyless signing, Trivy CRITICAL/HIGH gate, SBOM attestations
-- **⚠️ SHA256 verification**: placeholder `REPLACE_BEFORE_BUILD` in Dockerfile - not actually enforced
+- **SHA256 verification**: OWASP CRS tarball (v4.28.0) and coraza.conf (v3.7.0, via `CORAZA_CONF_SHA256` ARG) verified against pinned SHA256 checksums at build time
 - **CVEs resolved**: CVE-2026-27590 (9.1), CVE-2026-27587 (9.1), CVE-2026-27588 (8.8), CVE-2026-30851 (8.8), CVE-2026-52845 (8.1), CVE-2026-27586 (7.5), CVE-2026-52844 (7.5), CVE-2026-27585 (6.5), CVE-2026-27589 (6.1)
 
 ## CI/CD
@@ -40,9 +40,9 @@
 
 ## Conventions
 - Commit style: Conventional Commits (`feat:`, `fix:`, `docs:`, `chore:`, `ci:`)
-- Versioning: Semantic Versioning (v3.1.0 current)
+- Versioning: Semantic Versioning (v3.3.0 current)
 - Branch naming: `feat/desc`, `fix/desc`, `docs/desc`, `chore/desc`, `ci/desc`
-- No tests - manual validation via `docker compose up`
+- go-ftw integration tests via `make test-waf` (container starts on 127.0.0.1:9090) + manual validation
 - WAF default: DetectionOnly (change to On after 7-14 day observation window)
 
 ## Key Gotchas

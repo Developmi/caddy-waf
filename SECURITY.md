@@ -4,7 +4,7 @@
 
 | Version | Supported |
 |---------|-----------|
-| 3.0.x   | ✅ Yes (current) |
+| 3.3.x   | ✅ Yes (current) |
 | 2.0.x   | ❌ No - migrated to Developmi, upgrade to 3.0.x |
 | 1.0.x   | ❌ No |
 
@@ -75,6 +75,22 @@ cosign verify \
 ## Resolved CVEs
 
 All CVEs listed below are resolved in **caddy-waf v3.0.0** (Caddy ≥ 2.11.4) and later.
+
+---
+
+## Pending advisories (waiting on Caddy ≥ 2.11.5)
+
+These advisories affect the Caddy 2.11.4 binary or configuration surface and have **no patched Caddy release yet**. They are tracked in `.trivyignore` (Trivy scan gate) and re-enabled as soon as the base image moves to Caddy ≥ 2.11.5.
+
+| Advisory | Component | Severity | Impact for this project | Fixed in |
+|----------|-----------|----------|------------------------|----------|
+| `CVE-2026-56852` | golang.org/x/text v0.37.0 (embedded in Caddy binary) | HIGH | DoS via invalid UTF-8 — DoS-class only, no RCE; not reachable in reverse-proxy-only deployment | x/text v0.39.0 → Caddy ≥ 2.11.5 |
+| `GHSA-hrxh-6v49-42gf` | google.golang.org/grpc v1.81.0 (embedded in Caddy binary) | HIGH | xDS RBAC + HTTP/2 — gRPC/xDS not used by Caddy core in this deployment; not reachable | grpc v1.82.1 → Caddy ≥ 2.11.5 |
+| `GHSA-6365-7ppr-5r92` | Caddy `forward_auth` + `reverse_proxy` (configuration surface) | Moderate | Wrong-upstream connection under specific `forward_auth` configurations — verify production Caddyfile does not use the affected pattern | Caddy 2.11.5 (unreleased) |
+
+**Action on Caddy ≥ 2.11.5 release**: upgrade the base image, remove the two IDs from `.trivyignore`, and remove this section.
+
+---
 
 ### CVE-2026-27590
 
@@ -207,6 +223,7 @@ The following CVEs affect older OWASP CRS versions. **caddy-waf v3.0.0 ships CRS
 | **2026-06-23** | CVE-2026-52845 and CVE-2026-52844 published to NVD |
 | **2026-07-01** | caddy-waf **v3.0.0** released with Caddy 2.11.4 |
 | **2026-07-02** | OWASP CRS v4.28.0 released (included) |
+| **2026-08-11** | caddy-waf **v3.3.0** released - tool bumps (hadolint 2.15.1, go-ftw 2.5.0, Trivy v0.73.0), full `apk upgrade`, JSON-form HEALTHCHECK, version alignment |
 
 ---
 

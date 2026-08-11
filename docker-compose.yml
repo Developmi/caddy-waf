@@ -3,7 +3,7 @@
 
 services:
   caddy-waf:
-    image: ${CADDY_WAF_IMAGE:-ghcr.io/developmi/caddy-waf:v3.0.0}
+    image: ${CADDY_WAF_IMAGE:-ghcr.io/developmi/caddy-waf:v3.3.0}
     container_name: caddy-waf
     user: "1337:1337"
     restart: unless-stopped
