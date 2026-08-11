@@ -3,6 +3,36 @@
 All notable changes to this project will be documented in this file.
 Format: [Keep a Changelog](https://keepachangelog.com/) · Versioning: [SemVer](https://semver.org/)
 
+## [3.3.0] - 2026-08-11
+
+### Changed
+
+- **hadolint**: upgraded from 2.14.0 to **2.15.1** (local tooling and `lint.yml`).
+- **go-ftw**: upgraded from 2.4.0 to **2.5.0**.
+- **Trivy**: upgraded from v0.72.0 to **v0.73.0** in CI (`setup-trivy` action remains SHA-pinned at v0.3.1).
+- **Dockerfile**: widened `apk upgrade` from `c-ares curl libcurl` to **all packages** — pulls current Alpine 3.23 security fixes (openssl/libssl 3.5.7, curl 8.20.0, zlib 1.3.2, busybox, musl, ca-certificates) on every rebuild.
+- **Dockerfile**: HEALTHCHECK converted to JSON form (`CMD ["pgrep", "caddy"]`) — required by hadolint 2.15.x rule DL3025.
+- **Version alignment**: OCI `LABEL version`, Compose default image tag, `pyproject.toml`/`uv.lock`, AGENTS.md, README.md, and SECURITY.md aligned to **v3.3.0**.
+- **AGENTS.md**: fixed stale notes (caddy-dns/cloudflare v0.2.4, real SHA256 checksums in Dockerfile, test suite documentation).
+
+### Security
+
+- **Full base-image package upgrade**: now covers OpenSSL/libssl and all Alpine 3.23 packages, not only curl/c-ares. Includes fixes for the June 2026 OpenSSL advisories and zlib CVE-2026-22184 (fixed in zlib 1.3.2-r0).
+
+### Known issues (waiting on Caddy ≥ 2.11.5)
+
+- **Two HIGH findings in the Caddy 2.11.4 binary**, tracked in `.trivyignore` until a patched Caddy release exists:
+  - `CVE-2026-56852` — golang.org/x/text v0.37.0, DoS via invalid UTF-8 (fixed in x/text v0.39.0).
+  - `GHSA-hrxh-6v49-42gf` — google.golang.org/grpc v1.81.0, xDS RBAC + HTTP/2 (fixed in grpc v1.82.1).
+  - **Impact**: low for this deployment (DoS-class only, gRPC/xDS not used by Caddy core here; reverse-proxy only).
+  - **Action**: remove both entries from `.trivyignore` and upgrade the base image to Caddy ≥ 2.11.5 as soon as it ships. Also tracked in SECURITY.md → Pending advisories.
+
+## [3.2.1] - 2026-07-18
+
+### Fixed
+
+- **Trivy CI gate regression**: split the single combined command into two separate steps (SARIF upload + CRITICAL/HIGH exit-code gate). The combined command broke with trivy-action v0.70.0+.
+
 ## [3.2.0] - 2026-07-18
 
 ### Added
@@ -133,6 +163,8 @@ Format: [Keep a Changelog](https://keepachangelog.com/) · Versioning: [SemVer](
 - README.md and README.es.md with setup instructions.
 
 <!-- Version links for Keep a Changelog -->
+[3.3.0]: https://github.com/Developmi/caddy-waf/compare/v3.2.1...v3.3.0
+[3.2.1]: https://github.com/Developmi/caddy-waf/compare/v3.2.0...v3.2.1
 [3.2.0]: https://github.com/Developmi/caddy-waf/compare/v3.1.0...v3.2.0
 [3.1.0]: https://github.com/Developmi/caddy-waf/compare/v3.0.0...v3.1.0
 [3.0.0]: https://github.com/Developmi/caddy-waf/compare/v2.0.0...v3.0.0
