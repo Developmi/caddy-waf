@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 Format: [Keep a Changelog](https://keepachangelog.com/) · Versioning: [SemVer](https://semver.org/)
 
+## [3.3.1] - 2026-08-11
+
+### Added
+
+- **docker-compose.yml**: resource limits for `caddy-waf` (`mem_limit: 512m`, `cpus: 1.0`).
+- **docker-compose.yml**: JSON-file log rotation (`max-size: 50m`, `max-file: 5`).
+
+### Changed
+
+- **Dockerfile**: HEALTHCHECK now checks the Caddy admin `/metrics` endpoint (`curl -fs http://127.0.0.1:2019/metrics`) instead of process-only `pgrep` — also detects hung processes and verifies the admin API responds. `curl` is used because busybox `wget` resolves `localhost` to `::1` and fails.
+- **docker-compose.yml**: healthcheck mirrored to the same `/metrics` check (Compose healthcheck overrides the image's).
+- **Version alignment**: OCI `LABEL version`, Compose default image tag, `pyproject.toml`/`uv.lock`, AGENTS.md, README.md, and SECURITY.md aligned to **v3.3.1**.
+
 ## [3.3.0] - 2026-08-11
 
 ### Changed
@@ -163,6 +176,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/) · Versioning: [SemVer](
 - README.md and README.es.md with setup instructions.
 
 <!-- Version links for Keep a Changelog -->
+[3.3.1]: https://github.com/Developmi/caddy-waf/compare/v3.3.0...v3.3.1
 [3.3.0]: https://github.com/Developmi/caddy-waf/compare/v3.2.1...v3.3.0
 [3.2.1]: https://github.com/Developmi/caddy-waf/compare/v3.2.0...v3.2.1
 [3.2.0]: https://github.com/Developmi/caddy-waf/compare/v3.1.0...v3.2.0
