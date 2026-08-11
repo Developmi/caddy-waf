@@ -80,7 +80,7 @@ Starting from v3.0.0, the image ships with updated Caddy 2.11.4, official upstre
 
 ### 1. Pull the Image
 ```bash
-docker pull ghcr.io/developmi/caddy-waf:v3.3.0
+docker pull ghcr.io/developmi/caddy-waf:v3.3.1
 ```
 
 ### 2. Create Environment File
@@ -225,7 +225,7 @@ volumes:
 ### Environment Variables
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `CADDY_WAF_IMAGE` | `ghcr.io/developmi/caddy-waf:v3.3.0` | Caddy WAF image reference |
+| `CADDY_WAF_IMAGE` | `ghcr.io/developmi/caddy-waf:v3.3.1` | Caddy WAF image reference |
 | `EXAMPLE_APP_IMAGE` | `containous/whoami:latest` | Demo backend image |
 | `SITE_ADDRESS` | `localhost` | Site address/server name used by Caddy |
 | `BACKEND_UPSTREAM` | `example-app:80` | Reverse proxy backend upstream |
@@ -303,10 +303,10 @@ curl -I https://yourdomain.com
 ### Security Scanning
 ```bash
 # Scan image with Trivy
-docker run --rm aquasec/trivy image ghcr.io/developmi/caddy-waf:v3.3.0
+docker run --rm aquasec/trivy image ghcr.io/developmi/caddy-waf:v3.3.1
 
 # Scan with Docker Scout
-docker scout quickview ghcr.io/developmi/caddy-waf:v3.3.0
+docker scout quickview ghcr.io/developmi/caddy-waf:v3.3.1
 ```
 
 ---
@@ -375,6 +375,7 @@ The project follows [Keep a Changelog](https://keepachangelog.com/) and [Semanti
 
 | Version | Date | Highlights |
 |---------|------|------------|
+| [3.3.1](./CHANGELOG.md#331--2026-08-11) | 2026-08-11 | HEALTHCHECK via admin /metrics (curl), resource limits (512m/1 CPU), JSON-file log rotation, version alignment |
 | [3.3.0](./CHANGELOG.md#330--2026-08-11) | 2026-08-11 | Tool bumps (hadolint 2.15.1, go-ftw 2.5.0, Trivy v0.73.0), full apk upgrade, HEALTHCHECK JSON, version alignment |
 | [3.0.0](./CHANGELOG.md#300--2026-07-01) | 2026-07-01 | Caddy 2.11.4 upgrade, Official upstream plugins, CVE fixes, security headers plugin |
 | [2.0.0](./CHANGELOG.md#200--2026-03-14) | 2026-03-14 | Security hardening, systemd, OCI labels, CI updates |

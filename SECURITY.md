@@ -224,6 +224,7 @@ The following CVEs affect older OWASP CRS versions. **caddy-waf v3.0.0 ships CRS
 | **2026-07-01** | caddy-waf **v3.0.0** released with Caddy 2.11.4 |
 | **2026-07-02** | OWASP CRS v4.28.0 released (included) |
 | **2026-08-11** | caddy-waf **v3.3.0** released - tool bumps (hadolint 2.15.1, go-ftw 2.5.0, Trivy v0.73.0), full `apk upgrade`, JSON-form HEALTHCHECK, version alignment |
+| **2026-08-11** | caddy-waf **v3.3.1** released - HEALTHCHECK via admin `/metrics` (curl), resource limits (mem 512m, 1 CPU), JSON-file log rotation (50m × 5) |
 
 ---
 
