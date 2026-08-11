@@ -31,8 +31,8 @@ jobs:
             | tar -xz -C /usr/local/bin actionlint
           chmod 755 /usr/local/bin/actionlint
 
-          # hadolint v2.14.0
-          curl -fsSL "https://github.com/hadolint/hadolint/releases/download/v2.14.0/hadolint-linux-x86_64" \
+          # hadolint v2.15.1
+          curl -fsSL "https://github.com/hadolint/hadolint/releases/download/v2.15.1/hadolint-linux-x86_64" \
             -o /usr/local/bin/hadolint
           chmod 755 /usr/local/bin/hadolint
 
