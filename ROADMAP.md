@@ -70,3 +70,6 @@ Production-ready K8s manifests (Deployment, Service, Ingress, ConfigMap, HPA). S
 
 ### 4. WAF rule hot-reload
 Evaluate reloading WAF rules without container restart (e.g., via Caddy admin API).
+
+### 5. Expand go-ftw integration test coverage
+The CI gate (`test-waf.yml`) runs the 4-case baseline suite (allow + SQLi/XSS/traversal) on every PR and push to main. Planned scale-up: more OWASP CRS vectors (e.g., REQUEST-920 protocol attacks) and a WAF-mode matrix (DetectionOnly vs On).
