@@ -5,7 +5,7 @@
 Thumbs.db
 
 # Local test files
-test-*
+/test-*
 temp-*
 
 # Editor files
