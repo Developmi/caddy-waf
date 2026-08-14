@@ -1,0 +1,13 @@
+# Prometheus datasource (observability-prom profile).
+# Mounted into the grafana-prom service at /etc/grafana/provisioning/datasources/datasource.yml
+apiVersion: 1
+
+datasources:
+  - name: Caddy WAF Metrics
+    uid: caddy-waf-metrics
+    type: prometheus
+    access: proxy
+    url: http://prometheus:9090
+    isDefault: true
+    jsonData:
+      timeInterval: 15s

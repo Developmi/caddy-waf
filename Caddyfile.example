@@ -12,7 +12,18 @@
     # Security order - WAF must be first
     order coraza_waf first
     order rate_limit before basicauth
-    
+
+    # Expose the admin endpoint (serves /metrics for Caddy + Coraza WAF) on all
+    # interfaces so observability backends can scrape it over the internal Docker
+    # network. SECURITY: port 2019 must NEVER be published to the host - the
+    # admin API can accept config POSTs, so it stays strictly internal-only.
+    admin 0.0.0.0:2019
+
+    # Enable Caddy HTTP metrics collection (caddy_http_*); served on the admin
+    # /metrics endpoint. NOTE: this is a global option - the site-level
+    # "metrics" directive only serves the registry and must NOT be added.
+    metrics
+
     # Structured JSON logging for observability
     log {
         output stdout

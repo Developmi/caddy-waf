@@ -226,13 +226,22 @@ directives `
 
 ## 6. Monitoring and Alerts
 
-### Coraza WAF Metrics
+### Caddy Metrics (admin /metrics)
 
-Coraza exposes Prometheus metrics at the default Caddy metrics endpoint:
+The Caddy admin endpoint (`:2019/metrics`) exposes Prometheus metrics. With the
+observability stack enabled, scrape this endpoint with either backend:
 
-- `coraza_waf_processed_total` - Total requests processed
-- `coraza_waf_blocked_total` - Requests blocked by WAF
-- `coraza_waf_rules_triggered` - Rules triggered (by rule ID)
+- `caddy_http_requests_total` - Total requests (labels: server, handler, method)
+- `caddy_http_request_duration_seconds` - Request latency histogram (labels include `code`)
+- `caddy_http_requests_in_flight` - Concurrent requests gauge
+- `caddy_reverse_proxy_upstreams_healthy` - Backend upstream health (0/1)
+- `caddy_config_last_reload_successful` - Config reload status
+
+> **Note:** coraza-caddy v2.5.0 does not export `coraza_waf_*` metrics (upstream
+> limitation). WAF rule IDs and decisions are in the JSON audit log on stdout.
+
+See [README.md: Observability](README.md#-observability-metrics--dashboards)
+for the dual-backend (VictoriaMetrics + Prometheus) setup with Grafana.
 
 ### Log Configuration for SIEM
 

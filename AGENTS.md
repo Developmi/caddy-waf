@@ -45,6 +45,7 @@
 - Branch naming: `feat/desc`, `fix/desc`, `docs/desc`, `chore/desc`, `ci/desc`
 - go-ftw integration tests via `make test-waf` (container starts on 127.0.0.1:9090) + manual validation
 - WAF default: DetectionOnly (change to On after 7-14 day observation window)
+- Observability profiles (not in default `up`): `docker compose --profile observability-vm up -d` (VictoriaMetrics + Grafana) | `--profile observability-prom up -d` (Prometheus + Grafana); both scrape the same metrics/prometheus.yml from caddy-waf:2019 — admin /metrics must stay internal-only (never publish 2019)
 
 ## Key Gotchas
 - Caddyfile is runtime config mounted at `/etc/caddy/Caddyfile:ro`

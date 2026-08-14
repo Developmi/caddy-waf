@@ -1,0 +1,12 @@
+# Backend-agnostic Prometheus scrape configuration.
+# This exact file is consumed by BOTH observability backends:
+#   - VictoriaMetrics: -promscrape.config=/etc/prometheus/prometheus.yml
+#   - Prometheus:      --config.file=/etc/prometheus/prometheus.yml
+# Only standard Prometheus config syntax is used - no file_sd or VM-only options.
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: caddy
+    static_configs:
+      - targets: ["caddy-waf:2019"]
