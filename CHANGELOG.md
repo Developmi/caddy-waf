@@ -16,6 +16,12 @@ Format: [Keep a Changelog](https://keepachangelog.com/) · Versioning: [SemVer](
 - **docker-compose.yml**: healthcheck mirrored to the same `/metrics` check (Compose healthcheck overrides the image's).
 - **Version alignment**: OCI `LABEL version`, Compose default image tag, `pyproject.toml`/`uv.lock`, AGENTS.md, README.md, and SECURITY.md aligned to **v3.3.1**.
 
+### Known issues (waiting on Caddy ≥ 2.11.5)
+
+- **`CVE-2026-46600`** — golang.org/x/net v0.55.0 (embedded in the Caddy 2.11.4 binary), DoS via invalid DNS record parsing (`dns/dnsmessage`; fixed in x/net v0.56.0). Identified by the CI Trivy gate on 2026-08-14; tracked in `.trivyignore` until a patched Caddy release exists.
+  - **Impact**: low for this deployment — DoS-class only; Caddy core and the `caddy-dns/cloudflare` module do not parse raw DNS wire messages here.
+  - **Action**: remove the entry from `.trivyignore` and upgrade the base image to Caddy ≥ 2.11.5 as soon as it ships (also resolves `CVE-2026-56852` and `GHSA-hrxh-6v49-42gf`). Also tracked in SECURITY.md → Pending advisories.
+
 ## [3.3.0] - 2026-08-11
 
 ### Changed

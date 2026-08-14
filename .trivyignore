@@ -1,8 +1,9 @@
 # Trivy ignore file — caddy-waf
 #
-# The two findings below are embedded in the Caddy 2.11.4 Go binary (usr/bin/caddy).
-# No patched Caddy release exists yet: both are fixed in upstream Go dependencies
-# (golang.org/x/text v0.39.0, google.golang.org/grpc v1.82.1) that land in Caddy >= 2.11.5.
+# The three findings below are embedded in the Caddy 2.11.4 Go binary (usr/bin/caddy).
+# No patched Caddy release exists yet: all are fixed in upstream Go dependencies
+# (golang.org/x/text v0.39.0, google.golang.org/grpc v1.82.1, golang.org/x/net v0.56.0)
+# that land in Caddy >= 2.11.5.
 #
 # RE-ENABLE when the base image is upgraded to Caddy >= 2.11.5:
 # remove these lines (and the CHANGELOG/SECURITY.md known-issues notes).
@@ -14,3 +15,8 @@ CVE-2026-56852
 # GHSA-hrxh-6v49-42gf — google.golang.org/grpc v1.81.0: xDS RBAC and HTTP/2 vulnerabilities.
 # gRPC/xDS is not used by Caddy core in this deployment; not reachable.
 GHSA-hrxh-6v49-42gf
+
+# CVE-2026-46600 — golang.org/x/net v0.55.0: Denial of Service via invalid DNS record
+# parsing (x/net/dns/dnsmessage). DoS-class only; Caddy core and the caddy-dns/cloudflare
+# module do not parse raw DNS wire messages in this deployment; not reachable.
+CVE-2026-46600
