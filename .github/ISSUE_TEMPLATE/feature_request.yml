@@ -1,0 +1,33 @@
+name: Feature request
+description: Suggest an improvement or new capability for caddy-waf
+labels: [enhancement]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting an improvement. Check ROADMAP.md first to
+        see what is already planned or explicitly out of scope.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem / motivation
+      description: What gap does this address? Who is affected and how?
+    validations:
+      required: true
+  - type: textarea
+    id: proposed-solution
+    attributes:
+      label: Proposed solution
+      description: How should it work? Keep it concrete and testable.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Other approaches you evaluated and why they fall short
+  - type: textarea
+    id: scope-notes
+    attributes:
+      label: Scope notes
+      description: Security posture impact, backwards compatibility, docs, or maintenance burden
