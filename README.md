@@ -30,6 +30,7 @@ _Protect your web applications with enterprise-grade WAF in under 5 minutes - el
 - [Docker Deployment](#-docker-deployment)
 - [Testing & Validation](#-testing--validation)
 - [Monitoring & Observability](#-monitoring--observability)
+- [Operations Documentation](#-operations-documentation)
 - [Security](#-security)
 - [Changelog](#-changelog)
 - [Contributing](#-contributing)
@@ -131,6 +132,7 @@ caddy-waf/
 ├── assets/                   # Brand assets (logo)
 ├── deploy/
 │   └── systemd/              # Systemd service unit for bare-metal
+├── docs/                     # Operations docs (deployment, IR, compliance)
 ├── .github/workflows/        # CI/CD (build, scan, sign, push)
 ├── metrics/                  # Backend-agnostic Prometheus scrape config
 ├── grafana/                  # Provisioned datasources + dashboards
@@ -397,6 +399,19 @@ docker compose --profile observability-prom down -v
 ```
 
 See [TUNING.md](TUNING.md#6-monitoring-and-alerts) for metric details.
+
+---
+
+## 🧭 Operations Documentation
+
+Operational runbooks live in [`docs/`](docs/):
+
+| Document | Purpose |
+|----------|---------|
+| [Deployment checklist](docs/deployment-checklist.md) | Step-by-step deploy, verify, and rollback for Docker Compose and systemd (bare-metal) |
+| [Incident response](docs/incident-response.md) | Runbook for WAF false positives and generic incidents, with severity table |
+| [SOC 2 mappings](docs/soc2-mappings.md) | Trust Services Criteria mapped to implemented controls, with file:line evidence and honest gaps |
+| [SLSA compliance](docs/slsa-compliance.md) | Supply-chain level assessment of the build pipeline (current: L2, partial L3) |
 
 ---
 
