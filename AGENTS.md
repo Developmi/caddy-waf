@@ -31,6 +31,7 @@
 - **Supply chain**: Cosign keyless signing, Trivy CRITICAL/HIGH gate, SBOM attestations
 - **SHA256 verification**: OWASP CRS tarball (v4.28.0) and coraza.conf (v3.7.0, via `CORAZA_CONF_SHA256` ARG) verified against pinned SHA256 checksums at build time
 - **CVEs resolved**: CVE-2026-27590 (9.1), CVE-2026-27587 (9.1), CVE-2026-27588 (8.8), CVE-2026-30851 (8.8), CVE-2026-52845 (8.1), CVE-2026-27586 (7.5), CVE-2026-52844 (7.5), CVE-2026-27585 (6.5), CVE-2026-27589 (6.1)
+- **Security validation rule**: always contrast the CURRENT date against registered security issues. Validate only OPEN/active advisories (`.trivyignore` entries, SECURITY.md pending sections, base image and dependency versions) — never historical/closed ones unless the user asks. Re-check open advisories on every session and whenever upstream versions move (e.g., pending HIGHs awaiting a newer Caddy release).
 
 ## CI/CD
 - **Workflow**: `docker-build-scan-sign.yml` - scan → sign → push (multi-arch amd64+arm64, tag-triggered only)
@@ -44,6 +45,7 @@
 - Branch naming: `feat/desc`, `fix/desc`, `docs/desc`, `chore/desc`, `ci/desc`
 - go-ftw integration tests via `make test-waf` (container starts on 127.0.0.1:9090) + manual validation
 - WAF default: DetectionOnly (change to On after 7-14 day observation window)
+- Observability profiles (not in default `up`): `docker compose --profile observability-vm up -d` (VictoriaMetrics + Grafana) | `--profile observability-prom up -d` (Prometheus + Grafana); both scrape the same metrics/prometheus.yml from caddy-waf:2019 — admin /metrics must stay internal-only (never publish 2019)
 
 ## Key Gotchas
 - Caddyfile is runtime config mounted at `/etc/caddy/Caddyfile:ro`

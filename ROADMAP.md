@@ -1,6 +1,8 @@
 # Roadmap
 
-## ✅ Completed (v3.0.0)
+Every completed item links to the exact commit that delivered it — verify with `git show <hash>`.
+
+## Completed (v3.0.0)
 
 - **Caddy 2.11.4 upgrade** - Resolves 9 CVEs including 2 CRITICAL (CVE-2026-27590, CVE-2026-27587).
 - **Supply chain hardening**
@@ -19,17 +21,34 @@
   - ✅ TUNING.md with application-specific CRS exception guides.
   - ✅ CHANGELOG.md with full version history.
 
+## Completed since v3.0.0 (traceability)
+
+| Item | Commit | What / where |
+|------|--------|--------------|
+| 1. Cloudflare token format compatibility | → `dbae4fa` | `caddy-dns/cloudflare` pinned to v0.2.4 (`CADDY_DNS_CLOUDFLARE_REF`, Dockerfile) — accepts `cfut_`/`cfat_` API tokens |
+| 6. Automated dependency updates | → `87c7c93` | Dependabot for Docker + GitHub Actions (.github/dependabot.yml) |
+| 7a. FTW test suite | → `dbae4fa` | go-ftw integration suite, `make test-waf`, 4 cases (tests/) |
+| 7b. WAF metrics | → `ba09d40` | Dual-backend observability — VictoriaMetrics + Prometheus scrape the same `metrics/prometheus.yml`; `caddy_http_*` series on admin /metrics |
+| 7c. Grafana dashboard | → `ba09d40` | Provisioned datasources + dashboard (grafana/), profiles `observability-vm` / `observability-prom` |
+| 8a. Deployment checklists | → `bccfc2f` | docs/deployment-checklist.md — Docker Compose + systemd only; Kubernetes intentionally out of scope for now (item 3 below) |
+| 8b. IR runbook | → `bccfc2f` | docs/incident-response.md — WAF false positives, remediation, severity table |
+| 8c. SOC2 mappings | → `bccfc2f` | docs/soc2-mappings.md — TSC mapped to implemented controls with file:line evidence |
+| 8d. SLSA compliance | → `bccfc2f` | docs/slsa-compliance.md — current level L2 (partial L3), honest gap list |
+
+**Observability decision:** the same `metrics/prometheus.yml` feeds both backends (VictoriaMetrics via `-promscrape.config`, Prometheus via `--config.file`) — Caddy's /metrics output needs no changes per backend. Admin `:2019` stays internal-only.
+
+**coraza-caddy v2.5.0 limitation (upstream-watch, not a regression):** the plugin exports **no** `coraza_waf_*` metrics. WAF visibility comes from `caddy_http_*` series, the dashboard WAF-mode panel, and JSON audit logs. Revisit when upstream adds metrics.
+
 ## Current decisions
 
 - No hard blockers in default compose flow.
-- WAF default mode is `DetectionOnly`.
-- Transition to `SecRuleEngine On` is required only after a prudent production observation window.
+- WAF default mode is `DetectionOnly`; transition to `SecRuleEngine On` only after a prudent production observation window.
 - Runtime values are environment-driven (`SITE_ADDRESS`, `BACKEND_UPSTREAM`, `ACME_EMAIL`, `CADDY_WAF_IMAGE`, `EXAMPLE_APP_IMAGE`).
-- Healthchecks are present at image level and compose level.
+- Healthchecks at image level and compose level.
 - All Caddy plugins use official upstream modules.
-- Rate limiting uses `mholt/caddy-ratelimit` (pinned by commit SHA `5625512` - no release tags beyond v0.1.0).
+- Rate limiting uses `mholt/caddy-ratelimit` (pinned by commit SHA `5625512` — no release tags beyond v0.1.0).
 - DNS challenge support uses `caddy-dns/cloudflare`.
-- Security headers use Caddy's native `header` directive - no external plugin needed.
+- Security headers use Caddy's native `header` directive — no external plugin needed.
 
 ## Required production rollout sequence
 
@@ -38,35 +57,16 @@
 3. Move to `SecRuleEngine On` after establishing a stable false-positive baseline.
 4. Keep monitoring and refine CRS exclusions per application behavior.
 
-## Pending - next priorities
+## Pending — next priorities
 
-### 1. Cloudflare token format compatibility
-⚠️ Cloudflare now issues API tokens with `cfut_` / `cfat_` prefixes (since early 2026). `caddy-dns/cloudflare@v0.2.3` **rejects** this format. Fix: update to `@latest`. PR #123 in caddy-dns/cloudflare already added support.
+### 1. Alpine 3.24 base image migration
+The image currently runs on **Alpine 3.23** (CHANGELOG.md:26,33) — not 3.21 — with security support until ~November 2026. Migrate to Alpine 3.24 before EOL; the build-time `apk upgrade` keeps 3.23 patched in the meantime.
 
-### 2. Alpine base image migration
-Alpine 3.21 (current) has **security support until November 2026**. Alpine 3.24 is the latest stable release. Plan migration before EOL.
+### 2. Coraza-caddy issue monitor — HPACK bomb
+Open issue [#316](https://github.com/corazawaf/coraza-caddy/issues/316) — "Potential HTTP/2 HPACK bomb memory exhaustion" in coraza-caddy v2.5.0. Not a published CVE yet, but warrants monitoring.
 
-### 3. Coraza-caddy issue monitor - HPACK bomb
-Open issue [#316](https://github.com/corazawaf/coraza-caddy/issues/316) - "Potential HTTP/2 HPACK bomb memory exhaustion" in coraza-caddy v2.5.0. Not a published CVE yet, but warrants monitoring.
+### 3. Kubernetes deployment profile
+Production-ready K8s manifests (Deployment, Service, Ingress, ConfigMap, HPA). Still pending — the v3.3.x deployment checklists are intentionally Docker + systemd only.
 
-### 4. Kubernetes deployment profile
-Add production-ready Kubernetes manifests: Deployment, Service, Ingress, ConfigMap, and HPA.
-
-### 5. WAF rule hot-reload
-Evaluate adding support for reloading WAF rules without container restart (e.g., via Caddy admin API).
-
-### 6. Automated dependency updates
-Integrate Dependabot or Renovate for automated tracking of Caddy, Coraza, CRS, and Alpine base image updates.
-
-### 7. Testing and observability
-
-- Add end-to-end FTW (Failure Tracking Web) test suite against the container image.
-- Export structured WAF metrics for Prometheus.
-- Add pre-built Grafana dashboard for WAF monitoring.
-
-### 8. Compliance and operations
-
-- Add formal deployment checklist per environment (Docker, systemd, K8s).
-- Add incident response runbook for WAF false positives.
-- Document SOC2 control mappings for WAF deployment.
-- Add SLSA compliance documentation for the build pipeline.
+### 4. WAF rule hot-reload
+Evaluate reloading WAF rules without container restart (e.g., via Caddy admin API).

@@ -30,6 +30,7 @@ _Protect your web applications with enterprise-grade WAF in under 5 minutes - el
 - [Docker Deployment](#-docker-deployment)
 - [Testing & Validation](#-testing--validation)
 - [Monitoring & Observability](#-monitoring--observability)
+- [Operations Documentation](#-operations-documentation)
 - [Security](#-security)
 - [Changelog](#-changelog)
 - [Contributing](#-contributing)
@@ -131,7 +132,10 @@ caddy-waf/
 ├── assets/                   # Brand assets (logo)
 ├── deploy/
 │   └── systemd/              # Systemd service unit for bare-metal
+├── docs/                     # Operations docs (deployment, IR, compliance)
 ├── .github/workflows/        # CI/CD (build, scan, sign, push)
+├── metrics/                  # Backend-agnostic Prometheus scrape config
+├── grafana/                  # Provisioned datasources + dashboards
 ├── Dockerfile                # Multi-stage build with pinned plugins
 ├── docker-compose.yml        # Production-grade compose with security hardening
 ├── Caddyfile                 # Runtime configuration (WAF + TLS + reverse proxy)
@@ -332,9 +336,82 @@ docker scout quickview ghcr.io/developmi/caddy-waf:v3.3.1
 ```
 
 ### WAF Metrics to Monitor
-- `coraza_waf_processed_total` - Total requests processed
-- `coraza_waf_blocked_total` - Requests blocked by WAF
-- `coraza_waf_rules_triggered` - Rules triggered (by ID)
+The Caddy admin endpoint (`:2019/metrics`) exposes real Prometheus metrics:
+
+- `caddy_http_requests_total` - Total requests (labels: server, handler, method)
+- `caddy_http_request_duration_seconds` - Request latency histogram (labels include `code`)
+- `caddy_http_requests_in_flight` - Concurrent requests gauge
+- `caddy_reverse_proxy_upstreams_healthy` - Backend upstream health (0/1)
+- `caddy_config_last_reload_successful` - Config reload status
+
+> **Note:** coraza-caddy v2.5.0 does not export `coraza_waf_*` metrics (upstream
+> limitation). WAF rule IDs and decisions are available in the JSON audit log on
+> stdout, not on `/metrics`.
+
+---
+
+## 📊 Observability (metrics + dashboards)
+
+Dual-backend observability: the same `metrics/prometheus.yml` scrape config
+works with **both** VictoriaMetrics and Prometheus (identical Prometheus
+exposition format), so Caddy's `/metrics` output needs no changes. Pick one
+profile:
+
+```bash
+# VictoriaMetrics + Grafana (Grafana on http://localhost:3000)
+docker compose --profile observability-vm up -d
+
+# Prometheus + Grafana (Grafana on http://localhost:3001)
+docker compose --profile observability-prom up -d
+```
+
+Profile services are **not** started by plain `docker compose up` — default
+behavior is unchanged. Grafana is bound to loopback only (127.0.0.1), with
+anonymous read access so the dashboard opens without login
+(admin UI: `admin` / `admin`, override with `GRAFANA_ADMIN_USER` /
+`GRAFANA_ADMIN_PASSWORD`).
+
+### How it works
+
+- `metrics/prometheus.yml` — single canonical scrape config, mounted read-only:
+  VictoriaMetrics consumes it via `-promscrape.config`, Prometheus via
+  `--config.file`. Targets the internal `caddy-waf:2019`.
+- The Caddyfile exposes the admin endpoint (`/metrics`) on `0.0.0.0:2019` and
+  enables `caddy_http_*` metric collection.
+- Each profile provisions its own Grafana datasource (VictoriaMetrics or
+  Prometheus) pointing at the backend, and loads the same dashboard
+  (`grafana/dashboards/caddy-waf.json`): request rate, status codes, p95
+  latency, in-flight requests, backend health, throughput, request errors, plus
+  a WAF mode note.
+
+### Security
+
+Port `2019` (Caddy admin API) is **never published to the host** — the admin
+API can accept config POSTs, so it stays strictly inside the internal Docker
+network. Scraping happens over the `caddy-network` bridge only. Backends
+(VictoriaMetrics:8428, Prometheus:9090) are also internal-only.
+
+### Tear down
+
+```bash
+docker compose --profile observability-vm down -v
+docker compose --profile observability-prom down -v
+```
+
+See [TUNING.md](TUNING.md#6-monitoring-and-alerts) for metric details.
+
+---
+
+## 🧭 Operations Documentation
+
+Operational runbooks live in [`docs/`](docs/):
+
+| Document | Purpose |
+|----------|---------|
+| [Deployment checklist](docs/deployment-checklist.md) | Step-by-step deploy, verify, and rollback for Docker Compose and systemd (bare-metal) |
+| [Incident response](docs/incident-response.md) | Runbook for WAF false positives and generic incidents, with severity table |
+| [SOC 2 mappings](docs/soc2-mappings.md) | Trust Services Criteria mapped to implemented controls, with file:line evidence and honest gaps |
+| [SLSA compliance](docs/slsa-compliance.md) | Supply-chain level assessment of the build pipeline (current: L2, partial L3) |
 
 ---
 

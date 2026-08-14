@@ -1,0 +1,13 @@
+# VictoriaMetrics datasource (observability-vm profile).
+# Mounted into the grafana-vm service at /etc/grafana/provisioning/datasources/datasource.yml
+apiVersion: 1
+
+datasources:
+  - name: Caddy WAF Metrics
+    uid: caddy-waf-metrics
+    type: victoriametrics
+    access: proxy
+    url: http://victoriametrics:8428
+    isDefault: true
+    jsonData:
+      timeInterval: 15s

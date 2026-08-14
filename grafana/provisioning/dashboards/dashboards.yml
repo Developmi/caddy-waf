@@ -1,0 +1,13 @@
+# Grafana dashboard provisioning: load JSON dashboards from a mounted directory.
+apiVersion: 1
+
+providers:
+  - name: caddy-waf
+    orgId: 1
+    folder: caddy-waf
+    type: file
+    disableDeletion: false
+    updateIntervalSeconds: 30
+    allowUiUpdates: false
+    options:
+      path: /var/lib/grafana/dashboards
