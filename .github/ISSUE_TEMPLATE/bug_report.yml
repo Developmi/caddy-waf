@@ -1,0 +1,64 @@
+name: Bug report
+description: Report a problem with the caddy-waf image, configuration, or documentation
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this bug report. Check
+        CHANGELOG.md and ROADMAP.md first to avoid duplicates.
+  - type: input
+    id: image-version
+    attributes:
+      label: Image version
+      description: Tag of ghcr.io/developmi/caddy-waf (e.g. v3.3.1) or commit SHA
+      placeholder: v3.3.1
+    validations:
+      required: true
+  - type: dropdown
+    id: deployment-mode
+    attributes:
+      label: Deployment mode
+      options:
+        - Docker Compose
+        - systemd (bare metal)
+        - Kubernetes
+        - Other
+    validations:
+      required: true
+  - type: dropdown
+    id: waf-mode
+    attributes:
+      label: WAF mode
+      description: As configured in the Caddyfile (SecRuleEngine)
+      options:
+        - DetectionOnly
+        - "On"
+    validations:
+      required: true
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: Expected vs. actual behavior, including error messages
+    validations:
+      required: true
+  - type: textarea
+    id: steps-to-reproduce
+    attributes:
+      label: Steps to reproduce
+      description: Minimal configuration and request that triggers the issue
+      placeholder: |
+        1. Start the stack with `docker compose up`
+        2. Send request ...
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant logs
+      description: Output of `docker compose logs`, Caddy admin log, or FTW run
+      render: shell
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional context
+      description: Environment details, custom Caddyfile snippets, or screenshots
