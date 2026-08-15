@@ -3,7 +3,7 @@
 Run these checklists for every deployment of caddy-waf — Docker Compose and
 systemd (bare-metal). Kubernetes is **out of scope** and covered later.
 
-The WAF defaults to `SecRuleEngine DetectionOnly` (Caddyfile:30): it logs
+The WAF defaults to `SecRuleEngine DetectionOnly` (Caddyfile.example:56): it logs
 attacks but never blocks. Keep this mode for a 7–14 day observation window
 before switching to `On`. See [incident-response.md](incident-response.md) if
 you see unexpected blocking after enabling `On`.
@@ -75,7 +75,10 @@ The unit runs `/usr/bin/caddy run --environ --config /etc/caddy/Caddyfile` as
 the `caddy-waf` user, so the runtime config and WAF rules live on disk, not in
 a container:
 
-- `/etc/caddy/Caddyfile` — site config (same file as the compose runtime file)
+- `/etc/caddy/Caddyfile` — site config for systemd, deployed from
+  `deploy/systemd/Caddyfile.systemd` (zero-trust variant: admin API bound to
+  loopback only). Do NOT reuse the compose runtime file — its admin bind
+  assumes the container network
 - `/etc/caddy/coraza.conf` and `/etc/caddy/owasp-crs/` — Coraza + CRS rules
   referenced by the Caddyfile `Include` directives
 - State lands in `/var/lib/caddy-waf` (systemd `StateDirectory=caddy-waf`)
@@ -130,9 +133,11 @@ a container:
 - [ ] Healthcheck passes: compose probes `curl -fs http://127.0.0.1:2019/metrics`
       every 30s (docker-compose.yml:40-45)
 - [ ] Admin `/metrics` is reachable only on the internal network — port 2019 is
-      **never** published to the host (Caddyfile:5-9); verify it is not
+      **never** published to the host (Caddyfile.example:16-20); verify it is not
       published: `docker compose ps` shows only 80/443 on the host
-- [ ] WAF is in `DetectionOnly` (Caddyfile:30) unless your observation window
+- [ ] systemd: admin API is bound to **loopback only** (Caddyfile.systemd:21-25) —
+      `ss -ltn` shows 2019 listening on `127.0.0.1`, never `*`
+- [ ] WAF is in `DetectionOnly` (Caddyfile.example:56) unless your observation window
       is over — never enable `On` on day one
 - [ ] A real request passes through: `curl -I https://yourdomain.com`
 - [ ] Audit log line appears for your request (JSON, `waf_rule_id` present) —

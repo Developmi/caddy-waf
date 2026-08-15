@@ -57,6 +57,8 @@
 
             # 5. Audit logging configuration
             SecAuditEngine RelevantOnly
+            # Deliberate divergence: the baked default audits to /data/logs/coraza-audit.log (M4);
+            # this standalone/systemd template audits to stdout for journald/collectors (§7/D6).
             SecAuditLog /dev/stdout
             SecAuditLogFormat JSON
             SecAuditLogParts ABCDEFGHIJKZ
