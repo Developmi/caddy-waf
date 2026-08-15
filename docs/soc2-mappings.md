@@ -31,7 +31,7 @@ project does not claim controls it does not have.
 
 | Requirement | Implementation | Evidence |
 |-------------|----------------|----------|
-| Changes are authorized and tested before release | PRs to `main` run the lint workflow (yamllint, hadolint, actionlint, zizmor); integration suite `make test-waf` (4 go-ftw cases) validates WAF behavior; container scans gate CRITICAL/HIGH before push | lint.yml:4-5,41-52; Makefile:103-104; tests/integration/baseline.yaml; .github/workflows/docker-build-scan-sign.yml:80-88 |
+| Changes are authorized and tested before release | PRs to `main` run the lint workflow (yamllint, hadolint, actionlint, zizmor); integration suite `make test-waf` (4 go-ftw cases) validates WAF behavior; container scans gate CRITICAL/HIGH before push | lint.yml:4-5,41-52; Makefile:103-104; tests/integration/baseline.yaml; .github/workflows/docker-build-scan-sign.yml:100-115 |
 | Releases are intentional and auditable | Pushes to the registry happen **only** on `v*` tags; multi-arch build, SBOM, Cosign keyless signature and attestation, SLSA provenance all tied to the tag event | .github/workflows/docker-build-scan-sign.yml:5,98-149 |
 | Dependencies are tracked and updated | Dependabot config for Docker + GitHub Actions | .github/dependabot.yml (commit 87c7c93) |
 | Changes are documented | Deployment checklists per environment, tuning guide, changelog, this mapping | docs/deployment-checklist.md; TUNING.md; CHANGELOG.md |

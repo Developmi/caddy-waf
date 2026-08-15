@@ -183,6 +183,25 @@ jobs:
           subject-digest: ${{ steps.build-push.outputs.digest }}
           push-to-registry: true
 
+      # Rollback: if signing/attestation/SBOM fails after publish, remove the
+      # published version so a broken tag is never left unsigned.
+      - name: Rollback tag if post-push steps failed
+        if: failure() && steps.build-push.outputs.digest != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REF_NAME: ${{ github.ref_name }}
+        run: |
+          PACKAGE="orgs/${{ github.repository_owner }}/packages/container/caddy-waf"
+          VERSION_ID="$(gh api "${PACKAGE}/versions" \
+            | jq -r --arg ref "$REF_NAME" '.[] | select(.metadata.container.tags[]? == $ref) | .id' \
+            | head -1)"
+          if [ -n "$VERSION_ID" ]; then
+            gh api -X DELETE "${PACKAGE}/versions/${VERSION_ID}" \
+              -f confirm=true -H "Accept: application/vnd.github+json"
+          else
+            echo "::notice::Rollback skipped: no published version found for tag ${REF_NAME}"
+          fi
+
       - name: Build summary
         if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
         env:

@@ -195,9 +195,6 @@ The following CVEs affect older OWASP CRS versions. **caddy-waf v3.0.0 ships CRS
 |-----|------|----------|-------------|
 | CVE-2026-21876 | **9.3 CRITICAL** | CRS ≥ 4.22.0 | Multipart charset bypass in rule 922110 |
 | CVE-2026-33691 | **6.8 MEDIUM** | CRS ≥ 4.25.0 | File upload bypass with whitespace padding |
-
----
-
 ---
 
 ## Pending advisories (waiting on Caddy ≥ 2.11.5)
@@ -226,6 +223,7 @@ These advisories affect the Caddy 2.11.4 binary or configuration surface and hav
 | **2026-07-02** | OWASP CRS v4.28.0 released (included) |
 | **2026-08-11** | caddy-waf **v3.3.0** released - tool bumps (hadolint 2.15.1, go-ftw 2.5.0, Trivy v0.73.0), full `apk upgrade`, JSON-form HEALTHCHECK, version alignment |
 | **2026-08-11** | caddy-waf **v3.3.1** released - HEALTHCHECK via admin `/metrics` (curl), resource limits (mem 512m, 1 CPU), JSON-file log rotation (50m × 5) |
+| **2026-08-14** | caddy-waf **v3.3.2** released - WAF active by default (DetectionOnly), dual-arch scanning, bare-boot regression gate (make test-boot), systemd Caddyfile variant tracked |
 
 ---
 

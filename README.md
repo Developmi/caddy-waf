@@ -272,10 +272,12 @@ config `deploy/systemd/Caddyfile.systemd` — the admin API is bound to loopback
 only (`admin localhost:2019`). Never use `0.0.0.0:2019` on a host network: the
 admin API accepts config POSTs.
 
+**Prerequisite:** caddy binary with Coraza and `/etc/caddy/coraza.conf` + `/etc/caddy/owasp-crs` installed on the host (see pre-flight checklist in `docs/deployment-checklist.md`).
+
 ```bash
 sudo cp deploy/systemd/caddy-waf.service /etc/systemd/system/
 sudo useradd -r -s /usr/sbin/nologin caddy-waf
-sudo install -o caddy-waf -g caddy-waf -m 0640 deploy/systemd/Caddyfile.systemd /etc/caddy/Caddyfile
+sudo install -D -o caddy-waf -g caddy-waf -m 0640 deploy/systemd/Caddyfile.systemd /etc/caddy/Caddyfile
 sudo -u caddy-waf caddy validate --config /etc/caddy/Caddyfile
 sudo systemctl daemon-reload
 sudo systemctl enable --now caddy-waf
@@ -458,12 +460,12 @@ The project follows [Keep a Changelog](https://keepachangelog.com/) and [Semanti
 
 | Version | Date | Highlights |
 |---------|------|------------|
-| [3.3.1](./CHANGELOG.md#331--2026-08-11) | 2026-08-11 | HEALTHCHECK via admin /metrics (curl), resource limits (512m/1 CPU), JSON-file log rotation, version alignment |
-| [3.3.2](./CHANGELOG.md#332--2026-08-14) | 2026-08-14 | WAF default active (DetectionOnly), dual-arch scanning, boot regression gate, systemd variant tracked |
-| [3.3.0](./CHANGELOG.md#330--2026-08-11) | 2026-08-11 | Tool bumps (hadolint 2.15.1, go-ftw 2.5.0, Trivy v0.73.0), full apk upgrade, HEALTHCHECK JSON, version alignment |
-| [3.0.0](./CHANGELOG.md#300--2026-07-01) | 2026-07-01 | Caddy 2.11.4 upgrade, Official upstream plugins, CVE fixes, security headers plugin |
-| [2.0.0](./CHANGELOG.md#200--2026-03-14) | 2026-03-14 | Security hardening, systemd, OCI labels, CI updates |
-| [1.0.0](./CHANGELOG.md#100--2026-02-09) | 2026-02-09 | Initial release with Coraza WAF + OWASP CRS |
+| [3.3.2](./CHANGELOG.md#332---2026-08-14) | 2026-08-14 | WAF default active (DetectionOnly), dual-arch scanning, boot regression gate, systemd variant tracked |
+| [3.3.1](./CHANGELOG.md#331---2026-08-11) | 2026-08-11 | HEALTHCHECK via admin /metrics (curl), resource limits (512m/1 CPU), JSON-file log rotation, version alignment |
+| [3.3.0](./CHANGELOG.md#330---2026-08-11) | 2026-08-11 | Tool bumps (hadolint 2.15.1, go-ftw 2.5.0, Trivy v0.73.0), full apk upgrade, HEALTHCHECK JSON, version alignment |
+| [3.0.0](./CHANGELOG.md#300---2026-07-01) | 2026-07-01 | Caddy 2.11.4 upgrade, Official upstream plugins, CVE fixes, security headers plugin |
+| [2.0.0](./CHANGELOG.md#200---2026-03-14) | 2026-03-14 | Security hardening, systemd, OCI labels, CI updates |
+| [1.0.0](./CHANGELOG.md#100---2026-02-09) | 2026-02-09 | Initial release with Coraza WAF + OWASP CRS |
 
 ---
 

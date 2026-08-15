@@ -95,6 +95,8 @@ a container:
 
    ```bash
    sudo -u caddy-waf caddy validate --config /etc/caddy/Caddyfile
+   # Works without the ACME_EMAIL drop-in: {$ACME_EMAIL:} defaults to empty;
+   # ACME_EMAIL is applied via the drop-in in step 4.
    ```
 
 3. Enable and start:
