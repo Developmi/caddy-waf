@@ -68,26 +68,69 @@ RUN mkdir -p /etc/caddy/owasp-crs /tmp/downloads && \
     test -f /etc/caddy/owasp-crs/crs-setup.conf
 
 ## Adjust permissions for non-privileged caddy user (UID 1337, GID 1337)
-RUN chown -R 1337:1337 /etc/caddy/owasp-crs /etc/caddy/coraza.conf && \
+RUN mkdir -p /data/logs && \
+    chown -R 1337:1337 /etc/caddy/owasp-crs /etc/caddy/coraza.conf /data/logs && \
     chmod -R 755 /etc/caddy/owasp-crs && \
     chmod 644 /etc/caddy/coraza.conf
 
-# Create default Caddyfile for validation
-RUN echo '# Default Caddyfile - replace with volume mount' > /etc/caddy/Caddyfile.default && \
-    echo '{' >> /etc/caddy/Caddyfile.default && \
-    echo '    # Global configuration' >> /etc/caddy/Caddyfile.default && \
-    echo '    log {' >> /etc/caddy/Caddyfile.default && \
-    echo '        output stdout' >> /etc/caddy/Caddyfile.default && \
-    echo '        format json' >> /etc/caddy/Caddyfile.default && \
-    echo '    }' >> /etc/caddy/Caddyfile.default && \
-    echo '}' >> /etc/caddy/Caddyfile.default && \
-    echo '' >> /etc/caddy/Caddyfile.default && \
-    echo ':80 {' >> /etc/caddy/Caddyfile.default && \
-    echo '    respond "Caddy WAF is running"' >> /etc/caddy/Caddyfile.default && \
-    echo '}' >> /etc/caddy/Caddyfile.default
+# Default Caddyfile — ACTIVE WAF baseline (DetectionOnly).
+# The image CMD runs `caddy run --config /etc/caddy/Caddyfile`, so the loaded
+# default is this file; Caddyfile.default is the reference copy. Replace both
+# with a volume mount (/etc/caddy/Caddyfile) for real deployments.
+RUN cat > /etc/caddy/Caddyfile.default <<'EOF'
+# Default Caddyfile - replace with volume mount
+{
+    # Zero-trust default: admin API bound to loopback only (Caddy default).
+    # Bind to 0.0.0.0:2019 ONLY inside an isolated Docker network when the
+    # caddy-waf-ui or observability scraping requires it - never host-published.
+    admin localhost:2019
+
+    order coraza_waf first
+
+    log {
+        output stdout
+        format json
+    }
+}
+
+(waf) {
+    coraza_waf {
+        directives `
+            Include /etc/caddy/coraza.conf
+            Include /etc/caddy/owasp-crs/crs-setup.conf
+            Include /etc/caddy/owasp-crs/rules/*.conf
+
+            # Default mode for new deployments: monitor first, then enforce.
+            SecRuleEngine DetectionOnly
+            SecAuditEngine RelevantOnly
+            SecAuditLog /data/logs/coraza-audit.log
+            SecAuditLogFormat JSON
+            SecAuditLogParts ABCDEFGHIJKZ
+        `
+    }
+}
+
+:80 {
+    import waf
+    respond "Caddy WAF is running"
+}
+EOF
+
+# Loaded default: the config Caddy actually starts with (CMD default).
+RUN cp /etc/caddy/Caddyfile.default /etc/caddy/Caddyfile
 
 # Validate Caddy and WAF configuration
 RUN caddy validate --config /etc/caddy/Caddyfile.default --adapter caddyfile
+
+# Coraza provisions /data/logs/coraza-audit.log as root during the validate above;
+# re-chown so the baked default config boots as UID 1337 (contract §7/D6).
+RUN chown -R 1337:1337 /data/logs
+
+# Build-time release gate: the baked default MUST enable the WAF (contract §9).
+# A bare `docker run` of this image must never serve traffic without Coraza.
+RUN grep -q 'coraza_waf' /etc/caddy/Caddyfile && \
+    grep -q 'SecRuleEngine DetectionOnly' /etc/caddy/Caddyfile && \
+    grep -q 'SecAuditLog /data/logs/coraza-audit.log' /etc/caddy/Caddyfile
 
 ## Ensure caddy user exists with UID 1337 and GID 1337 (align with hardening suite)
 RUN id -u caddy 2>/dev/null || (addgroup -g 1337 -S caddy && adduser -u 1337 -S caddy -G caddy)
