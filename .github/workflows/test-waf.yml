@@ -28,6 +28,9 @@ jobs:
           set -o pipefail
           make test-waf 2>&1 | tee go-ftw.log
 
+      - name: Run bare-boot regression test
+        run: make test-boot
+
       - name: Tear down test stack
         if: always()
         run: make test-clean

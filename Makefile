@@ -29,6 +29,7 @@ help:
 	@echo "-------"
 	@echo "  make test           Run all checks (lint + WAF integration)"
 	@echo "  make test-waf       Run WAF integration tests against live container"
+	@echo "  make test-boot      Run bare-boot regression test (baked default as UID 1337)"
 	@echo "  make test-clean     Clean up leftover test containers"
 	@echo ""
 
@@ -102,6 +103,9 @@ test: lint test-waf                # Run all checks (lint + WAF integration)
 
 test-waf: tools                    # Run WAF integration tests against live container
 	@tools/test-integration.sh
+
+test-boot: tools                   # Run bare-boot regression test (baked default as UID 1337)
+	@tools/test-boot.sh
 
 test-clean:                        # Force cleanup any leftover test containers
 	@docker compose -f docker-compose.yml -f docker-compose.test.yml down -v 2>/dev/null || true
