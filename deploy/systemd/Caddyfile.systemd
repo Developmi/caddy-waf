@@ -1,0 +1,108 @@
+# Caddyfile for systemd deployments (caddy-waf.service)
+# =====================================================
+# Zero-trust variant of Caddyfile.example for bare-metal/systemd deployments.
+# The unit runs in the HOST network namespace, so the admin API MUST stay on
+# loopback: `admin localhost:2019` is reachable only by local processes.
+# NEVER change this to 0.0.0.0:2019 on a host network — the admin API accepts
+# config POSTs (Caddy docs: anyone who can reach the endpoint could control
+# the server). Container deployments (Docker Compose) use Caddyfile.example,
+# where the admin endpoint is bound inside the isolated Docker network.
+# Documentation: https://github.com/Developmi/caddy-waf
+
+# Global configuration
+{
+    # Email for Let's Encrypt certificates
+    email {$ACME_EMAIL}
+
+    # Security order - WAF must be first
+    order coraza_waf first
+    order rate_limit before basicauth
+
+    # Zero-trust: admin API on loopback only (host network namespace).
+    # Local processes (healthcheck, `caddy reload`/`caddy stop`, host metrics
+    # scraping) can reach it; LAN, Tailscale, WAN and Docker bridge containers
+    # cannot.
+    admin localhost:2019
+
+    # Enable Caddy HTTP metrics collection (caddy_http_*); served on the admin
+    # /metrics endpoint. NOTE: this is a global option - the site-level
+    # "metrics" directive only serves the registry and must NOT be added.
+    metrics
+
+    # Structured JSON logging for observability
+    log {
+        output stdout
+        format json {
+            time_format "iso8601"
+            level "info"
+        }
+    }
+}
+
+# WAF Configuration Block
+# -----------------------
+# By default, WAF runs in DetectionOnly mode to prevent false positives.
+# Change to 'SecRuleEngine On' after monitoring and tuning.
+(waf) {
+    coraza_waf {
+        directives `
+            # 1. Base Coraza configuration
+            Include /etc/caddy/coraza.conf
+
+            # 2. OWASP CRS setup configuration
+            Include /etc/caddy/owasp-crs/crs-setup.conf
+
+            # 3. OWASP CRS protection rules
+            Include /etc/caddy/owasp-crs/rules/*.conf
+
+            # 4. WAF Engine Mode
+            # Options: On, Off, DetectionOnly
+            # Start with DetectionOnly, monitor logs, then switch to On
+            SecRuleEngine DetectionOnly
+
+            # 5. Audit logging configuration
+            SecAuditEngine RelevantOnly
+            SecAuditLog /dev/stdout
+            SecAuditLogFormat JSON
+            SecAuditLogParts ABCDEFGHIJKZ
+        `
+    }
+}
+
+# Example 1: Simple static site with WAF (env-driven via --environ)
+# ------------------------------------------------------------------
+{$SITE_ADDRESS:example.com} {
+    import waf
+
+    tls {
+        protocols tls1.2 tls1.3
+    }
+
+    header {
+        Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+        X-Content-Type-Options "nosniff"
+        X-Frame-Options "DENY"
+        Referrer-Policy "strict-origin-when-cross-origin"
+    }
+
+    respond "Caddy with Coraza WAF is working!" 200
+}
+
+# Example 2: Reverse proxy to a backend service with WAF (env-driven)
+# --------------------------------------------------------------------
+api.example.com {
+    import waf
+
+    tls {
+        protocols tls1.2 tls1.3
+    }
+
+    header {
+        Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+        X-Content-Type-Options "nosniff"
+        X-Frame-Options "DENY"
+        Referrer-Policy "strict-origin-when-cross-origin"
+    }
+
+    reverse_proxy {$BACKEND_UPSTREAM:example-app:80}
+}
