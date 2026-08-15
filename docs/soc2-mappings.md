@@ -14,14 +14,14 @@ project does not claim controls it does not have.
 |-------------|----------------|----------|
 | Restrict access to systems and data | Container runs as non-root `1337:1337`, drops all capabilities except `NET_BIND_SERVICE`, `no-new-privileges`, read-only rootfs, tmpfs mounted `noexec` | docker-compose.yml:8-21 |
 | Apply least privilege to the host process (bare-metal) | systemd unit runs as dedicated `caddy-waf` user with `AmbientCapabilities=CAP_NET_BIND_SERVICE` only, `NoNewPrivileges=true`, `ProtectSystem=strict`, `PrivateTmp`, syscall filtering | deploy/systemd/caddy-waf.service:8-18,25-40 |
-| Prevent unauthorized exposure of management interfaces | Caddy admin API (`:2019`, serves `/metrics`) is bound inside the internal Docker network only — never published to the host; Grafana bound to loopback | Caddyfile:5-9; docker-compose.yml:22-25,141,167 |
-| Secure configuration of security components | WAF defaults to `SecRuleEngine DetectionOnly` — new deployments observe before enforcing, reducing the blast radius of misconfiguration | Caddyfile:30 |
+| Prevent unauthorized exposure of management interfaces | Caddy admin API (`:2019`, serves `/metrics`) is bound inside the internal Docker network only — never published to the host; Grafana bound to loopback | Caddyfile.example:16-20; docker-compose.yml:22-25,141,167 |
+| Secure configuration of security components | WAF defaults to `SecRuleEngine DetectionOnly` — new deployments observe before enforcing, reducing the blast radius of misconfiguration | Caddyfile.example:56 |
 
 ## CC7 — Monitoring, detection & incident response
 
 | Requirement | Implementation | Evidence |
 |-------------|----------------|----------|
-| Detect anomalous activity | Structured JSON access + WAF audit logs to stdout (Coraza audit log carries `waf_rule_id` / decision); `caddy_http_*` Prometheus metrics on the admin endpoint | Caddyfile:16-19,31-34; README.md:319-347 |
+| Detect anomalous activity | Structured JSON access + WAF audit logs to stdout (Coraza audit log carries `waf_rule_id` / decision); `caddy_http_*` Prometheus metrics on the admin endpoint | Caddyfile.example:25-31,60-62; README.md:319-347 |
 | Collect and store metrics | Dual-backend observability (VictoriaMetrics or Prometheus) scraping the same `metrics/prometheus.yml`; Grafana dashboard with request rate, status codes, p95 latency, backend health | docker-compose.yml:62-172; metrics/prometheus.yml; grafana/dashboards/caddy-waf.json |
 | Monitor service health | Healthcheck probes the admin `/metrics` endpoint every 30s (process + API check) | docker-compose.yml:40-45 |
 | Respond to identified incidents | Dedicated IR runbook for WAF false positives: triage, rule exclusion, DetectionOnly fallback, severity table | docs/incident-response.md |

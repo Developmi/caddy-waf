@@ -73,3 +73,9 @@ Evaluate reloading WAF rules without container restart (e.g., via Caddy admin AP
 
 ### 5. Expand go-ftw integration test coverage
 The CI gate (`test-waf.yml`) runs the 4-case baseline suite (allow + SQLi/XSS/traversal) on every PR and push to main. Planned scale-up: more OWASP CRS vectors (e.g., REQUEST-920 protocol attacks) and a WAF-mode matrix (DetectionOnly vs On).
+
+### 6. mTLS remote administration (contract §6 target state)
+Enable Caddy's remote admin listener (`admin.remote`, default `:2021`) with mutual TLS — `admin.identity` (issuer: internal/local CA) + `access_control[].public_keys` (base64 DER client certs) + path/method permissions. **JSON config only** — the Caddyfile `admin` block cannot express identity/remote (upstream `options.go` supports only `origins`/`enforce_origin`). Requires: systemd deployment moves from Caddyfile to a JSON config, client-cert issuance/rotation from the local PKI CA (`pki/authorities/local`, Smallstep-backed), and the plaintext local endpoint stays on loopback (it has no TLS/mTLS capability upstream). Upstream marks remote admin EXPERIMENTAL — re-validate before adopting.
+
+### 7. UI client certificates (caddy-waf-ui mTLS consumer)
+TLS client support in the UI's admin client: `tls.Config` with client certificate + local-CA root, `CADDY_ADMIN_URL` https, env-driven cert paths; contract INTEGRATION.md §4/§10 updates. Unblocks mTLS remote admin end-to-end (items 6 + this one are the §6 target pair).

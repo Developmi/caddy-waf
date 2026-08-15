@@ -47,7 +47,7 @@ jobs:
           tags: |
             type=ref,event=tag
 
-      - name: Build image for local scan (load into docker daemon)
+      - name: Build amd64 image for local scan (load into docker daemon)
         id: build-scan
         uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a # v7.3.0
         with:
@@ -58,14 +58,26 @@ jobs:
           tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}-scan
           labels: ${{ steps.meta.outputs.labels }}
 
-      # ponytail: amd64-only scan. CRITICAL/HIGH vulns are arch-independent
+      - name: Build arm64 image for local scan (load into docker daemon)
+        id: build-scan-arm64
+        uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a # v7.3.0
+        with:
+          context: .
+          push: false
+          load: true
+          platforms: linux/arm64
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}-scan-arm64
+          labels: ${{ steps.meta.outputs.labels }}
+
+      # Both architectures are scanned before push; the published platforms
+      # (linux/amd64, linux/arm64) must match the scanned surface exactly.
       - name: Install Trivy
         uses: aquasecurity/setup-trivy@81e514348e19b6112ce2a7e3ecbafe19c1e1f567 # v0.3.1
         with:
           version: v0.73.0
           cache: true
 
-      - name: Generate Trivy SARIF report
+      - name: Generate Trivy SARIF reports (amd64 + arm64)
         continue-on-error: true
         run: |
           trivy image \
@@ -76,8 +88,16 @@ jobs:
             --format sarif \
             --output trivy-results.sarif \
             "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}-scan"
+          trivy image \
+            --scanners vuln \
+            --severity CRITICAL,HIGH \
+            --ignore-unfixed \
+            --skip-version-check \
+            --format sarif \
+            --output trivy-results-arm64.sarif \
+            "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}-scan-arm64"
 
-      - name: Scan with Trivy (gate — fail on CRITICAL/HIGH)
+      - name: Scan with Trivy (gate — fail on CRITICAL/HIGH, both architectures)
         run: |
           trivy image \
             --scanners vuln \
@@ -86,14 +106,29 @@ jobs:
             --skip-version-check \
             --exit-code 1 \
             "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}-scan"
+          trivy image \
+            --scanners vuln \
+            --severity CRITICAL,HIGH \
+            --ignore-unfixed \
+            --skip-version-check \
+            --exit-code 1 \
+            "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}-scan-arm64"
 
-      - name: Upload Trivy SARIF
+      - name: Upload Trivy SARIF (amd64)
         if: (!cancelled()) && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
         continue-on-error: true
         uses: github/codeql-action/upload-sarif@eec0bff2f6c15bf3f1e8a0152f94d17664a06a06 # v4
         with:
           sarif_file: trivy-results.sarif
           category: trivy
+
+      - name: Upload Trivy SARIF (arm64)
+        if: (!cancelled()) && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
+        continue-on-error: true
+        uses: github/codeql-action/upload-sarif@eec0bff2f6c15bf3f1e8a0152f94d17664a06a06 # v4
+        with:
+          sarif_file: trivy-results-arm64.sarif
+          category: trivy-arm64
 
       - name: Build and push multi-arch (tag releases only)
         if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')

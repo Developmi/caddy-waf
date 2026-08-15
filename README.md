@@ -81,7 +81,7 @@ Starting from v3.0.0, the image ships with updated Caddy 2.11.4, official upstre
 
 ### 1. Pull the Image
 ```bash
-docker pull ghcr.io/developmi/caddy-waf:v3.3.1
+docker pull ghcr.io/developmi/caddy-waf:v3.3.2
 ```
 
 ### 2. Create Environment File
@@ -138,7 +138,7 @@ caddy-waf/
 ├── grafana/                  # Provisioned datasources + dashboards
 ├── Dockerfile                # Multi-stage build with pinned plugins
 ├── docker-compose.yml        # Production-grade compose with security hardening
-├── Caddyfile                 # Runtime configuration (WAF + TLS + reverse proxy)
+├── Caddyfile                 # Runtime configuration — untracked, generated from Caddyfile.example (WAF + TLS + reverse proxy)
 ├── Caddyfile.example         # Templated configuration with 5 deployment examples
 ├── .env.example              # Environment variable template (3 groups)
 ├── TUNING.md                 # WAF tuning guide per application type
@@ -229,12 +229,11 @@ volumes:
 ### Environment Variables
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `CADDY_WAF_IMAGE` | `ghcr.io/developmi/caddy-waf:v3.3.1` | Caddy WAF image reference |
+| `CADDY_WAF_IMAGE` | `ghcr.io/developmi/caddy-waf:v3.3.2` | Caddy WAF image reference |
 | `EXAMPLE_APP_IMAGE` | `containous/whoami:latest` | Demo backend image |
 | `SITE_ADDRESS` | `localhost` | Site address/server name used by Caddy |
 | `BACKEND_UPSTREAM` | `example-app:80` | Reverse proxy backend upstream |
 | `ACME_EMAIL` | (empty) | Email for Let's Encrypt certificates |
-| `CADDY_ADAPTER` | `caddyfile` | Configuration adapter to use |
 
 ### Plugins Included
 - `github.com/corazawaf/coraza-caddy/v2@v2.5.0` - Coraza WAF integration
@@ -268,9 +267,16 @@ docker build \
 ```
 
 ### Systemd deployment (bare-metal)
+The unit runs on the **host network namespace**, so it uses the zero-trust
+config `deploy/systemd/Caddyfile.systemd` — the admin API is bound to loopback
+only (`admin localhost:2019`). Never use `0.0.0.0:2019` on a host network: the
+admin API accepts config POSTs.
+
 ```bash
 sudo cp deploy/systemd/caddy-waf.service /etc/systemd/system/
 sudo useradd -r -s /usr/sbin/nologin caddy-waf
+sudo install -o caddy-waf -g caddy-waf -m 0640 deploy/systemd/Caddyfile.systemd /etc/caddy/Caddyfile
+sudo -u caddy-waf caddy validate --config /etc/caddy/Caddyfile
 sudo systemctl daemon-reload
 sudo systemctl enable --now caddy-waf
 ```
@@ -307,10 +313,10 @@ curl -I https://yourdomain.com
 ### Security Scanning
 ```bash
 # Scan image with Trivy
-docker run --rm aquasec/trivy image ghcr.io/developmi/caddy-waf:v3.3.1
+docker run --rm aquasec/trivy image ghcr.io/developmi/caddy-waf:v3.3.2
 
 # Scan with Docker Scout
-docker scout quickview ghcr.io/developmi/caddy-waf:v3.3.1
+docker scout quickview ghcr.io/developmi/caddy-waf:v3.3.2
 ```
 
 ---
@@ -376,7 +382,7 @@ anonymous read access so the dashboard opens without login
 - `metrics/prometheus.yml` — single canonical scrape config, mounted read-only:
   VictoriaMetrics consumes it via `-promscrape.config`, Prometheus via
   `--config.file`. Targets the internal `caddy-waf:2019`.
-- The Caddyfile exposes the admin endpoint (`/metrics`) on `0.0.0.0:2019` and
+- Caddyfile.example exposes the admin endpoint (`/metrics`) on `0.0.0.0:2019` and
   enables `caddy_http_*` metric collection.
 - Each profile provisions its own Grafana datasource (VictoriaMetrics or
   Prometheus) pointing at the backend, and loads the same dashboard
@@ -453,6 +459,7 @@ The project follows [Keep a Changelog](https://keepachangelog.com/) and [Semanti
 | Version | Date | Highlights |
 |---------|------|------------|
 | [3.3.1](./CHANGELOG.md#331--2026-08-11) | 2026-08-11 | HEALTHCHECK via admin /metrics (curl), resource limits (512m/1 CPU), JSON-file log rotation, version alignment |
+| [3.3.2](./CHANGELOG.md#332--2026-08-14) | 2026-08-14 | WAF default active (DetectionOnly), dual-arch scanning, boot regression gate, systemd variant tracked |
 | [3.3.0](./CHANGELOG.md#330--2026-08-11) | 2026-08-11 | Tool bumps (hadolint 2.15.1, go-ftw 2.5.0, Trivy v0.73.0), full apk upgrade, HEALTHCHECK JSON, version alignment |
 | [3.0.0](./CHANGELOG.md#300--2026-07-01) | 2026-07-01 | Caddy 2.11.4 upgrade, Official upstream plugins, CVE fixes, security headers plugin |
 | [2.0.0](./CHANGELOG.md#200--2026-03-14) | 2026-03-14 | Security hardening, systemd, OCI labels, CI updates |

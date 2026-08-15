@@ -25,7 +25,7 @@ README.md:228-235).
 | `SITE_ADDRESS` | `localhost` | Site address / server name | Set to your public domain when serving TLS via Let's Encrypt |
 | `BACKEND_UPSTREAM` | `example-app:80` | Reverse proxy target | Point to your real backend (service name on the compose network, or host:port) |
 | `ACME_EMAIL` | empty | Let's Encrypt certificate issuance | Set to a monitored mailbox (expiry warnings) |
-| `CADDY_WAF_IMAGE` | `ghcr.io/developmi/caddy-waf:v3.3.1` | Image to run | Prefer an immutable digest (`@sha256:...`) in production |
+| `CADDY_WAF_IMAGE` | `ghcr.io/developmi/caddy-waf:v3.3.2` | Image to run | Prefer an immutable digest (`@sha256:...`) in production |
 
 - [ ] `.env` exists and has real values (`cp .env.example .env`, then edit)
 - [ ] Runtime `Caddyfile` exists (`cp Caddyfile.example Caddyfile`) and matches

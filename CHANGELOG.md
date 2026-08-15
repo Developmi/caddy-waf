@@ -3,6 +3,27 @@
 All notable changes to this project will be documented in this file.
 Format: [Keep a Changelog](https://keepachangelog.com/) · Versioning: [SemVer](https://semver.org/)
 
+## [3.3.2] - 2026-08-14
+
+### Added
+
+- **Dockerfile**: WAF is now **active by default** in the baked config — `coraza_waf` runs first (`order coraza_waf first`), `SecRuleEngine DetectionOnly`, `SecAuditEngine RelevantOnly`, JSON audit log to `/data/logs/coraza-audit.log`, and a build-time grep gate fails the image if the WAF directives are missing.
+- **Dockerfile**: `/data/logs` is created and owned by UID 1337 so Coraza can write the audit log at runtime (contract §7/D6).
+- **CI**: dual-architecture Trivy scan (amd64 + arm64) with SARIF upload and CRITICAL/HIGH exit-code gate on both architectures.
+- **Tests**: new bare-boot regression gate `make test-boot` (`tools/test-boot.sh`) — asserts the image starts healthy with the baked default config as UID 1337 (no mounts).
+- **deploy/systemd**: tracked `Caddyfile.systemd` zero-trust variant (admin API bound to loopback only).
+- **.env.example**: image pinned to `:v3.3.2` (no `:latest`); removed obsolete `CADDY_ADAPTER`.
+
+### Fixed
+
+- **Dockerfile**: baked default config could not boot as UID 1337 — `caddy validate` at build time (root) made Coraza create `/data/logs/coraza-audit.log` as root; the file is now re-chowned (`chown -R 1337:1337 /data/logs`) right after validation.
+- **docs**: corrected `Caddyfile.systemd` admin citation in `docs/deployment-checklist.md` (lines 21-25).
+
+### Changed
+
+- **Version alignment**: OCI `LABEL version`, Compose default image tag, `.env.example`, `pyproject.toml`/`uv.lock`, AGENTS.md, README.md, SECURITY.md, and bug report template aligned to **v3.3.2**.
+- **Known issues (waiting on Caddy ≥ 2.11.5)**: unchanged from 3.3.1 — `CVE-2026-56852`, `GHSA-hrxh-6v49-42gf`, `CVE-2026-46600` (tracked in `.trivyignore`) and `GHSA-6365-7ppr-5r92` (Moderate, documented in SECURITY.md).
+
 ## [3.3.1] - 2026-08-11
 
 ### Added
@@ -18,7 +39,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/) · Versioning: [SemVer](
 
 ### Known issues (waiting on Caddy ≥ 2.11.5)
 
-- **`CVE-2026-46600`** — golang.org/x/net v0.55.0 (embedded in the Caddy 2.11.4 binary), DoS via invalid DNS record parsing (`dns/dnsmessage`; fixed in x/net v0.56.0). Identified by the CI Trivy gate on 2026-08-14; tracked in `.trivyignore` until a patched Caddy release exists.
+- **`CVE-2026-46600`** — golang.org/x/net v0.55.0 (embedded in the Caddy 2.11.4 binary), DoS via invalid DNS record parsing (`dns/dnsmessage`; fixed in x/net v0.56.0). Tracked in `.trivyignore` until a patched Caddy release exists (the finding was identified by the CI Trivy gate on 2026-08-14, after this release).
   - **Impact**: low for this deployment — DoS-class only; Caddy core and the `caddy-dns/cloudflare` module do not parse raw DNS wire messages here.
   - **Action**: remove the entry from `.trivyignore` and upgrade the base image to Caddy ≥ 2.11.5 as soon as it ships (also resolves `CVE-2026-56852` and `GHSA-hrxh-6v49-42gf`). Also tracked in SECURITY.md → Pending advisories.
 
@@ -77,7 +98,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/) · Versioning: [SemVer](
 
 ### Fixed
 
-- Upgraded `c-ares`, `curl`, `libcurl` in base image (5 HIGH CVEs: CVE-2026-33630, CVE-2026-5773, CVE-2026-6276).
+- Upgraded `c-ares`, `curl`, `libcurl` in base image (3 HIGH CVEs: CVE-2026-33630, CVE-2026-5773, CVE-2026-6276).
 
 ### Changed
 
@@ -183,6 +204,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/) · Versioning: [SemVer](
 
 <!-- Version links for Keep a Changelog -->
 [3.3.1]: https://github.com/Developmi/caddy-waf/compare/v3.3.0...v3.3.1
+[3.3.2]: https://github.com/Developmi/caddy-waf/compare/v3.3.1...v3.3.2
 [3.3.0]: https://github.com/Developmi/caddy-waf/compare/v3.2.1...v3.3.0
 [3.2.1]: https://github.com/Developmi/caddy-waf/compare/v3.2.0...v3.2.1
 [3.2.0]: https://github.com/Developmi/caddy-waf/compare/v3.1.0...v3.2.0
