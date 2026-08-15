@@ -79,3 +79,17 @@ Enable Caddy's remote admin listener (`admin.remote`, default `:2021`) with mutu
 
 ### 7. UI client certificates (caddy-waf-ui mTLS consumer)
 TLS client support in the UI's admin client: `tls.Config` with client certificate + local-CA root, `CADDY_ADMIN_URL` https, env-driven cert paths; contract INTEGRATION.md §4/§10 updates. Unblocks mTLS remote admin end-to-end (items 6 + this one are the §6 target pair).
+
+### 8. Review follow-ups — 4R v3.3.2 (non-blocking findings, tracked for cleanup)
+All findings below are WARNING/SUGGESTION from the v3.3.2 4R review (lineage `review-004a497aff6bb2fa`) — none block the release; they are tracked here so nothing is left loose.
+
+| # | Location | Issue | Suggested fix |
+|---|----------|-------|---------------|
+| 8.1 | `.github/workflows/docker-build-scan-sign.yml:205-206` | Build summary has an explicit `if:` (replaces implicit `success()`) — on failed tag runs it still prints "🎉 Build Successful!" + docker pull, right after the rollback step | Add `success()` to the step's `if:` condition |
+| 8.2 | `.github/workflows/docker-build-scan-sign.yml:189` | Rollback coverage gaps: run cancellation after push → `failure()` false → rollback never runs; partial multi-arch push → digest unset → guard skips cleanup with tag partially live | Consider `always()` + pre-push state check, or document manual retry |
+| 8.3 | `docs/deployment-checklist.md:105` | `enable --now` (step 3) runs before the ACME_EMAIL drop-in (step 4, :116-120) — first boot uses `example.com` defaults and attempts ACME (noise/backoff) | Reorder steps or document the transient state |
+| 8.4 | `README.md:467-468` | Release-table anchors `#200---2026-03-14` / `#100---2026-02-09` miss the real GitHub id suffix (`-made-in-deprecated-repo`) — fragment navigation broken for 2.0.0/1.0.0 | Complete the anchors with the real ids |
+| 8.5 | `docs/soc2-mappings.md:35,46` | Stale ranges `:5,98-149` / `:111-149` vs real cosign sign `:158-166`, attest `:168-176`, SLSA `:178-184` | Re-cite against the current workflow |
+| 8.6 | `docs/deployment-checklist.md:34` | Cites cosign verify at `README.md:276-287`; the command is actually at `:290-295` | Update the cited range |
+| 8.7 | `README.md:450` | Consecutive `---` horizontal rules (450 and 454) above the releases table | Remove one separator |
+| 8.8 | `docs/soc2-mappings.md:28` | Cites `README.md:345-347`; the "no `coraza_waf_*` metrics" note is at `:355-357` | Update the cited range |
