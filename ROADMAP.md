@@ -39,6 +39,8 @@ Every completed item links to the exact commit that delivered it — verify with
 
 **coraza-caddy v2.5.0 limitation (upstream-watch, not a regression):** the plugin exports **no** `coraza_waf_*` metrics. WAF visibility comes from `caddy_http_*` series, the dashboard WAF-mode panel, and JSON audit logs. Revisit when upstream adds metrics.
 
+**Coraza version alignment (verified 2026-08-21):** coraza-caddy v2.5.0 embeds the **coraza engine v3.7.0** (go.mod at tag v2.5.0), and the `coraza.conf-recommended` downloaded at build time (tag v3.7.0, SHA256-pinned) matches the embedded engine exactly. Engine >= 3.3.3 → CVE-2025-29914 (GHSA-q9f5-625g-xm39) does not apply. coraza-caddy v2.5.0 is the latest tagged plugin release; upstream main already targets Caddy v2.11.4.
+
 ## Current decisions
 
 - No hard blockers in default compose flow.
@@ -60,10 +62,10 @@ Every completed item links to the exact commit that delivered it — verify with
 ## Pending — next priorities
 
 ### 1. Alpine 3.24 base image migration
-The image currently runs on **Alpine 3.23** (CHANGELOG.md:26,33) — not 3.21 — with security support until ~November 2026. Migrate to Alpine 3.24 before EOL; the build-time `apk upgrade` keeps 3.23 patched in the meantime.
+The image currently runs on **Alpine 3.23.5** (verified 2026-08-21 from the `caddy:2.11.4` official image — the Alpine base is fixed by the upstream Caddy image, so an independent base swap would break the pinned Caddy 2.11.4 build). Alpine 3.23 EOL is **2027-11-01** (stack.watch / eosl.date). Migrate to Alpine 3.24 (current, EOL 2028-06-01) once Caddy publishes an image on it; the build-time `apk upgrade` keeps 3.23 packages patched in the meantime.
 
 ### 2. Coraza-caddy issue monitor — HPACK bomb
-Open issue [#316](https://github.com/corazawaf/coraza-caddy/issues/316) — "Potential HTTP/2 HPACK bomb memory exhaustion" in coraza-caddy v2.5.0. Not a published CVE yet, but warrants monitoring.
+Open issue [#316](https://github.com/corazawaf/coraza-caddy/issues/316) — "Potential HTTP/2 HPACK bomb memory exhaustion" in coraza-caddy v2.5.0 (opened 2026-06-09, re-verified open 2026-08-21; context: HTTP/2 "Bomb" class disclosed June 2026, e.g. CVE-2026-49975). Not a published CVE for coraza-caddy yet, but warrants monitoring.
 
 ### 3. Kubernetes deployment profile
 Production-ready K8s manifests (Deployment, Service, Ingress, ConfigMap, HPA). Still pending — the v3.3.x deployment checklists are intentionally Docker + systemd only.

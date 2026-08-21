@@ -87,8 +87,8 @@ All CVEs listed below are resolved in **caddy-waf v3.0.0** (Caddy ≥ 2.11.4) an
 | **Vector** | AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:N |
 | **CWE** | CWE-172 (Encoding Error) |
 | **Description** | Remote Code Execution via FastCGI Unicode encoding bypass. An attacker can execute arbitrary code when Caddy is configured as a reverse proxy to a FastCGI backend by sending a specially crafted request with Unicode-encoded path segments. |
-| **Affected** | caddy-waf < 3.0.0 (Caddy < 2.11.2) |
-| **Resolved In** | Caddy 2.11.2+ (included in caddy-waf v3.0.0) |
+| **Affected** | caddy-waf < 3.0.0 (Caddy < 2.11.1) |
+| **Resolved In** | Caddy 2.11.1+ (included in caddy-waf v3.0.0) |
 
 ### CVE-2026-27587
 
@@ -138,6 +138,19 @@ All CVEs listed below are resolved in **caddy-waf v3.0.0** (Caddy ≥ 2.11.4) an
 | **Affected** | caddy-waf < 3.0.0 (Caddy < 2.11.4) |
 | **Resolved In** | Caddy 2.11.4+ (included in caddy-waf v3.0.0) |
 
+### CVE-2026-45135
+
+| Field | Value |
+|-------|-------|
+| **CVE ID** | CVE-2026-45135 |
+| **CVSS** | **8.1 HIGH** |
+| **Vector** | AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:H |
+| **CWE** | CWE-20 (Improper Input Validation) |
+| **Description** | Unsafe Unicode handling in the FastCGI `splitPos` function (misuse of x/text `search.IgnoreCase` with non-ASCII bytes) can treat non-PHP files as scripts. If an attacker can place content on a file served via FastCGI (e.g. uploads), this can lead to remote code execution. |
+| **Affected** | caddy-waf < 3.0.0 (Caddy 2.7.0 - 2.11.2) |
+| **Resolved In** | Caddy 2.11.3+ (included in caddy-waf v3.0.0) |
+| **Note** | No FastCGI backend is used in the default deployment (reverse-proxy only). Documented for transparency. |
+
 ### CVE-2026-27586
 
 | Field | Value |
@@ -163,6 +176,19 @@ All CVEs listed below are resolved in **caddy-waf v3.0.0** (Caddy ≥ 2.11.4) an
 | **Resolved In** | Caddy 2.11.4+ (included in caddy-waf v3.0.0) |
 | **Note** | Linux/container deployments are **not affected**. Documented for transparency. |
 
+### CVE-2026-30852
+
+| Field | Value |
+|-------|-------|
+| **CVE ID** | CVE-2026-30852 |
+| **CVSS** | **7.5 HIGH** |
+| **Vector** | AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N |
+| **CWE** | CWE-74 + CWE-200 |
+| **Description** | The `vars_regexp` matcher double-expands user-controlled input through Caddy's replacer. A request header containing placeholder syntax (e.g. `{env.DATABASE_URL}` or `{file./etc/passwd}`) is expanded a second time, leaking environment variables, file contents, and system information in response headers. |
+| **Affected** | caddy-waf < 3.0.0 (Caddy >= 2.7.5, < 2.11.2) |
+| **Resolved In** | Caddy 2.11.2+ (included in caddy-waf v3.0.0) |
+| **Note** | Requires the `vars_regexp` matcher in the Caddyfile; not used in the default deployment. Documented for transparency. |
+
 ### CVE-2026-27585
 
 | Field | Value |
@@ -187,6 +213,44 @@ All CVEs listed below are resolved in **caddy-waf v3.0.0** (Caddy ≥ 2.11.4) an
 | **Affected** | caddy-waf < 3.0.0 (Caddy < 2.11.3) |
 | **Resolved In** | Caddy 2.11.3+ (included in caddy-waf v3.0.0) |
 
+### CVE-2026-45692
+
+| Field | Value |
+|-------|-------|
+| **CVE ID** | CVE-2026-45692 |
+| **CVSS** | **5.4 MEDIUM** |
+| **Vector** | AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:L/A:N |
+| **CWE** | CWE-187 (Partial String Comparison) |
+| **Description** | Remote admin authorization bypass in the `/config` API: array index normalization is matched before prefix matching, allowing a limited admin user to reach configuration paths outside the intended prefix. |
+| **Affected** | caddy-waf < 3.0.0 (Caddy >= 2.4.0, < 2.11.3) |
+| **Resolved In** | Caddy 2.11.3+ (included in caddy-waf v3.0.0) |
+| **Note** | Remote admin is not enabled in this project (admin listener is localhost-only). Documented for transparency. |
+
+### CVE-2026-52846
+
+| Field | Value |
+|-------|-------|
+| **CVE ID** | CVE-2026-52846 |
+| **CVSS** | **4.2 MEDIUM** |
+| **Vector** | AV:N/AC:H/PR:N/UI:R/S:U/C:L/I:L/A:N |
+| **CWE** | CWE-116 (Improper Encoding or Escaping of Output) |
+| **Description** | The `stripHTML` template function can be bypassed with malformed HTML (e.g. `<<>img src=x onerror=alert()>`), allowing XSS when the sanitized output is rendered. |
+| **Affected** | caddy-waf < 3.0.0 (Caddy < 2.11.4) |
+| **Resolved In** | Caddy 2.11.4+ (included in caddy-waf v3.0.0) |
+| **Note** | The `templates` directive is not used in this deployment (reverse-proxy only) - not reachable. |
+
+### GHSA-j8px-rmrx-76h9
+
+| Field | Value |
+|-------|-------|
+| **Advisory** | GHSA-j8px-rmrx-76h9 (no CVE assigned) |
+| **CVSS** | Moderate |
+| **Vector** | - |
+| **CWE** | CWE-178 (Case Sensitivity) |
+| **Description** | Three vulnerabilities patched in v2.11.4: rewrite placeholder re-expansion; unbounded body buffer DoS via `{http.request.body}` (OOM-kill under container memory limits); `fileHidden()` case-sensitivity bypass (casefold matching on macOS/Windows/Linux). |
+| **Affected** | caddy-waf < 3.0.0 (Caddy <= 2.11.3) |
+| **Resolved In** | Caddy 2.11.4+ (included in caddy-waf v3.0.0) |
+
 ### OWASP CRS - not affected
 
 The following CVEs affect older OWASP CRS versions. **caddy-waf v3.0.0 ships CRS v4.28.0 and is not affected.** Listed for transparency.
@@ -195,6 +259,16 @@ The following CVEs affect older OWASP CRS versions. **caddy-waf v3.0.0 ships CRS
 |-----|------|----------|-------------|
 | CVE-2026-21876 | **9.3 CRITICAL** | CRS ≥ 4.22.0 | Multipart charset bypass in rule 922110 |
 | CVE-2026-33691 | **6.8 MEDIUM** | CRS ≥ 4.25.0 | File upload bypass with whitespace padding |
+
+### Caddy advisories - not applicable
+
+The following advisories do not affect this project. Listed for transparency.
+
+| Advisory | Severity | Description | Why not applicable |
+|----------|----------|-------------|--------------------|
+| `GHSA-wwhq-w58m-w29c` | High (no CVE) | Bypass of the CVE-2026-30852 fix - literal keys in `vars_regexp` (e.g. `tenant_id`) still double-expand and leak `{env.*}` / `{file.*}` placeholders | Affects Caddy <= 2.11.2 only (no patched release); caddy-waf ships Caddy 2.11.4 - out of affected range |
+| `GHSA-gx7w-56w6-g48x` | Moderate | Remote admin authorization bypass on PKI endpoints via prefix-based path matching | Remote admin is not enabled in this project (admin listener is localhost-only) - not reachable. Re-verify before adopting roadmap item 6 (mTLS remote admin) |
+
 ---
 
 ## Pending advisories (waiting on Caddy ≥ 2.11.5)
@@ -214,13 +288,16 @@ These advisories affect the Caddy 2.11.4 binary or configuration surface and hav
 
 | Date | Event |
 |------|-------|
-| **2026-02-09** | Caddy 2.11.1 released - fixes CVE-2026-30851 |
-| **2026-02-24** | Caddy 2.11.2 released - fixes CVE-2026-27590, CVE-2026-27587 |
+| **2026-02-09** | Caddy 2.11.1 released - fixes CVE-2026-30851, CVE-2026-27590 |
+| **2026-02-24** | Caddy 2.11.2 released - fixes CVE-2026-27587 |
 | **2026-05-12** | Caddy 2.11.3 released - fixes CVE-2026-27588, CVE-2026-27586, CVE-2026-27585, CVE-2026-27589 |
+| **2026-05-13** | Caddy advisories published - CVE-2026-45135, CVE-2026-45692, GHSA-wwhq-w58m-w29c, GHSA-gx7w-56w6-g48x |
 | **2026-06-02** | Caddy 2.11.4 released - fixes CVE-2026-52845, CVE-2026-52844 |
 | **2026-06-23** | CVE-2026-52845 and CVE-2026-52844 published to NVD |
+| **2026-06-23** | CVE-2026-45692 and CVE-2026-52846 published to NVD |
 | **2026-07-01** | caddy-waf **v3.0.0** released with Caddy 2.11.4 |
 | **2026-07-02** | OWASP CRS v4.28.0 released (included) |
+| **2026-07-10** | GHSA-6365-7ppr-5r92 and GHSA-j8px-rmrx-76h9 published |
 | **2026-08-11** | caddy-waf **v3.3.0** released - tool bumps (hadolint 2.15.1, go-ftw 2.5.0, Trivy v0.73.0), full `apk upgrade`, JSON-form HEALTHCHECK, version alignment |
 | **2026-08-11** | caddy-waf **v3.3.1** released - HEALTHCHECK via admin `/metrics` (curl), resource limits (mem 512m, 1 CPU), JSON-file log rotation (50m × 5) |
 | **2026-08-14** | caddy-waf **v3.3.2** released - WAF active by default (DetectionOnly), dual-arch scanning, bare-boot regression gate (make test-boot), systemd Caddyfile variant tracked |
