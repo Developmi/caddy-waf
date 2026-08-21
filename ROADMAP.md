@@ -27,7 +27,7 @@ Every completed item links to the exact commit that delivered it — verify with
 |------|--------|--------------|
 | 1. Cloudflare token format compatibility | → `dbae4fa` | `caddy-dns/cloudflare` pinned to v0.2.4 (`CADDY_DNS_CLOUDFLARE_REF`, Dockerfile) — accepts `cfut_`/`cfat_` API tokens |
 | 6. Automated dependency updates | → `87c7c93` | Dependabot for Docker + GitHub Actions (.github/dependabot.yml) |
-| 7a. FTW test suite | → `dbae4fa` | go-ftw integration suite, `make test-waf`, 4 cases (tests/) |
+| 7a. FTW test suite | → `dbae4fa` | go-ftw integration suite, `make test-waf`, 20 cases (tests/integration) |
 | 7b. WAF metrics | → `ba09d40` | Dual-backend observability — VictoriaMetrics + Prometheus scrape the same `metrics/prometheus.yml`; `caddy_http_*` series on admin /metrics |
 | 7c. Grafana dashboard | → `ba09d40` | Provisioned datasources + dashboard (grafana/), profiles `observability-vm` / `observability-prom` |
 | 8a. Deployment checklists | → `bccfc2f` | docs/deployment-checklist.md — Docker Compose + systemd only; Kubernetes intentionally out of scope for now (item 3 below) |
@@ -74,7 +74,7 @@ Production-ready K8s manifests (Deployment, Service, Ingress, ConfigMap, HPA). S
 Evaluate reloading WAF rules without container restart (e.g., via Caddy admin API).
 
 ### 5. Expand go-ftw integration test coverage
-The CI gate (`test-waf.yml`) runs the 4-case baseline suite (allow + SQLi/XSS/traversal) on every PR and push to main. Planned scale-up: more OWASP CRS vectors (e.g., REQUEST-920 protocol attacks) and a WAF-mode matrix (DetectionOnly vs On).
+Expanded (2026-08-21) from 4 to **20 cases**: baseline (4) + OWASP CRS core (10: SQLi, XSS, MSSQL, RCE, PHP exec, RFI/SSRF, LFI, header injection, unicode XSS) + bypass (6: false-positive check, double-encoding, header-based payloads, POST JSON body, fullwidth XSS), mapped to OWASP Top 10 2025 (A03 strong coverage). Remaining: REQUEST-920 protocol attacks and a WAF-mode matrix (DetectionOnly vs On).
 
 ### 6. mTLS remote administration (contract §6 target state)
 Enable Caddy's remote admin listener (`admin.remote`, default `:2021`) with mutual TLS — `admin.identity` (issuer: internal/local CA) + `access_control[].public_keys` (base64 DER client certs) + path/method permissions. **JSON config only** — the Caddyfile `admin` block cannot express identity/remote (upstream `options.go` supports only `origins`/`enforce_origin`). Requires: systemd deployment moves from Caddyfile to a JSON config, client-cert issuance/rotation from the local PKI CA (`pki/authorities/local`, Smallstep-backed), and the plaintext local endpoint stays on loopback (it has no TLS/mTLS capability upstream). Upstream marks remote admin EXPERIMENTAL — re-validate before adopting.

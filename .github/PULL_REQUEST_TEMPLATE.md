@@ -11,7 +11,7 @@
 ## Test Plan
 
 - [ ] `make lint` — all checks pass (yamllint, actionlint, hadolint, zizmor)
-- [ ] `make test-waf` — go-ftw integration suite passes (4/4)
+- [ ] `make test-waf` — go-ftw integration suite passes (20/20)
 - [ ] `docker compose config` — valid compose file
 - [ ] Manual validation against a running stack (if runtime behavior changed)
 

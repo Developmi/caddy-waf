@@ -321,6 +321,16 @@ docker run --rm aquasec/trivy image ghcr.io/developmi/caddy-waf:v3.3.2
 docker scout quickview ghcr.io/developmi/caddy-waf:v3.3.2
 ```
 
+### Integration Tests (go-ftw)
+
+The WAF behavior is verified with the [go-ftw](https://github.com/coreruleset/go-ftw) framework, the OWASP CRS testing tool:
+
+```bash
+make test-waf   # starts the test container (WAF in blocking mode) on 127.0.0.1:9090, runs the 20-case suite, tears down
+```
+
+The 20-case suite (tests/integration/) covers: baseline (health + SQLi/XSS/path-traversal), OWASP CRS core (RCE, PHP exec, RFI/SSRF, LFI, MSSQL, header injection, unicode XSS) and bypass scenarios (double-encoding, header/body payloads, fullwidth XSS, false-positive check) — mapped to OWASP Top 10 2025 categories (A03 Injection strong coverage). See [CONTRIBUTING.md](./CONTRIBUTING.md) for details.
+
 ---
 
 ## 📈 Monitoring & Observability

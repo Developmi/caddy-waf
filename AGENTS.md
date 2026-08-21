@@ -35,7 +35,7 @@
 
 ## CI/CD
 - **Workflow**: `docker-build-scan-sign.yml` - scan → sign → push (multi-arch amd64+arm64, tag-triggered only)
-- **Workflow**: `test-waf.yml` - functional gate: runs `make test-waf` (go-ftw, 4-case baseline) on every PR and push to main
+- **Workflow**: `test-waf.yml` - functional gate: runs `make test-waf` (go-ftw, 20-case OWASP CRS suite) on every PR and push to main
 - **Registry**: `ghcr.io/developmi/caddy-waf`
 - **Triggers**: tags v* (releases) + PRs to main (validation)
 - **Scan gate**: Trivy fails build on CRITICAL/HIGH (ignores unfixed)

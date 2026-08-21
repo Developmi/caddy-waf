@@ -72,6 +72,6 @@ Before submitting a PR, run the full test suite:
 make test         # runs lint + WAF integration tests
 ```
 
-The WAF integration tests (`make test-waf`) start a test container with WAF in blocking mode, verify that CRS rules block SQLi/XSS/path traversal, and tear down automatically.
+The WAF integration tests (`make test-waf`) start a test container with WAF in blocking mode, verify that CRS rules block SQLi, XSS, path traversal, RCE, RFI/SSRF, LFI, header injection and encoding-bypass payloads (20 cases across baseline, OWASP CRS core and bypass suites), and tear down automatically.
 
 Requires Docker and `make tools` to install `go-ftw` (the OWASP CRS testing framework).

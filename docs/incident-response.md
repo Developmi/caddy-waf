@@ -48,7 +48,7 @@ up only as log entries; after switching to `On` they become user-facing 403s.
    WAF and compare. The go-ftw integration suite covers the baseline:
 
    ```bash
-   make test-waf        # starts the test container on 127.0.0.1:9090, runs 4 cases, tears down
+    make test-waf        # starts the test container on 127.0.0.1:9090, runs 20 OWASP CRS cases, tears down
    ```
 
    For the suspect rule, check the rule definition and its exclusion advice:
@@ -116,7 +116,7 @@ sudo systemctl restart caddy-waf                             # systemd
 
 ## Verify the fix
 
-- [ ] `make test-waf` passes (4/4 go-ftw cases)
+- [ ] `make test-waf` passes (20/20 go-ftw cases)
 - [ ] The previously blocked request now succeeds (200) with `SecRuleEngine On`
 - [ ] The excluded rule no longer appears in the audit log for that request
 - [ ] Other rules still block real attack payloads (spot-check with
