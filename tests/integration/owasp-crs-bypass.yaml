@@ -1,0 +1,114 @@
+---
+meta:
+  author: "Developmi"
+  description: "OWASP Top 10 2025 bypass and false-positive edge cases - CRS 4.28.0"
+  enabled: true
+  name: "caddy-waf-owasp-crs-bypass"
+
+rule_id: 999003
+
+tests:
+  - test_title: "Benign request with special characters - WAF should allow"
+    test_id: 1
+    description: "False-positive check: parentheses and digits in a clean query must NOT be blocked (expect 200)."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/?q=the+files+(yep)+and+1+2+3"
+            method: "GET"
+            headers:
+              User-Agent: "caddy-waf-test/1.0"
+              Host: "localhost"
+          output:
+            status: [200]
+
+  - test_title: "Double URL-encoded SQLi - WAF should block"
+    test_id: 2
+    description: "OWASP A03 (Injection). Bypass attempt: double-encoded ' OR 1=1 (rules 942100/930100 after decoding) triggers 403."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/?id=%2527%2520OR%25201%253D1"
+            method: "GET"
+            headers:
+              User-Agent: "caddy-waf-test/1.0"
+              Host: "localhost"
+          output:
+            status: [403]
+
+  - test_title: "XSS payload in User-Agent header - WAF should block"
+    test_id: 3
+    description: "OWASP A03 (Injection). CRS rule 941110. Official CRS payload (941110-3) - XSS in User-Agent triggers 403."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/"
+            method: "GET"
+            headers:
+              User-Agent: "\"<script+>alert(1);</script>=value\""
+              Host: "localhost"
+          output:
+            status: [403]
+
+  - test_title: "SQLi payload in X-Forwarded-For header - WAF should block"
+    test_id: 4
+    description: "OWASP A03 (Injection). CRS rule 942100. SQLi tautology inside a request header triggers 403."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/"
+            method: "GET"
+            headers:
+              User-Agent: "caddy-waf-test/1.0"
+              Host: "localhost"
+              X-Forwarded-For: "1' OR '1'='1"
+          output:
+            status: [403]
+
+  - test_title: "SQLi payload in JSON POST body - WAF should block"
+    test_id: 5
+    description: "OWASP A03 (Injection). CRS rule 942100. SQLi tautology inside a JSON POST body triggers 403."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/post"
+            method: "POST"
+            headers:
+              User-Agent: "caddy-waf-test/1.0"
+              Host: "localhost"
+              Content-Type: "application/json"
+            data: "{\"id\":\"1' OR '1'='1\"}"
+          output:
+            status: [403]
+
+  - test_title: "XSS fullwidth unicode in query string - WAF should block"
+    test_id: 6
+    description: "OWASP A03 (Injection). CRS rule 941110. Fullwidth Unicode <script> in query string triggers 403."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/?q=%EF%BC%9Cscript%EF%BC%9Ealert(1)%EF%BC%9C/script%EF%BC%9E"
+            method: "GET"
+            headers:
+              User-Agent: "caddy-waf-test/1.0"
+              Host: "localhost"
+          output:
+            status: [403]
