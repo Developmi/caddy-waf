@@ -58,7 +58,7 @@ Starting from v3.0.0, the image ships with updated Caddy 2.11.4, official upstre
 
 #### 🛡️ WAF Capabilities
 - **Coraza WAF v2.5.0**: Modern, high-performance web application firewall engine
-- **OWASP CRS v4.28.0**: Latest Core Rule Set with 290+ protection rules
+- **OWASP CRS v4.29.0**: Latest Core Rule Set with 290+ protection rules
 - **DetectionOnly by default**: Prevents false positives in new deployments
 - **Audit logging**: JSON audit logs to stdout for easy monitoring
 - **Rate limiting**: Built-in rate limiting via `mholt/caddy-ratelimit`
@@ -155,7 +155,7 @@ caddy-waf/
 flowchart LR
     Client[Client] -->|HTTPS :443| Caddy[Caddy v2.11.4]
     Caddy -->|WAF layer| Coraza[Coraza WAF v2.5.0]
-    Coraza -->|OWASP CRS v4.28.0| Rules[290+ Rules]
+    Coraza -->|OWASP CRS v4.29.0| Rules[290+ Rules]
     Coraza -->|Decision| Action{Allow?}
     Action -->|Yes| Backend[Upstream Backend]
     Action -->|No| Block[Block + Audit Log]

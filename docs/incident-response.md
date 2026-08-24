@@ -20,7 +20,7 @@ Mode matters:
 | `DetectionOnly` (default, Caddyfile.example:56) | Coraza logs the match, **never blocks** | Blocked users cannot come from the WAF — look at your backend, network, or rate limiter |
 | `On` | Coraza blocks with 403 (Coraza's default) | A 403 with `waf_rule_id` in the audit log is a real WAF block |
 
-Note: CRS 4.28.0 is intentionally sensitive (290+ rules covering SQLi, XSS,
+Note: CRS 4.29.0 is intentionally sensitive (290+ rules covering SQLi, XSS,
 command injection, path traversal). Payloads that *look* like an attack — e.g.
 a search for `1; DROP TABLE`, an email containing `<script>`, or URLs with
 encoded path segments — are routinely flagged. In `DetectionOnly` these show

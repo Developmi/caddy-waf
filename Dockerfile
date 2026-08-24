@@ -28,7 +28,7 @@ LABEL maintainer="Miguel Lozano"
 LABEL vendor="Developmi"
 LABEL version="3.3.2"
 LABEL waf.coraza.version="2.5.0"
-LABEL waf.owasp-crs.version="4.28.0"
+LABEL waf.owasp-crs.version="4.29.0"
 
 # Copy the custom binary
 COPY --from=builder /usr/bin/caddy /usr/bin/caddy
@@ -46,10 +46,10 @@ ARG CORAZA_CONF_SHA256=fea02902c81b2b9691746e08b934dea5ded6382aa7b561c31b9edef00
 RUN mkdir -p /etc/caddy/owasp-crs /tmp/downloads && \
     # Ensure wget and tar are available (Alpine base includes them)
     apk add --no-cache wget=1.25.0-r2 tar=1.35-r4 && \
-    # Download OWASP CRS v4.28.0 source archive with SHA256 verification
-    wget -q -O /tmp/downloads/coreruleset.tar.gz https://github.com/coreruleset/coreruleset/archive/refs/tags/v4.28.0.tar.gz && \
+    # Download OWASP CRS v4.29.0 source archive with SHA256 verification
+    wget -q -O /tmp/downloads/coreruleset.tar.gz https://github.com/coreruleset/coreruleset/archive/refs/tags/v4.29.0.tar.gz && \
     # Verify SHA256 checksum
-    echo "d8acc96f25ad07c8e3a595a23c797324f6d77e59ddf9e26e90dd95ebd2e676ce  /tmp/downloads/coreruleset.tar.gz" | sha256sum -c - && \
+    echo "cedd55533de917b6e397352a67a31993da4c07816f1fefcc94eacf542fc86337  /tmp/downloads/coreruleset.tar.gz" | sha256sum -c - && \
     tar xzf /tmp/downloads/coreruleset.tar.gz -C /etc/caddy/owasp-crs --strip-components=1 && \
     rm -f /tmp/downloads/coreruleset.tar.gz && \
     # Prepare CRS Setup file

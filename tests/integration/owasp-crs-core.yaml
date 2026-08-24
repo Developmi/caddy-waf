@@ -1,7 +1,7 @@
 ---
 meta:
   author: "Developmi"
-  description: "OWASP Top 10 2025 core coverage - CRS 4.28.0 main attack categories"
+  description: "OWASP Top 10 2025 core coverage - CRS 4.29.0 main attack categories"
   enabled: true
   name: "caddy-waf-owasp-crs-core"
 

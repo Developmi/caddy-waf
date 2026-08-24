@@ -1,7 +1,7 @@
 ---
 meta:
   author: "Developmi"
-  description: "OWASP Top 10 2025 bypass and false-positive edge cases - CRS 4.28.0"
+  description: "OWASP Top 10 2025 bypass and false-positive edge cases - CRS 4.29.0"
   enabled: true
   name: "caddy-waf-owasp-crs-bypass"
 

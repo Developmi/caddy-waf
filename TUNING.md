@@ -1,6 +1,6 @@
 # OWASP CRS Tuning Guide for Caddy with Coraza WAF
 
-A practical guide to configuring, tuning, and operating the OWASP Core Rule Set (CRS) v4.28.0 with Coraza WAF on Caddy.
+A practical guide to configuring, tuning, and operating the OWASP Core Rule Set (CRS) v4.29.0 with Coraza WAF on Caddy.
 
 ---
 
@@ -295,8 +295,8 @@ Add an init container or sidecar that downloads and verifies the rules:
 #!/bin/sh
 set -euo pipefail
 
-CRS_VERSION="v4.28.0"
-CRS_SHA256="d8acc96f25ad07c8e3a595a23c797324f6d77e59ddf9e26e90dd95ebd2e676ce"
+CRS_VERSION="v4.29.0"
+CRS_SHA256="cedd55533de917b6e397352a67a31993da4c07816f1fefcc94eacf542fc86337"
 
 wget -q -O /tmp/coreruleset.tar.gz \
   "https://github.com/coreruleset/coreruleset/archive/refs/tags/${CRS_VERSION}.tar.gz"
