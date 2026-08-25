@@ -3,6 +3,24 @@
 All notable changes to this project will be documented in this file.
 Format: [Keep a Changelog](https://keepachangelog.com/) · Versioning: [SemVer](https://semver.org/)
 
+## [3.4.0] - 2026-08-24
+
+### Changed
+
+- **OWASP CRS**: upgraded from 4.28.0 to **4.29.0** — anti-evasion improvements for rule 932 (backslash-prefix and quote evasion in shell commands), `stat` command detection at PL-2+, expanded web shell detection, and false-positive fixes (942190/942200/942390/953100; 930120 restores `node_modules` coverage; 932171 allows `json.` prefix). Tarball SHA256 pinned: `cedd55533de917b6e397352a67a31993da4c07816f1fefcc94eacf542fc86337`.
+- **CI**: Trivy upgraded from v0.73.0 to **v0.74.0** (setup-trivy action remains SHA-pinned).
+- **CI**: Actions bumps from dependabot PRs #11-#15 — `actions/checkout` 4.3.1→7.0.1, `actions/upload-artifact` 4.6.2→7.0.1, `docker/setup-buildx-action` 3.12.0→4.2.0, `sigstore/cosign-installer` bump, `actions/attest-build-provenance` bump.
+- **Version alignment**: OCI `LABEL version`, Compose default image tag, `.env.example`, `pyproject.toml`/`uv.lock`, AGENTS.md, README.md, SECURITY.md, and bug report template aligned to **v3.4.0**.
+
+### Added
+
+- **Tests**: integration suite expanded from 4 to **20 go-ftw cases** covering OWASP Top 10 2025 — baseline (4) + OWASP CRS core (10: SQLi, XSS, MSSQL, RCE, PHP exec, RFI/SSRF, LFI, header injection, unicode XSS) + bypass (6: false-positive check, double-encoding, header-based payloads, POST JSON body, fullwidth XSS). Documented across AGENTS.md, ROADMAP.md, README.md, CONTRIBUTING.md, PR template, and incident-response runbook.
+- **docs**: SECURITY.md documents 5 additional resolved advisories (CVE-2026-45135, CVE-2026-30852, CVE-2026-45692, CVE-2026-52846, GHSA-j8px-rmrx-76h9) plus a "Caddy advisories - not applicable" section; CVE-2026-27590 corrected to fixed-in 2.11.1; ROADMAP.md corrected Alpine 3.23 EOL (2027-11-01) and verified coraza version alignment (plugin v2.5.0 = engine v3.7.0).
+
+### Known issues (waiting on Caddy ≥ 2.11.5)
+
+- Unchanged from 3.3.2 — `CVE-2026-56852`, `GHSA-hrxh-6v49-42gf`, `CVE-2026-46600` (tracked in `.trivyignore`) and `GHSA-6365-7ppr-5r92` (Moderate, documented in SECURITY.md).
+
 ## [3.3.2] - 2026-08-14
 
 ### Added
@@ -203,6 +221,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/) · Versioning: [SemVer](
 - README.md and README.es.md with setup instructions.
 
 <!-- Version links for Keep a Changelog -->
+[3.4.0]: https://github.com/Developmi/caddy-waf/compare/v3.3.2...v3.4.0
 [3.3.1]: https://github.com/Developmi/caddy-waf/compare/v3.3.0...v3.3.1
 [3.3.2]: https://github.com/Developmi/caddy-waf/compare/v3.3.1...v3.3.2
 [3.3.0]: https://github.com/Developmi/caddy-waf/compare/v3.2.1...v3.3.0

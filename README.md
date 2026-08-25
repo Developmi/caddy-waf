@@ -81,7 +81,7 @@ Starting from v3.0.0, the image ships with updated Caddy 2.11.4, official upstre
 
 ### 1. Pull the Image
 ```bash
-docker pull ghcr.io/developmi/caddy-waf:v3.3.2
+docker pull ghcr.io/developmi/caddy-waf:v3.4.0
 ```
 
 ### 2. Create Environment File
@@ -229,7 +229,7 @@ volumes:
 ### Environment Variables
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `CADDY_WAF_IMAGE` | `ghcr.io/developmi/caddy-waf:v3.3.2` | Caddy WAF image reference |
+| `CADDY_WAF_IMAGE` | `ghcr.io/developmi/caddy-waf:v3.4.0` | Caddy WAF image reference |
 | `EXAMPLE_APP_IMAGE` | `containous/whoami:latest` | Demo backend image |
 | `SITE_ADDRESS` | `localhost` | Site address/server name used by Caddy |
 | `BACKEND_UPSTREAM` | `example-app:80` | Reverse proxy backend upstream |
@@ -315,10 +315,10 @@ curl -I https://yourdomain.com
 ### Security Scanning
 ```bash
 # Scan image with Trivy
-docker run --rm aquasec/trivy image ghcr.io/developmi/caddy-waf:v3.3.2
+docker run --rm aquasec/trivy image ghcr.io/developmi/caddy-waf:v3.4.0
 
 # Scan with Docker Scout
-docker scout quickview ghcr.io/developmi/caddy-waf:v3.3.2
+docker scout quickview ghcr.io/developmi/caddy-waf:v3.4.0
 ```
 
 ### Integration Tests (go-ftw)
@@ -470,6 +470,7 @@ The project follows [Keep a Changelog](https://keepachangelog.com/) and [Semanti
 
 | Version | Date | Highlights |
 |---------|------|------------|
+| [3.4.0](./CHANGELOG.md#340---2026-08-24) | 2026-08-24 | OWASP CRS 4.29.0, Trivy v0.74.0, 20-case integration suite (OWASP Top 10 2025), Actions bumps |
 | [3.3.2](./CHANGELOG.md#332---2026-08-14) | 2026-08-14 | WAF default active (DetectionOnly), dual-arch scanning, boot regression gate, systemd variant tracked |
 | [3.3.1](./CHANGELOG.md#331---2026-08-11) | 2026-08-11 | HEALTHCHECK via admin /metrics (curl), resource limits (512m/1 CPU), JSON-file log rotation, version alignment |
 | [3.3.0](./CHANGELOG.md#330---2026-08-11) | 2026-08-11 | Tool bumps (hadolint 2.15.1, go-ftw 2.5.0, Trivy v0.73.0), full apk upgrade, HEALTHCHECK JSON, version alignment |
