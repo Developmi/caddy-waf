@@ -4,7 +4,7 @@
 
 | Version | Supported |
 |---------|-----------|
-| 3.3.x   | ✅ Yes (current) |
+| 3.4.x   | ✅ Yes (current) |
 | 2.0.x   | ❌ No - migrated to Developmi, upgrade to 3.0.x |
 | 1.0.x   | ❌ No |
 
@@ -253,7 +253,7 @@ All CVEs listed below are resolved in **caddy-waf v3.0.0** (Caddy ≥ 2.11.4) an
 
 ### OWASP CRS - not affected
 
-The following CVEs affect older OWASP CRS versions. **caddy-waf v3.0.0 ships CRS v4.28.0 and is not affected.** Listed for transparency.
+The following CVEs affect older OWASP CRS versions. **caddy-waf v3.4.0+ ships CRS v4.29.0 and is not affected.** Listed for transparency.
 
 | CVE | CVSS | Fixed In | Description |
 |-----|------|----------|-------------|
@@ -273,16 +273,18 @@ The following advisories do not affect this project. Listed for transparency.
 
 ## Pending advisories (waiting on Caddy ≥ 2.11.5)
 
-These advisories affect the Caddy 2.11.4 binary or configuration surface and have **no patched Caddy release yet**. The three HIGH findings are tracked in `.trivyignore` (Trivy scan gate); `GHSA-6365-7ppr-5r92` is a Moderate configuration-surface advisory documented here only. All are re-enabled/resolved as soon as the base image moves to Caddy ≥ 2.11.5.
+These advisories affect the Caddy 2.11.4 binary or configuration surface and have **no patched Caddy release yet**. The five HIGH findings are tracked in `.trivyignore` (Trivy scan gate); `GHSA-6365-7ppr-5r92` is a Moderate configuration-surface advisory documented here only. All are re-enabled/resolved as soon as the base image moves to Caddy ≥ 2.11.5.
 
 | Advisory | Component | Severity | Impact for this project | Fixed in |
 |----------|-----------|----------|------------------------|----------|
 | `CVE-2026-56852` | golang.org/x/text v0.37.0 (embedded in Caddy binary) | HIGH | DoS via invalid UTF-8 — DoS-class only, no RCE; not reachable in reverse-proxy-only deployment | x/text v0.39.0 → Caddy ≥ 2.11.5 |
 | `GHSA-hrxh-6v49-42gf` | google.golang.org/grpc v1.81.0 (embedded in Caddy binary) | HIGH | xDS RBAC + HTTP/2 — gRPC/xDS not used by Caddy core in this deployment; not reachable | grpc v1.82.1 → Caddy ≥ 2.11.5 |
 | `CVE-2026-46600` | golang.org/x/net v0.55.0 (embedded in Caddy binary) | HIGH | DoS via invalid DNS record parsing (`dns/dnsmessage`) — DoS-class only; Caddy core and caddy-dns/cloudflare do not parse raw DNS messages in this deployment; not reachable | x/net v0.56.0 → Caddy ≥ 2.11.5 |
+| `CVE-2026-56854` | golang.org/x/crypto v0.52.0 (embedded in Caddy binary) | CRITICAL | Vulnerability in the `ssh` package — no SSH surface exposed by Caddy core or any module in this deployment (reverse-proxy only); not reachable | x/crypto v0.55.0 → Caddy ≥ 2.11.5 |
+| `CVE-2026-84304` | google.golang.org/grpc v1.81.0 (embedded in Caddy binary) | HIGH | gRPC vulnerability (xDS/HTTP-2 family) — gRPC/xDS not used by Caddy core in this deployment; not reachable. Same dependency as GHSA-hrxh-6v49-42gf, patched later in grpc v1.83.1 | grpc v1.83.1 → Caddy ≥ 2.11.5 |
 | `GHSA-6365-7ppr-5r92` | Caddy `forward_auth` + `reverse_proxy` (configuration surface) | Moderate | Wrong-upstream connection under specific `forward_auth` configurations — verify production Caddyfile does not use the affected pattern | Caddy 2.11.5 (unreleased) |
 
-**Action on Caddy ≥ 2.11.5 release**: upgrade the base image, remove the three `.trivyignore` entries, and remove this section.
+**Action on Caddy ≥ 2.11.5 release**: upgrade the base image, remove the five `.trivyignore` entries, and remove this section.
 
 ## Timeline
 
