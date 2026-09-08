@@ -40,7 +40,7 @@ project does not claim controls it does not have.
 
 | Requirement | Implementation | Evidence |
 |-------------|----------------|----------|
-| Verify integrity of downloaded components | OWASP CRS v4.28.0 tarball and `coraza.conf` are SHA256-checked at build time (`CORAZA_CONF_SHA256` ARG) | Dockerfile:43,50-52,58-59 |
+| Verify integrity of downloaded components | OWASP CRS v4.29.0 tarball and `coraza.conf` are SHA256-checked at build time (`CORAZA_CONF_SHA256` ARG) | Dockerfile:43,50-52,58-59 |
 | Pin versions of system packages | Alpine `wget`, `tar` pinned by exact version | Dockerfile:48 |
 | Pin third-party actions | All GitHub Actions pinned by commit SHA with `# vX` comments | .github/workflows/docker-build-scan-sign.yml:25-47; lint.yml:17-19,23 |
 | Attest and sign artifacts | Cosign keyless signing (OIDC) + SBOM (CycloneDX) attestation + SLSA build provenance attached to every tagged release | .github/workflows/docker-build-scan-sign.yml:111-149; SECURITY.md:50-71 |
