@@ -15,7 +15,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/) · Versioning: [SemVer](
 
 ### Known issues (waiting on Caddy ≥ 2.11.5)
 
-- **grpc-lift hypothesis pending verification**: coraza-caddy v2.6.0's go.mod lifts `google.golang.org/grpc` to v1.82.1. If the shipped binary confirms grpc ≥ v1.82.1 and Trivy clears `GHSA-hrxh-6v49-42gf` / `CVE-2026-84304`, the two suppressions are removed from `.trivyignore`/SECURITY.md and this note is updated; otherwise all five suppressions remain unchanged.
+- **grpc-lift confirmed, one HIGH pending**: coraza-caddy v2.6.0's go.mod lifts `google.golang.org/grpc` to **v1.82.1** (verified in the shipped binary). Trivy cleared `GHSA-hrxh-6v49-42gf`, `CVE-2026-56852`, `CVE-2026-46600`, and `CVE-2026-56854`; `.trivyignore`/SECURITY.md were pruned accordingly. `CVE-2026-84304` (grpc, fixed in v1.83.1) remains the single pending HIGH until a later coraza-caddy/Caddy base ships grpc ≥ v1.83.1.
 
 ## [3.4.0] - 2026-08-24
 
