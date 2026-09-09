@@ -3,11 +3,11 @@
 All notable changes to this project will be documented in this file.
 Format: [Keep a Changelog](https://keepachangelog.com/) · Versioning: [SemVer](https://semver.org/)
 
-## [3.5.1] - 2026-09-09
+## [3.5.2] - 2026-09-09
 
 ### Release note
 
-- **v3.5.0 was never published**: its tag was created first, but the CI run was cancelled by a 20-minute job timeout (raised to 45m in #27) before any image was pushed. The `protect-tags-v` ruleset prevents deleting or rewriting that tag, so this identical image content ships as **v3.5.1**.
+- **v3.5.0 and v3.5.1 were never published**: their tags were burned before any image was pushed — v3.5.0 by a 20-minute CI job timeout (raised to 45m in #27), v3.5.1 by the Trivy gate revealing new advisory **CVE-2026-84445** (grpc v1.82.1) at scan time. The `protect-tags-v` ruleset prevents deleting or rewriting those tags, so this identical image content ships as **v3.5.2** with the new finding suppressed.
 
 ### Changed
 
@@ -15,11 +15,12 @@ Format: [Keep a Changelog](https://keepachangelog.com/) · Versioning: [SemVer](
 - **Dockerfile**: base image stages digest-pinned to their multi-arch index digests (2.11.4 tag kept as comment for readability):
   - builder: `caddy:2.11.4-builder@sha256:b8f9c720f13f64c13dd42db28e8f38a3fab54c11fce4d93bda26d710c448dcfd`
   - final: `caddy:2.11.4@sha256:df7f1c2fb114453b951de51a98efc010db1655a92c2e86be6706714e2417a78d`
-- **Version alignment**: OCI `LABEL version` → **3.5.1** and `LABEL waf.coraza.version` → **2.6.0**.
+- **Version alignment**: OCI `LABEL version` → **3.5.2** and `LABEL waf.coraza.version` → **2.6.0**.
+- **Security**: new pending advisory `CVE-2026-84445` (grpc v1.82.1, xDS DoS, not reachable) added to `.trivyignore` and SECURITY.md — two HIGH suppressions now tracked until Caddy ≥ 2.11.5.
 
 ### Known issues (waiting on Caddy ≥ 2.11.5)
 
-- **grpc-lift confirmed, one HIGH pending**: coraza-caddy v2.6.0's go.mod lifts `google.golang.org/grpc` to **v1.82.1** (verified in the shipped binary). Trivy cleared `GHSA-hrxh-6v49-42gf`, `CVE-2026-56852`, `CVE-2026-46600`, and `CVE-2026-56854`; `.trivyignore`/SECURITY.md were pruned accordingly. `CVE-2026-84304` (grpc, fixed in v1.83.1) remains the single pending HIGH until a later coraza-caddy/Caddy base ships grpc ≥ v1.83.1.
+- **grpc-lift confirmed, two HIGH pending**: coraza-caddy v2.6.0's go.mod lifts `google.golang.org/grpc` to **v1.82.1** (verified in the shipped binary). Trivy cleared `GHSA-hrxh-6v49-42gf`, `CVE-2026-56852`, `CVE-2026-46600`, and `CVE-2026-56854`; `.trivyignore`/SECURITY.md were pruned accordingly. `CVE-2026-84304` (fixed in v1.83.1) and `CVE-2026-84445` (fixed in v1.82.2/v1.83.2) remain pending HIGHs until a later coraza-caddy/Caddy base ships grpc ≥ v1.82.2.
 
 ## [3.4.0] - 2026-08-24
 
@@ -239,7 +240,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/) · Versioning: [SemVer](
 - README.md and README.es.md with setup instructions.
 
 <!-- Version links for Keep a Changelog -->
-[3.5.1]: https://github.com/Developmi/caddy-waf/compare/v3.4.0...v3.5.1
+[3.5.2]: https://github.com/Developmi/caddy-waf/compare/v3.4.0...v3.5.2
 [3.4.0]: https://github.com/Developmi/caddy-waf/compare/v3.3.2...v3.4.0
 [3.3.1]: https://github.com/Developmi/caddy-waf/compare/v3.3.0...v3.3.1
 [3.3.2]: https://github.com/Developmi/caddy-waf/compare/v3.3.1...v3.3.2
