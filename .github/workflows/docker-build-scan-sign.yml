@@ -10,16 +10,22 @@ env:
   REGISTRY: ghcr.io
   IMAGE_NAME: developmi/caddy-waf
 
-permissions:
-  contents: read
-  packages: write
-  id-token: write # required for keyless Cosign
-  attestations: write
-  security-events: write # required for SARIF upload to GitHub Security tab
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  # Releases must never be cut mid-flight; a newer run on the same ref waits.
+  cancel-in-progress: false
 
 jobs:
-  build-scan-sign:
+  # Runs on pull requests AND tag pushes. Least-privilege: read-only contents
+  # scope. Builds amd64 + arm64 into the local daemon, then gates the push on
+  # the Trivy CRITICAL/HIGH scan. PR runs end here — no elevated permission is
+  # granted on a pull_request context, so no SARIF upload to Code Scanning.
+  scan:
+    name: Build and scan
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    timeout-minutes: 20
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -31,13 +37,6 @@ jobs:
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@37fe631027851001ddb9b187196cc803df7f5f0e # v4.3.0
-
-      - name: Login to GHCR
-        uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Extract metadata
         id: meta
@@ -114,24 +113,70 @@ jobs:
             --exit-code 1 \
             "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}-scan-arm64"
 
-      - name: Upload Trivy SARIF (amd64)
-        if: (!cancelled()) && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
-        continue-on-error: true
-        uses: github/codeql-action/upload-sarif@eec0bff2f6c15bf3f1e8a0152f94d17664a06a06 # v4
+      # Hand the SARIF reports to the tag-only publish job, which carries the
+      # security-events: write permission needed for Code Scanning upload.
+      - name: Upload Trivy SARIF artifacts
+        if: (!cancelled())
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          sarif_file: trivy-results.sarif
-          category: trivy
+          name: trivy-sarif
+          path: |
+            trivy-results.sarif
+            trivy-results-arm64.sarif
+          retention-days: 7
 
-      - name: Upload Trivy SARIF (arm64)
-        if: (!cancelled()) && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
-        continue-on-error: true
-        uses: github/codeql-action/upload-sarif@eec0bff2f6c15bf3f1e8a0152f94d17664a06a06 # v4
+  # Tag pushes only (pull requests never reach this job). Carries the elevated
+  # permissions a release needs — packages, attestations, and security-events
+  # writes — so they can never be exercised from a pull_request context.
+  publish:
+    name: Publish multi-arch image
+    needs: scan
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      id-token: write # required for keyless Cosign
+      attestations: write
+      security-events: write # required for SARIF upload to GitHub Security tab
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          sarif_file: trivy-results-arm64.sarif
-          category: trivy-arm64
+          persist-credentials: false
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@96fe6ef7f33517b61c61be40b68a1882f3264fb8 # v4.2.0
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@37fe631027851001ddb9b187196cc803df7f5f0e # v4.3.0
+
+      - name: Login to GHCR
+        uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302 # v6.2.0
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=ref,event=tag
+
+      # Scan job produces the SARIF; a failure here aborts before any push, so
+      # the rollback guard below never fires for a missing artifact.
+      - name: Download Trivy SARIF artifacts
+        id: download-sarif
+        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
+        with:
+          name: trivy-sarif
+          path: trivy-sarif
 
       - name: Build and push multi-arch (tag releases only)
-        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
         id: build-push
         uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a # v7.3.0
         with:
@@ -145,18 +190,18 @@ jobs:
 
       - name: Generate SBOM (CycloneDX JSON)
         id: sbom
-        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
-        uses: anchore/sbom-action@e22c389904149dbc22b58101806040fa8d37a610 # v0
+        if: steps.build-push.outputs.digest != ''
+        uses: anchore/sbom-action@3ad7283483fc7af8ff2b4ea19663c2d5ca935e26 # v0.24.2
         with:
           image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.ref_name }}
           format: cyclonedx-json
           output-file: sbom.cdx.json
 
       - name: Install Cosign
-        uses: sigstore/cosign-installer@398d4b0eeef1380460a10c8013a76f728fb906ac # v3
+        uses: sigstore/cosign-installer@6f9f17788090df1f26f669e9d70d6ae9567deba6 # v4.1.2
 
       - name: Sign image by digest (keyless OIDC)
-        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') && steps.build-push.outputs.digest != ''
+        if: steps.build-push.outputs.digest != ''
         env:
           DIGEST: ${{ steps.build-push.outputs.digest }}
           REGISTRY: ${{ env.REGISTRY }}
@@ -166,7 +211,7 @@ jobs:
           cosign sign --yes "${IMAGE}"
 
       - name: Attach SBOM attestation by digest
-        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') && steps.build-push.outputs.digest != ''
+        if: steps.build-push.outputs.digest != ''
         env:
           DIGEST: ${{ steps.build-push.outputs.digest }}
           REGISTRY: ${{ env.REGISTRY }}
@@ -176,7 +221,7 @@ jobs:
           cosign attest --type cyclonedx --predicate sbom.cdx.json --yes "${IMAGE}"
 
       - name: Attest build provenance (SLSA)
-        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
+        if: steps.build-push.outputs.digest != ''
         uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
         with:
           subject-name: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
@@ -184,7 +229,8 @@ jobs:
           push-to-registry: true
 
       # Rollback: if signing/attestation/SBOM fails after publish, remove the
-      # published version so a broken tag is never left unsigned.
+      # published version so a broken tag is never left unsigned. Placed before
+      # the best-effort SARIF uploads so their failures cannot trigger it.
       - name: Rollback tag if post-push steps failed
         if: failure() && steps.build-push.outputs.digest != ''
         env:
@@ -202,8 +248,24 @@ jobs:
             echo "::notice::Rollback skipped: no published version found for tag ${REF_NAME}"
           fi
 
+      - name: Upload Trivy SARIF (amd64)
+        if: (!cancelled()) && steps.build-push.outputs.digest != ''
+        continue-on-error: true
+        uses: github/codeql-action/upload-sarif@eec0bff2f6c15bf3f1e8a0152f94d17664a06a06 # v4
+        with:
+          sarif_file: trivy-sarif/trivy-results.sarif
+          category: trivy
+
+      - name: Upload Trivy SARIF (arm64)
+        if: (!cancelled()) && steps.build-push.outputs.digest != ''
+        continue-on-error: true
+        uses: github/codeql-action/upload-sarif@eec0bff2f6c15bf3f1e8a0152f94d17664a06a06 # v4
+        with:
+          sarif_file: trivy-sarif/trivy-results-arm64.sarif
+          category: trivy-arm64
+
       - name: Build summary
-        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
+        if: success()
         env:
           REF_NAME: ${{ github.ref_name }}
           REGISTRY: ${{ env.REGISTRY }}
