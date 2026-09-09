@@ -28,7 +28,7 @@ LABEL org.opencontainers.image.description="Production-ready Caddy web server wi
 LABEL org.opencontainers.image.licenses="MIT"
 LABEL maintainer="Miguel Lozano"
 LABEL vendor="Developmi"
-LABEL version="3.5.1"
+LABEL version="3.5.2"
 LABEL waf.coraza.version="2.6.0"
 LABEL waf.owasp-crs.version="4.29.0"
 
