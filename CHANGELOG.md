@@ -3,7 +3,11 @@
 All notable changes to this project will be documented in this file.
 Format: [Keep a Changelog](https://keepachangelog.com/) · Versioning: [SemVer](https://semver.org/)
 
-## [3.5.0] - 2026-09-09
+## [3.5.1] - 2026-09-09
+
+### Release note
+
+- **v3.5.0 was never published**: its tag was created first, but the CI run was cancelled by a 20-minute job timeout (raised to 45m in #27) before any image was pushed. The `protect-tags-v` ruleset prevents deleting or rewriting that tag, so this identical image content ships as **v3.5.1**.
 
 ### Changed
 
@@ -11,7 +15,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/) · Versioning: [SemVer](
 - **Dockerfile**: base image stages digest-pinned to their multi-arch index digests (2.11.4 tag kept as comment for readability):
   - builder: `caddy:2.11.4-builder@sha256:b8f9c720f13f64c13dd42db28e8f38a3fab54c11fce4d93bda26d710c448dcfd`
   - final: `caddy:2.11.4@sha256:df7f1c2fb114453b951de51a98efc010db1655a92c2e86be6706714e2417a78d`
-- **Version alignment**: OCI `LABEL version` → **3.5.0** and `LABEL waf.coraza.version` → **2.6.0**.
+- **Version alignment**: OCI `LABEL version` → **3.5.1** and `LABEL waf.coraza.version` → **2.6.0**.
 
 ### Known issues (waiting on Caddy ≥ 2.11.5)
 
@@ -235,7 +239,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/) · Versioning: [SemVer](
 - README.md and README.es.md with setup instructions.
 
 <!-- Version links for Keep a Changelog -->
-[3.5.0]: https://github.com/Developmi/caddy-waf/compare/v3.4.0...v3.5.0
+[3.5.1]: https://github.com/Developmi/caddy-waf/compare/v3.4.0...v3.5.1
 [3.4.0]: https://github.com/Developmi/caddy-waf/compare/v3.3.2...v3.4.0
 [3.3.1]: https://github.com/Developmi/caddy-waf/compare/v3.3.0...v3.3.1
 [3.3.2]: https://github.com/Developmi/caddy-waf/compare/v3.3.1...v3.3.2
