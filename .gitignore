@@ -68,6 +68,7 @@ node_modules/
 .aider*
 .codegraph*
 .atl*
+openspec
 graphify-out/
 
 # Bin Tools for linting
