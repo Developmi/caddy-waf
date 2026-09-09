@@ -1,33 +1,18 @@
 # Trivy ignore file — caddy-waf
 #
-# The five findings below are embedded in the Caddy 2.11.4 Go binary (usr/bin/caddy).
-# No patched Caddy release exists yet: all are fixed in upstream Go dependencies
-# (golang.org/x/text v0.39.0, google.golang.org/grpc v1.82.1/v1.83.1,
-# golang.org/x/net v0.56.0, golang.org/x/crypto v0.55.0)
-# that land in Caddy >= 2.11.5.
+# The one finding below is embedded in the Caddy 2.11.4 Go binary (usr/bin/caddy).
+# No patched Caddy release exists yet: it is fixed in google.golang.org/grpc v1.83.1,
+# which requires a coraza-caddy release newer than v2.6.0 and Caddy >= 2.11.5.
+#
+# The four suppressions cleared by the v3.5.0 rebuild were removed on 2026-09-09
+# (CVE-2026-56852, GHSA-hrxh-6v49-42gf, CVE-2026-46600, CVE-2026-56854 — grpc lifted
+# to v1.82.1 by coraza-caddy v2.6.0, x/text/x/net/x/crypto lifted by the rebuild);
+# see the SECURITY.md pending-advisories section for the resolution record.
 #
 # RE-ENABLE when the base image is upgraded to Caddy >= 2.11.5:
-# remove these lines (and the CHANGELOG/SECURITY.md known-issues notes).
+# remove this line (and the CHANGELOG/SECURITY.md known-issues notes).
 
-# CVE-2026-56852 — golang.org/x/text v0.37.0: Denial of Service via invalid UTF-8 input.
-# DoS-class only (no RCE); not reachable in this deployment (reverse-proxy only, no templates).
-CVE-2026-56852
-
-# GHSA-hrxh-6v49-42gf — google.golang.org/grpc v1.81.0: xDS RBAC and HTTP/2 vulnerabilities.
-# gRPC/xDS is not used by Caddy core in this deployment; not reachable.
-GHSA-hrxh-6v49-42gf
-
-# CVE-2026-46600 — golang.org/x/net v0.55.0: Denial of Service via invalid DNS record
-# parsing (x/net/dns/dnsmessage). DoS-class only; Caddy core and the caddy-dns/cloudflare
-# module do not parse raw DNS wire messages in this deployment; not reachable.
-CVE-2026-46600
-
-# CVE-2026-56854 — golang.org/x/crypto v0.52.0: vulnerability in the ssh package.
-# No SSH surface is exposed by Caddy core or any module in this deployment
-# (reverse-proxy only); not reachable.
-CVE-2026-56854
-
-# CVE-2026-84304 — google.golang.org/grpc v1.81.0: gRPC vulnerability (xDS/HTTP-2 family).
-# gRPC/xDS is not used by Caddy core in this deployment; not reachable. Same
-# dependency as GHSA-hrxh-6v49-42gf above, patched later in grpc v1.83.1.
+# CVE-2026-84304 — google.golang.org/grpc v1.82.1: gRPC vulnerability (xDS/HTTP-2 family).
+# gRPC/xDS is not used by Caddy core in this deployment; not reachable. Patched in
+# grpc v1.83.1 (needs coraza-caddy > v2.6.0 / Caddy >= 2.11.5).
 CVE-2026-84304

@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 Format: [Keep a Changelog](https://keepachangelog.com/) · Versioning: [SemVer](https://semver.org/)
 
+## [3.5.0] - 2026-09-09
+
+### Changed
+
+- **coraza-caddy**: upgraded from v2.5.0 to **v2.6.0** (`CORAZA_CADDY_REF`) — WebSocket+WAF fixes (#262), client IP logging (#321), `tx_id_req_header` support (#248), WriteHeader handling (#330), HPACK docs (#329), grpc dependency lifted to v1.82.1 (#340). WAF engine coraza/v3 stays **v3.7.0** and OWASP CRS stays **v4.29.0** — engine, rule-set, and Caddyfile configuration unchanged.
+- **Dockerfile**: base image stages digest-pinned to their multi-arch index digests (2.11.4 tag kept as comment for readability):
+  - builder: `caddy:2.11.4-builder@sha256:b8f9c720f13f64c13dd42db28e8f38a3fab54c11fce4d93bda26d710c448dcfd`
+  - final: `caddy:2.11.4@sha256:df7f1c2fb114453b951de51a98efc010db1655a92c2e86be6706714e2417a78d`
+- **Version alignment**: OCI `LABEL version` → **3.5.0** and `LABEL waf.coraza.version` → **2.6.0**.
+
+### Known issues (waiting on Caddy ≥ 2.11.5)
+
+- **grpc-lift confirmed, one HIGH pending**: coraza-caddy v2.6.0's go.mod lifts `google.golang.org/grpc` to **v1.82.1** (verified in the shipped binary). Trivy cleared `GHSA-hrxh-6v49-42gf`, `CVE-2026-56852`, `CVE-2026-46600`, and `CVE-2026-56854`; `.trivyignore`/SECURITY.md were pruned accordingly. `CVE-2026-84304` (grpc, fixed in v1.83.1) remains the single pending HIGH until a later coraza-caddy/Caddy base ships grpc ≥ v1.83.1.
+
 ## [3.4.0] - 2026-08-24
 
 ### Changed
@@ -221,6 +235,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/) · Versioning: [SemVer](
 - README.md and README.es.md with setup instructions.
 
 <!-- Version links for Keep a Changelog -->
+[3.5.0]: https://github.com/Developmi/caddy-waf/compare/v3.4.0...v3.5.0
 [3.4.0]: https://github.com/Developmi/caddy-waf/compare/v3.3.2...v3.4.0
 [3.3.1]: https://github.com/Developmi/caddy-waf/compare/v3.3.0...v3.3.1
 [3.3.2]: https://github.com/Developmi/caddy-waf/compare/v3.3.1...v3.3.2
