@@ -21,3 +21,20 @@ updates:
       default-days: 7
     commit-message:
       prefix: "chore(deps):"
+
+  # Python tooling managed with uv (pyproject.toml + uv.lock at repo root).
+  # Grouped so yamllint/zizmor updates land as one pull request per cycle.
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    cooldown:
+      default-days: 7
+    commit-message:
+      prefix: "chore(deps):"
+    groups:
+      python-tooling:
+        patterns:
+          - "yamllint"
+          - "zizmor"

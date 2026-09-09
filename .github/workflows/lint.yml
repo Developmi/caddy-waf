@@ -26,15 +26,24 @@ jobs:
 
       - name: Install system linters
         run: |
-          # actionlint v1.7.12
-          curl -fsSL "https://github.com/rhysd/actionlint/releases/download/v1.7.12/actionlint_1.7.12_linux_amd64.tar.gz" \
-            | tar -xz -C /usr/local/bin actionlint
-          chmod 755 /usr/local/bin/actionlint
+          set -euo pipefail
 
-          # hadolint v2.15.1
+          # actionlint v1.7.12 — sha256 must equal ACTIONLINT_SHA256_LINUX_AMD64
+          # in tools/versions.mk (CI runs ubuntu-latest = linux/amd64).
+          curl -fsSL "https://github.com/rhysd/actionlint/releases/download/v1.7.12/actionlint_1.7.12_linux_amd64.tar.gz" \
+            -o /tmp/actionlint.tar.gz
+          echo "8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8  /tmp/actionlint.tar.gz" | sha256sum -c -
+          tar -xz -C /usr/local/bin -f /tmp/actionlint.tar.gz actionlint
+          chmod 755 /usr/local/bin/actionlint
+          rm -f /tmp/actionlint.tar.gz
+
+          # hadolint v2.15.1 — sha256 must equal HADOLINT_SHA256_LINUX_AMD64
+          # in tools/versions.mk (CI runs ubuntu-latest = linux/amd64).
           curl -fsSL "https://github.com/hadolint/hadolint/releases/download/v2.15.1/hadolint-linux-x86_64" \
-            -o /usr/local/bin/hadolint
-          chmod 755 /usr/local/bin/hadolint
+            -o /tmp/hadolint
+          echo "c7187db94eeeeca956519a6af171adc31453941a1e777961f6e680f697c8c507  /tmp/hadolint" | sha256sum -c -
+          install -m 0755 /tmp/hadolint /usr/local/bin/hadolint
+          rm -f /tmp/hadolint
 
       - name: Sync Python dependencies
         run: uv sync --frozen

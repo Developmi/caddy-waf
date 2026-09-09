@@ -1,0 +1,4 @@
+# Default code owners: every pull request requires a review from the maintainer.
+# The Developmi org has no teams (gh api orgs/Developmi/teams -> []), so the
+# owner resolves to the sole repository admin.
+* @Miguel-DevOps
