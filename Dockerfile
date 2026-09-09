@@ -1,11 +1,12 @@
 # Build Stage
-FROM caddy:2.11.4-builder AS builder
+# caddy:2.11.4-builder pinned to its multi-arch index digest (tag comment for readability)
+FROM caddy:2.11.4-builder@sha256:b8f9c720f13f64c13dd42db28e8f38a3fab54c11fce4d93bda26d710c448dcfd AS builder
 
 # Build args for deterministic plugin references.
-# coraza-caddy: https://github.com/corazawaf/coraza-caddy/releases/tag/v2.5.0
+# coraza-caddy: https://github.com/corazawaf/coraza-caddy/releases/tag/v2.6.0
 # caddy-ratelimit: https://github.com/mholt/caddy-ratelimit (no release tags beyond v0.1.0 - pinned by commit SHA)
 # caddy-dns/cloudflare: https://github.com/caddy-dns/cloudflare/releases/tag/v0.2.4
-ARG CORAZA_CADDY_REF=v2.5.0
+ARG CORAZA_CADDY_REF=v2.6.0
 ARG CADDY_RATELIMIT_REF=5625512
 ARG CADDY_DNS_CLOUDFLARE_REF=v0.2.4
 
@@ -16,7 +17,8 @@ RUN xcaddy build \
     --with github.com/caddy-dns/cloudflare@${CADDY_DNS_CLOUDFLARE_REF}
 
 # Final Stage
-FROM caddy:2.11.4
+# caddy:2.11.4 pinned to its multi-arch index digest (tag comment for readability)
+FROM caddy:2.11.4@sha256:df7f1c2fb114453b951de51a98efc010db1655a92c2e86be6706714e2417a78d
 SHELL ["/bin/ash", "-eo", "pipefail", "-c"]
 
 # Container metadata
@@ -26,8 +28,8 @@ LABEL org.opencontainers.image.description="Production-ready Caddy web server wi
 LABEL org.opencontainers.image.licenses="MIT"
 LABEL maintainer="Miguel Lozano"
 LABEL vendor="Developmi"
-LABEL version="3.4.0"
-LABEL waf.coraza.version="2.5.0"
+LABEL version="3.5.0"
+LABEL waf.coraza.version="2.6.0"
 LABEL waf.owasp-crs.version="4.29.0"
 
 # Copy the custom binary
