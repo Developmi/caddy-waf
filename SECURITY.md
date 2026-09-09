@@ -280,7 +280,7 @@ These advisories affect the Caddy 2.11.4 binary or configuration surface and hav
 | `CVE-2026-84304` | google.golang.org/grpc v1.82.1 (embedded in Caddy binary) | HIGH | gRPC vulnerability (xDS/HTTP-2 family) — gRPC/xDS not used by Caddy core in this deployment; not reachable. Patched in grpc v1.83.1 | grpc v1.83.1 → Caddy ≥ 2.11.5 |
 | `GHSA-6365-7ppr-5r92` | Caddy `forward_auth` + `reverse_proxy` (configuration surface) | Moderate | Wrong-upstream connection under specific `forward_auth` configurations — verify production Caddyfile does not use the affected pattern | Caddy 2.11.5 (unreleased) |
 
-**Resolved in v3.5.0 (2026-09-09)** — the coraza-caddy v2.6.0 rebuild lifted the affected Go dependencies, so Trivy no longer reports these findings; their `.trivyignore` suppressions and rows below were removed:
+**Resolved in v3.5.1 (2026-09-09)** — the coraza-caddy v2.6.0 rebuild lifted the affected Go dependencies, so Trivy no longer reports these findings; their `.trivyignore` suppressions and rows below were removed:
 
 | Advisory | Component (before) | Fixed by |
 |----------|--------------------|----------|
@@ -308,6 +308,7 @@ These advisories affect the Caddy 2.11.4 binary or configuration surface and hav
 | **2026-08-11** | caddy-waf **v3.3.0** released - tool bumps (hadolint 2.15.1, go-ftw 2.5.0, Trivy v0.73.0), full `apk upgrade`, JSON-form HEALTHCHECK, version alignment |
 | **2026-08-11** | caddy-waf **v3.3.1** released - HEALTHCHECK via admin `/metrics` (curl), resource limits (mem 512m, 1 CPU), JSON-file log rotation (50m × 5) |
 | **2026-08-24** | caddy-waf **v3.4.0** released - OWASP CRS 4.29.0 (anti-evasion 932 + FP fixes), Trivy v0.74.0, integration suite 20 cases (OWASP Top 10 2025) |
+| **2026-09-09** | caddy-waf **v3.5.1** released - coraza-caddy v2.6.0 (WebSocket+WAF fixes, grpc v1.82.1), digest-pinned Caddy base, CI/CD hardening (SHA256-verified tools, least-privilege workflow) |
 | **2026-08-14** | caddy-waf **v3.3.2** released - WAF active by default (DetectionOnly), dual-arch scanning, bare-boot regression gate (make test-boot), systemd Caddyfile variant tracked |
 
 ---
