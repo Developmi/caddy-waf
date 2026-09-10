@@ -1,6 +1,6 @@
 # Build Stage
 # caddy:2.11.4-builder pinned to its multi-arch index digest (tag comment for readability)
-FROM caddy:2.11.4-builder@sha256:b8f9c720f13f64c13dd42db28e8f38a3fab54c11fce4d93bda26d710c448dcfd AS builder
+FROM caddy:2.11.4-builder@sha256:403d237d0bb16d2e62b1f93ca9ebb4953ecbb78aee5986765713a39f9263a5b4 AS builder
 
 # Build args for deterministic plugin references.
 # coraza-caddy: https://github.com/corazawaf/coraza-caddy/releases/tag/v2.6.0
@@ -18,7 +18,7 @@ RUN xcaddy build \
 
 # Final Stage
 # caddy:2.11.4 pinned to its multi-arch index digest (tag comment for readability)
-FROM caddy:2.11.4@sha256:df7f1c2fb114453b951de51a98efc010db1655a92c2e86be6706714e2417a78d
+FROM caddy:2.11.4@sha256:13ba145cba2f3e28fa801994876e4c086d1b95d5aa2a520a734765ffb6b12017
 SHELL ["/bin/ash", "-eo", "pipefail", "-c"]
 
 # Container metadata
