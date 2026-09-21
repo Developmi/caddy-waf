@@ -3,7 +3,7 @@
 ## Stack
 - **Type**: Docker infrastructure / deployment (no Go source code)
 - **Base image**: Caddy 2.11.4 (Alpine-based)
-- **WAF Engine**: Coraza WAF 2.5.0 (via coraza-caddy plugin)
+- **WAF Engine**: Coraza WAF 2.6.1 (via coraza-caddy plugin)
 - **Rule Set**: OWASP CRS 4.29.0
 - **Additional plugins**: caddy-ratelimit (0.1.0, pinned 5625512), caddy-dns/cloudflare (0.2.4)
 - **Language**: Go (build-time only via xcaddy builder image)
@@ -42,7 +42,7 @@
 
 ## Conventions
 - Commit style: Conventional Commits (`feat:`, `fix:`, `docs:`, `chore:`, `ci:`)
-- Versioning: Semantic Versioning (v3.4.0 current)
+- Versioning: Semantic Versioning (v3.5.3 current)
 - Branch naming: `feat/desc`, `fix/desc`, `docs/desc`, `chore/desc`, `ci/desc`
 - go-ftw integration tests via `make test-waf` (container starts on 127.0.0.1:9090) + manual validation
 - WAF default: DetectionOnly (change to On after 7-14 day observation window)
