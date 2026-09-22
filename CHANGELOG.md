@@ -3,13 +3,13 @@
 All notable changes to this project will be documented in this file.
 Format: [Keep a Changelog](https://keepachangelog.com/) · Versioning: [SemVer](https://semver.org/)
 
-## [3.5.3] - 2026-09-21
+## [3.5.4] - 2026-09-21
 
 ### Changed
 
 - **coraza-caddy**: upgraded from v2.6.0 to **v2.6.1** (`CORAZA_CADDY_REF`) — flush and hijack Unwrap fixes (#344); lifts `google.golang.org/grpc` to **v1.83.2**.
 - **Security**: resolved `CVE-2026-84304` and `CVE-2026-84445` in the compiled binary; removed all suppressions from `.trivyignore`.
-- **Version alignment**: OCI `LABEL version` → **3.5.3**, `LABEL waf.coraza.version` → **2.6.1**, Compose/env/docs aligned to **v3.5.3**.
+- **Version alignment**: OCI `LABEL version` → **3.5.4**, `LABEL waf.coraza.version` → **2.6.1**, Compose/env/docs aligned to **v3.5.4**.
 
 ## [3.5.2] - 2026-09-09
 
@@ -248,7 +248,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/) · Versioning: [SemVer](
 - README.md and README.es.md with setup instructions.
 
 <!-- Version links for Keep a Changelog -->
-[3.5.3]: https://github.com/Developmi/caddy-waf/compare/v3.5.2...v3.5.3
+[3.5.4]: https://github.com/Developmi/caddy-waf/compare/v3.5.2...v3.5.4
 [3.5.2]: https://github.com/Developmi/caddy-waf/compare/v3.4.0...v3.5.2
 [3.4.0]: https://github.com/Developmi/caddy-waf/compare/v3.3.2...v3.4.0
 [3.3.1]: https://github.com/Developmi/caddy-waf/compare/v3.3.0...v3.3.1
