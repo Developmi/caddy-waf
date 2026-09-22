@@ -6,7 +6,7 @@
 
 _Protect your web applications with enterprise-grade WAF in under 5 minutes - eliminate false-positive risk during deployment and slash SOC2 audit prep time._
 
-[![Tech](https://img.shields.io/badge/Caddy_v2.11.4_|_Coraza_v2.5.0-green?style=for-the-badge&logo=caddy&logoColor=white)](https://caddyserver.com)
+[![Tech](https://img.shields.io/badge/Caddy_v2.11.4_|_Coraza_v2.6.1-green?style=for-the-badge&logo=caddy&logoColor=white)](https://caddyserver.com)
 [![Docker](https://img.shields.io/badge/Docker_|_READY-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://hub.docker.com)
 [![CI](https://img.shields.io/badge/CI-Passing-brightgreen?style=for-the-badge&logo=githubactions&logoColor=white)](https://github.com/developmi/caddy-waf/actions)
 [![Supply Chain](https://img.shields.io/badge/Supply_Chain-Cosign_|_Trivy-4A90D9?style=for-the-badge)](https://github.com/developmi/caddy-waf/actions)
@@ -57,7 +57,7 @@ Starting from v3.0.0, the image ships with updated Caddy 2.11.4, official upstre
 - **Structured logging**: JSON logs for SIEM integration
 
 #### 🛡️ WAF Capabilities
-- **Coraza WAF v2.5.0**: Modern, high-performance web application firewall engine
+- **Coraza WAF v2.6.1**: Modern, high-performance web application firewall engine
 - **OWASP CRS v4.29.0**: Latest Core Rule Set with 290+ protection rules
 - **DetectionOnly by default**: Prevents false positives in new deployments
 - **Audit logging**: JSON audit logs to stdout for easy monitoring
@@ -81,7 +81,7 @@ Starting from v3.0.0, the image ships with updated Caddy 2.11.4, official upstre
 
 ### 1. Pull the Image
 ```bash
-docker pull ghcr.io/developmi/caddy-waf:v3.4.0
+docker pull ghcr.io/developmi/caddy-waf:v3.5.3
 ```
 
 ### 2. Create Environment File
@@ -154,7 +154,7 @@ caddy-waf/
 ```mermaid
 flowchart LR
     Client[Client] -->|HTTPS :443| Caddy[Caddy v2.11.4]
-    Caddy -->|WAF layer| Coraza[Coraza WAF v2.5.0]
+    Caddy -->|WAF layer| Coraza[Coraza WAF v2.6.1]
     Coraza -->|OWASP CRS v4.29.0| Rules[290+ Rules]
     Coraza -->|Decision| Action{Allow?}
     Action -->|Yes| Backend[Upstream Backend]
@@ -229,14 +229,14 @@ volumes:
 ### Environment Variables
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `CADDY_WAF_IMAGE` | `ghcr.io/developmi/caddy-waf:v3.4.0` | Caddy WAF image reference |
+| `CADDY_WAF_IMAGE` | `ghcr.io/developmi/caddy-waf:v3.5.3` | Caddy WAF image reference |
 | `EXAMPLE_APP_IMAGE` | `containous/whoami:latest` | Demo backend image |
 | `SITE_ADDRESS` | `localhost` | Site address/server name used by Caddy |
 | `BACKEND_UPSTREAM` | `example-app:80` | Reverse proxy backend upstream |
 | `ACME_EMAIL` | (empty) | Email for Let's Encrypt certificates |
 
 ### Plugins Included
-- `github.com/corazawaf/coraza-caddy/v2@v2.5.0` - Coraza WAF integration
+- `github.com/corazawaf/coraza-caddy/v2@v2.6.1` - Coraza WAF integration
 - `github.com/mholt/caddy-ratelimit@v0.1.0` - Rate limiting (DDoS protection)
 
 > **Note:** `caddy-ratelimit` development is active but releases are not tagged beyond `v0.1.0`. This image pins the module by commit SHA (`5625512`) to include post-tag fixes. See [Dockerfile](./Dockerfile) for the pinned reference.
@@ -315,10 +315,10 @@ curl -I https://yourdomain.com
 ### Security Scanning
 ```bash
 # Scan image with Trivy
-docker run --rm aquasec/trivy image ghcr.io/developmi/caddy-waf:v3.4.0
+docker run --rm aquasec/trivy image ghcr.io/developmi/caddy-waf:v3.5.3
 
 # Scan with Docker Scout
-docker scout quickview ghcr.io/developmi/caddy-waf:v3.4.0
+docker scout quickview ghcr.io/developmi/caddy-waf:v3.5.3
 ```
 
 ### Integration Tests (go-ftw)
@@ -470,6 +470,8 @@ The project follows [Keep a Changelog](https://keepachangelog.com/) and [Semanti
 
 | Version | Date | Highlights |
 |---------|------|------------|
+| [3.5.3](./CHANGELOG.md#353---2026-09-21) | 2026-09-21 | Coraza WAF 2.6.1, grpc v1.83.2, CVE-2026-84304 & CVE-2026-84445 resolved, empty .trivyignore |
+| [3.5.2](./CHANGELOG.md#352---2026-09-09) | 2026-09-09 | coraza-caddy v2.6.0 (WebSocket+WAF fixes, grpc v1.82.1), digest-pinned base, CI/CD hardening |
 | [3.4.0](./CHANGELOG.md#340---2026-08-24) | 2026-08-24 | OWASP CRS 4.29.0, Trivy v0.74.0, 20-case integration suite (OWASP Top 10 2025), Actions bumps |
 | [3.3.2](./CHANGELOG.md#332---2026-08-14) | 2026-08-14 | WAF default active (DetectionOnly), dual-arch scanning, boot regression gate, systemd variant tracked |
 | [3.3.1](./CHANGELOG.md#331---2026-08-11) | 2026-08-11 | HEALTHCHECK via admin /metrics (curl), resource limits (512m/1 CPU), JSON-file log rotation, version alignment |
