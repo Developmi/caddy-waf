@@ -81,7 +81,7 @@ Starting from v3.0.0, the image ships with updated Caddy 2.11.4, official upstre
 
 ### 1. Pull the Image
 ```bash
-docker pull ghcr.io/developmi/caddy-waf:v3.5.3
+docker pull ghcr.io/developmi/caddy-waf:v3.5.4
 ```
 
 ### 2. Create Environment File
@@ -229,7 +229,7 @@ volumes:
 ### Environment Variables
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `CADDY_WAF_IMAGE` | `ghcr.io/developmi/caddy-waf:v3.5.3` | Caddy WAF image reference |
+| `CADDY_WAF_IMAGE` | `ghcr.io/developmi/caddy-waf:v3.5.4` | Caddy WAF image reference |
 | `EXAMPLE_APP_IMAGE` | `containous/whoami:latest` | Demo backend image |
 | `SITE_ADDRESS` | `localhost` | Site address/server name used by Caddy |
 | `BACKEND_UPSTREAM` | `example-app:80` | Reverse proxy backend upstream |
@@ -315,10 +315,10 @@ curl -I https://yourdomain.com
 ### Security Scanning
 ```bash
 # Scan image with Trivy
-docker run --rm aquasec/trivy image ghcr.io/developmi/caddy-waf:v3.5.3
+docker run --rm aquasec/trivy image ghcr.io/developmi/caddy-waf:v3.5.4
 
 # Scan with Docker Scout
-docker scout quickview ghcr.io/developmi/caddy-waf:v3.5.3
+docker scout quickview ghcr.io/developmi/caddy-waf:v3.5.4
 ```
 
 ### Integration Tests (go-ftw)
@@ -470,7 +470,7 @@ The project follows [Keep a Changelog](https://keepachangelog.com/) and [Semanti
 
 | Version | Date | Highlights |
 |---------|------|------------|
-| [3.5.3](./CHANGELOG.md#353---2026-09-21) | 2026-09-21 | Coraza WAF 2.6.1, grpc v1.83.2, CVE-2026-84304 & CVE-2026-84445 resolved, empty .trivyignore |
+| [3.5.4](./CHANGELOG.md#353---2026-09-21) | 2026-09-21 | Coraza WAF 2.6.1, grpc v1.83.2, CVE-2026-84304 & CVE-2026-84445 resolved, empty .trivyignore |
 | [3.5.2](./CHANGELOG.md#352---2026-09-09) | 2026-09-09 | coraza-caddy v2.6.0 (WebSocket+WAF fixes, grpc v1.82.1), digest-pinned base, CI/CD hardening |
 | [3.4.0](./CHANGELOG.md#340---2026-08-24) | 2026-08-24 | OWASP CRS 4.29.0, Trivy v0.74.0, 20-case integration suite (OWASP Top 10 2025), Actions bumps |
 | [3.3.2](./CHANGELOG.md#332---2026-08-14) | 2026-08-14 | WAF default active (DetectionOnly), dual-arch scanning, boot regression gate, systemd variant tracked |

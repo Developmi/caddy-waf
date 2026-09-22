@@ -42,7 +42,7 @@
 
 ## Conventions
 - Commit style: Conventional Commits (`feat:`, `fix:`, `docs:`, `chore:`, `ci:`)
-- Versioning: Semantic Versioning (v3.5.3 current)
+- Versioning: Semantic Versioning (v3.5.4 current)
 - Branch naming: `feat/desc`, `fix/desc`, `docs/desc`, `chore/desc`, `ci/desc`
 - go-ftw integration tests via `make test-waf` (container starts on 127.0.0.1:9090) + manual validation
 - WAF default: DetectionOnly (change to On after 7-14 day observation window)
