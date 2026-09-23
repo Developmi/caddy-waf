@@ -3,6 +3,21 @@
 All notable changes to this project will be documented in this file.
 Format: [Keep a Changelog](https://keepachangelog.com/) · Versioning: [SemVer](https://semver.org/)
 
+## [3.5.5] - 2026-09-23
+
+### Added
+
+- **OWASP CRS Integration Suite Expansion**: Reorganized tests into Screaming Architecture with **122 automated integration cases** covering 12 official OWASP CRS v4.29.0 rule families (`00-baseline/`, `01-evasion/`, `02-hardening/`, and `crs/` 911 through 944). Added deep attack inspection for Node.js RCE (`require('child_process')`, dynamic `eval()`, `fs.readFileSync()`, ReDoS), cloud metadata SSRF, template injection (SSTI), Prototype Pollution, and robust false-positive immunity against complex JSON, GraphQL, and UTF-8 payloads.
+- **Granular Test Runners**: Added fast, targeted Makefile test commands (`make test-baseline`, `make test-evasion`, `make test-hardening`, `make test-crs`, `make test-suite SUITE=...`) running in milliseconds alongside unified `make test` (lint + 122 WAF integration tests + live security headers + bare-boot regression).
+- **Automated Live Header Validation**: Added automated verification in `tools/test-integration.sh` guaranteeing that server tokens are stripped and all mandatory security policies are enforced on live endpoints.
+
+### Changed
+
+- **Native Caddy Perimeter Hardening**: Implemented `(security_headers)` snippet suppressing `Server: Caddy`, `X-Powered-By`, and `X-AspNet-Version` banners across `Caddyfile.example`, `deploy/systemd/Caddyfile.systemd`, `tests/Caddyfile.test`, and baked image `Dockerfile` (`Caddyfile.default`).
+- **Strict Security Policies**: Enforced `Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()` and `X-Permitted-Cross-Domain-Policies: none`.
+- **Perimeter Defense-in-Depth**: Implemented native Caddy `@sensitive_paths` matcher returning `403 Forbidden` for `.git*`, `.env*`, `.aws*`, `.docker*`, `*.sql`, `*.htpasswd`, `*.bak`, `*.conf`, ensuring sensitive files are blocked even when the WAF is operating in `DetectionOnly` observation mode.
+- **CI Supply Chain Release Gate**: Enforced mandatory `test` gate in `.github/workflows/docker-build-scan-sign.yml` requiring all 122 integration tests and bare-boot checks to pass green before Cosign signing and GHCR publication.
+
 ## [3.5.4] - 2026-09-21
 
 ### Changed
