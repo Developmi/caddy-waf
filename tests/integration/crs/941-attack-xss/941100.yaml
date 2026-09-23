@@ -1,33 +1,16 @@
 ---
 meta:
   author: "Developmi"
-  description: "OWASP Top 10 2025 core coverage - CRS 4.29.0 main attack categories"
+  description: "CRS 4.29.0 Family 941 - Cross-Site Scripting (XSS)"
   enabled: true
-  name: "caddy-waf-owasp-crs-core"
+  name: "crs-941-attack-xss"
 
-rule_id: 999002
+rule_id: 941000
 
 tests:
-  - test_title: "SQL Injection tautology via URL parameter - WAF should block"
+  - test_title: "Classic script tag - WAF should block"
     test_id: 1
-    description: "OWASP A03 (Injection). CRS rule 942100. 'AND 1=1' tautology in query string triggers 403."
-    stages:
-      - stage:
-          input:
-            dest_addr: "127.0.0.1"
-            port: 9090
-            protocol: "http"
-            uri: "/?id=1+AND+1=1"
-            method: "GET"
-            headers:
-              User-Agent: "caddy-waf-test/1.0"
-              Host: "localhost"
-          output:
-            status: [403]
-
-  - test_title: "Cross-Site Scripting script tag - WAF should block"
-    test_id: 2
-    description: "OWASP A03 (Injection). CRS rule 941100. <script>alert(1)</script> in query string triggers 403."
+    description: "CRS rule 941110/941100. Classic <script> tag triggers 403."
     stages:
       - stage:
           input:
@@ -42,35 +25,50 @@ tests:
           output:
             status: [403]
 
-  - test_title: "MSSQL injection xp_dirtree - WAF should block"
+  - test_title: "Image onerror event handler - WAF should block"
+    test_id: 2
+    description: "CRS rule 941120. onerror attribute vector triggers 403."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/?img=<img%20src=x%20onerror=alert(1)>"
+            method: "GET"
+            headers:
+              User-Agent: "caddy-waf-test/1.0"
+              Host: "localhost"
+          output:
+            status: [403]
+
+  - test_title: "Body onload event handler - WAF should block"
     test_id: 3
-    description: "OWASP A03 (Injection). CRS rule 942190. Official CRS payload (942190-38) - xp_dirtree stack in POST body triggers 403."
+    description: "CRS rule 941120. onload attribute vector triggers 403."
     stages:
       - stage:
           input:
             dest_addr: "127.0.0.1"
             port: 9090
             protocol: "http"
-            uri: "/post"
-            method: "POST"
+            uri: "/?body=<body%20onload=alert('XSS')>"
+            method: "GET"
             headers:
               User-Agent: "caddy-waf-test/1.0"
               Host: "localhost"
-              Content-Type: "application/x-www-form-urlencoded"
-            data: "var=1);declare @q varchar(99);set @q='\\\\j0kwbatxjfgjp0qu3ibonwovamgmkq8h05unittests.corerule' 'set.org\\\\kph'; exec master.dbo.xp_dirtree @q;--"  # yamllint disable-line rule:line-length
           output:
             status: [403]
 
-  - test_title: "RCE Unix command injection - WAF should block"
+  - test_title: "JavaScript URI scheme - WAF should block"
     test_id: 4
-    description: "OWASP A03 (Injection). CRS rules 932100/930120. 'cat /etc/passwd' in query string triggers 403."
+    description: "CRS rule 941150. javascript: pseudo-protocol triggers 403."
     stages:
       - stage:
           input:
             dest_addr: "127.0.0.1"
             port: 9090
             protocol: "http"
-            uri: "/?cmd=cat+/etc/passwd"
+            uri: "/?link=javascript:alert(1)"
             method: "GET"
             headers:
               User-Agent: "caddy-waf-test/1.0"
@@ -78,16 +76,16 @@ tests:
           output:
             status: [403]
 
-  - test_title: "PHP exec injection - WAF should block"
+  - test_title: "Iframe injection vector - WAF should block"
     test_id: 5
-    description: "OWASP A03 (Injection). CRS rule 933160. Official CRS payload (933160-7) - 'exec (blah)' encoded triggers 403."
+    description: "CRS rule 941170. <iframe src=...> vector triggers 403."
     stages:
       - stage:
           input:
             dest_addr: "127.0.0.1"
             port: 9090
             protocol: "http"
-            uri: "/?foo=exec%20%20%28blah%29"
+            uri: "/?frame=<iframe%20src=javascript:alert(1)>"
             method: "GET"
             headers:
               User-Agent: "caddy-waf-test/1.0"
@@ -95,16 +93,16 @@ tests:
           output:
             status: [403]
 
-  - test_title: "SSRF gopher scheme - WAF should block"
+  - test_title: "SVG onload injection - WAF should block"
     test_id: 6
-    description: "OWASP A10 (SSRF). CRS rule 931130. Official CRS payload (931130-18) - gopher:// in query string triggers 403."
+    description: "CRS rule 941200/941120. <svg onload=...> vector triggers 403."
     stages:
       - stage:
           input:
             dest_addr: "127.0.0.1"
             port: 9090
             protocol: "http"
-            uri: "/?x=gopher://google.com/_SSRFTest!"
+            uri: "/?svg=<svg/onload=alert(1)>"
             method: "GET"
             headers:
               User-Agent: "caddy-waf-test/1.0"
@@ -112,16 +110,16 @@ tests:
           output:
             status: [403]
 
-  - test_title: "SSRF file scheme - WAF should block"
+  - test_title: "Document cookie access - WAF should block"
     test_id: 7
-    description: "OWASP A10 (SSRF). CRS rule 931130. Official CRS payload (931130-21) - url:file:// in query string triggers 403."
+    description: "CRS rule 941320. Access to document.cookie triggers 403."
     stages:
       - stage:
           input:
             dest_addr: "127.0.0.1"
             port: 9090
             protocol: "http"
-            uri: "/?x=url:file://etc/services"
+            uri: "/?x=document.cookie"
             method: "GET"
             headers:
               User-Agent: "caddy-waf-test/1.0"
@@ -129,16 +127,16 @@ tests:
           output:
             status: [403]
 
-  - test_title: "Local File Inclusion OS file - WAF should block"
+  - test_title: "Window location redirection - WAF should block"
     test_id: 8
-    description: "OWASP A01 (Access Control). CRS rule 930120. Official CRS payload (930120-6) - /sys/class in query string triggers 403."
+    description: "CRS rule 941320. Manipulation of window.location triggers 403."
     stages:
       - stage:
           input:
             dest_addr: "127.0.0.1"
             port: 9090
             protocol: "http"
-            uri: "/?test=/sys/class"
+            uri: "/?redirect=window.location='http://evil.com'"
             method: "GET"
             headers:
               User-Agent: "caddy-waf-test/1.0"
@@ -146,16 +144,16 @@ tests:
           output:
             status: [403]
 
-  - test_title: "HTTP header injection CRLF - WAF should block"
+  - test_title: "HTML entity encoded script tag - WAF should block"
     test_id: 9
-    description: "OWASP A05 (Misconfiguration). CRS rule 921160. Official CRS payload (921160-4) - CRLF in query string triggers 403."
+    description: "CRS rule 941110. Decoded HTML entity &lt;script&gt; triggers 403."
     stages:
       - stage:
           input:
             dest_addr: "127.0.0.1"
             port: 9090
             protocol: "http"
-            uri: "/?variableX=bar&variable2=%0d%0aRemote-addr:%20foo.bar.com"
+            uri: "/?payload=&lt;script&gt;alert(1)&lt;/script&gt;"
             method: "GET"
             headers:
               User-Agent: "caddy-waf-test/1.0"
@@ -163,10 +161,9 @@ tests:
           output:
             status: [403]
 
-  - test_title: "XSS fullwidth unicode in POST body - WAF should block"
+  - test_title: "XSS payload in POST body - WAF should block"
     test_id: 10
-    description: >-
-      OWASP A03 (Injection). CRS rule 941110. Official CRS payload (941110-7) - fullwidth Unicode <script> in form body triggers 403.
+    description: "CRS rule 941110. XSS payload submitted in POST body triggers 403."
     stages:
       - stage:
           input:
@@ -179,6 +176,6 @@ tests:
               User-Agent: "caddy-waf-test/1.0"
               Host: "localhost"
               Content-Type: "application/x-www-form-urlencoded"
-            data: "var=%ef%bc%9cscript%20%ef%bc%9ealert%281%29%ef%bc%9c/script%ef%bc%9e"
+            data: "comment=<script>alert(document.domain)</script>"
           output:
             status: [403]

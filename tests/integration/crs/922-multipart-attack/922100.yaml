@@ -1,0 +1,114 @@
+---
+meta:
+  author: "Developmi"
+  description: "CRS 4.29.0 Family 922 - Multipart Form-Data Attacks"
+  enabled: true
+  name: "crs-922-multipart-attack"
+
+rule_id: 922000
+
+tests:
+  - test_title: "Multipart with Content-Transfer-Encoding 8bit - WAF should block"
+    test_id: 1
+    description: "CRS rule 922120. Deprecated Content-Transfer-Encoding header triggers 403."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/post"
+            method: "POST"
+            headers:
+              User-Agent: "caddy-waf-test/1.0"
+              Host: "localhost"
+              Content-Type: "multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW"
+            data: |
+              ------WebKitFormBoundary7MA4YWxkTrZu0gW
+              Content-Disposition: form-data; name="file"; filename="test.txt"
+              Content-Type: text/plain
+              Content-Transfer-Encoding: 8bit
+
+              malicious content
+              ------WebKitFormBoundary7MA4YWxkTrZu0gW--
+          output:
+            status: [403]
+
+  - test_title: "Multipart with Content-Transfer-Encoding base64 - WAF should block"
+    test_id: 2
+    description: "CRS rule 922120. Deprecated Content-Transfer-Encoding base64 header triggers 403."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/post"
+            method: "POST"
+            headers:
+              User-Agent: "caddy-waf-test/1.0"
+              Host: "localhost"
+              Content-Type: "multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW"
+            data: |
+              ------WebKitFormBoundary7MA4YWxkTrZu0gW
+              Content-Disposition: form-data; name="file"; filename="test.bin"
+              Content-Type: application/octet-stream
+              Content-Transfer-Encoding: base64
+
+              SGVsbG8gV29ybGQ=
+              ------WebKitFormBoundary7MA4YWxkTrZu0gW--
+          output:
+            status: [403]
+
+  - test_title: "Multipart global _charset_ parameter definition - WAF should block"
+    test_id: 3
+    description: "CRS rule 922100. Disallowed global _charset_ form-data parameter triggers 403."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/post"
+            method: "POST"
+            headers:
+              User-Agent: "caddy-waf-test/1.0"
+              Host: "localhost"
+              Content-Type: "multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW"
+            data: |
+              ------WebKitFormBoundary7MA4YWxkTrZu0gW
+              Content-Disposition: form-data; name="_charset_"
+
+              utf-7
+              ------WebKitFormBoundary7MA4YWxkTrZu0gW
+              Content-Disposition: form-data; name="field"
+
+              payload
+              ------WebKitFormBoundary7MA4YWxkTrZu0gW--
+          output:
+            status: [403]
+
+  - test_title: "Multipart illegal charset utf-7 in part Content-Type - WAF should block"
+    test_id: 4
+    description: "CRS rule 922110. Illegal charset utf-7 in multipart Content-Type triggers 403."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/post"
+            method: "POST"
+            headers:
+              User-Agent: "caddy-waf-test/1.0"
+              Host: "localhost"
+              Content-Type: "multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW"
+            data: |
+              ------WebKitFormBoundary7MA4YWxkTrZu0gW
+              Content-Disposition: form-data; name="comment"
+              Content-Type: text/plain; charset=utf-7
+
+              +ACI-test+ACI-
+              ------WebKitFormBoundary7MA4YWxkTrZu0gW--
+          output:
+            status: [403]

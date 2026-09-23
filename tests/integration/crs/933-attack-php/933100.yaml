@@ -1,0 +1,111 @@
+---
+meta:
+  author: "Developmi"
+  description: "CRS 4.29.0 Family 933 - PHP Application Attacks"
+  enabled: true
+  name: "crs-933-attack-php"
+
+rule_id: 933000
+
+tests:
+  - test_title: "PHP opening tag and phpinfo - WAF should block"
+    test_id: 1
+    description: "CRS rule 933100/933160. Inline PHP tag with phpinfo() triggers 403."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/?code=<?php%20phpinfo();%20?>"
+            method: "GET"
+            headers:
+              User-Agent: "caddy-waf-test/1.0"
+              Host: "localhost"
+          output:
+            status: [403]
+
+  - test_title: "PHP wrapper php://input - WAF should block"
+    test_id: 2
+    description: "CRS rule 933150. php://input wrapper in query triggers 403."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/?include=php://input"
+            method: "GET"
+            headers:
+              User-Agent: "caddy-waf-test/1.0"
+              Host: "localhost"
+          output:
+            status: [403]
+
+  - test_title: "PHP wrapper php://filter - WAF should block"
+    test_id: 3
+    description: "CRS rule 933150. php://filter wrapper stream in query triggers 403."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/?page=php://filter/convert.base64-encode/resource=config.php"
+            method: "GET"
+            headers:
+              User-Agent: "caddy-waf-test/1.0"
+              Host: "localhost"
+          output:
+            status: [403]
+
+  - test_title: "PHP eval execution - WAF should block"
+    test_id: 4
+    description: "CRS rule 933160. eval() function invocation triggers 403."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/?x=eval(base64_decode('cGhwaW5mbygpOw=='))"
+            method: "GET"
+            headers:
+              User-Agent: "caddy-waf-test/1.0"
+              Host: "localhost"
+          output:
+            status: [403]
+
+  - test_title: "PHP superglobal $_GET manipulation - WAF should block"
+    test_id: 5
+    description: "CRS rule 933130. Reference to $_GET variable triggers 403."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/?var=$_GET['admin']"
+            method: "GET"
+            headers:
+              User-Agent: "caddy-waf-test/1.0"
+              Host: "localhost"
+          output:
+            status: [403]
+
+  - test_title: "PHP system execution function - WAF should block"
+    test_id: 6
+    description: "CRS rule 933160. system() function invocation triggers 403."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/?exec=system('id')"
+            method: "GET"
+            headers:
+              User-Agent: "caddy-waf-test/1.0"
+              Host: "localhost"
+          output:
+            status: [403]

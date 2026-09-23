@@ -1,0 +1,111 @@
+---
+meta:
+  author: "Developmi"
+  description: "CRS 4.29.0 Rule 913100 - Security Scanner User-Agents"
+  enabled: true
+  name: "crs-913-scanner-detection"
+
+rule_id: 913100
+
+tests:
+  - test_title: "Scanner User-Agent sqlmap - WAF should block"
+    test_id: 1
+    description: "User-Agent associated with sqlmap triggers rule 913100."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/"
+            method: "GET"
+            headers:
+              User-Agent: "sqlmap/1.5#stable (http://sqlmap.org)"
+              Host: "localhost"
+          output:
+            status: [403]
+
+  - test_title: "Scanner User-Agent Nikto - WAF should block"
+    test_id: 2
+    description: "User-Agent associated with Nikto triggers rule 913100."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/"
+            method: "GET"
+            headers:
+              User-Agent: "Mozilla/5.00 (Nikto/2.1.6) (Evasions:None) (Test:Port Check)"
+              Host: "localhost"
+          output:
+            status: [403]
+
+  - test_title: "Scanner User-Agent DirBuster - WAF should block"
+    test_id: 3
+    description: "User-Agent associated with DirBuster triggers rule 913100."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/"
+            method: "GET"
+            headers:
+              User-Agent: "DirBuster-1.0-RC1 (http://www.owasp.org/index.php/Category:OWASP_DirBuster_Project)"
+              Host: "localhost"
+          output:
+            status: [403]
+
+  - test_title: "Scanner User-Agent masscan - WAF should block"
+    test_id: 4
+    description: "User-Agent associated with masscan triggers rule 913100."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/"
+            method: "GET"
+            headers:
+              User-Agent: "masscan/1.3 (https://github.com/robertdavidgraham/masscan)"
+              Host: "localhost"
+          output:
+            status: [403]
+
+  - test_title: "Scanner User-Agent w3af - WAF should block"
+    test_id: 5
+    description: "User-Agent associated with w3af triggers rule 913100."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/"
+            method: "GET"
+            headers:
+              User-Agent: "w3af.org"
+              Host: "localhost"
+          output:
+            status: [403]
+
+  - test_title: "Scanner User-Agent Arachni - WAF should block"
+    test_id: 6
+    description: "User-Agent associated with Arachni triggers rule 913100."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/"
+            method: "GET"
+            headers:
+              User-Agent: "Arachni/v1.5.1"
+              Host: "localhost"
+          output:
+            status: [403]

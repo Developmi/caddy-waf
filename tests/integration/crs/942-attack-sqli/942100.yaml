@@ -1,0 +1,216 @@
+---
+meta:
+  author: "Developmi"
+  description: "CRS 4.29.0 Family 942 - SQL Injection (SQLi)"
+  enabled: true
+  name: "crs-942-attack-sqli"
+
+rule_id: 942000
+
+tests:
+  - test_title: "Classic SQLi tautology - WAF should block"
+    test_id: 1
+    description: "CRS rule 942100/942120. ' OR '1'='1 tautology triggers 403."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/?id=1'+OR+'1'='1"
+            method: "GET"
+            headers:
+              User-Agent: "caddy-waf-test/1.0"
+              Host: "localhost"
+          output:
+            status: [403]
+
+  - test_title: "UNION SELECT information_schema - WAF should block"
+    test_id: 2
+    description: "CRS rule 942260/942140. UNION SELECT on information_schema triggers 403."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/?cat=1+UNION+SELECT+1,2,table_name+FROM+information_schema.tables--"
+            method: "GET"
+            headers:
+              User-Agent: "caddy-waf-test/1.0"
+              Host: "localhost"
+          output:
+            status: [403]
+
+  - test_title: "MSSQL xp_cmdshell execution - WAF should block"
+    test_id: 3
+    description: "CRS rule 942190. Execution of xp_cmdshell triggers 403."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/?q=1;exec+master..xp_cmdshell+'dir'--"
+            method: "GET"
+            headers:
+              User-Agent: "caddy-waf-test/1.0"
+              Host: "localhost"
+          output:
+            status: [403]
+
+  - test_title: "Blind SQLi WAITFOR DELAY - WAF should block"
+    test_id: 4
+    description: "CRS rule 942150/942160. MSSQL WAITFOR DELAY triggers 403."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/?item=1;WAITFOR+DELAY+'0:0:5'--"
+            method: "GET"
+            headers:
+              User-Agent: "caddy-waf-test/1.0"
+              Host: "localhost"
+          output:
+            status: [403]
+
+  - test_title: "Blind SQLi MySQL SLEEP - WAF should block"
+    test_id: 5
+    description: "CRS rule 942150/942160. MySQL SLEEP function triggers 403."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/?id=1+AND+SLEEP(5)--"
+            method: "GET"
+            headers:
+              User-Agent: "caddy-waf-test/1.0"
+              Host: "localhost"
+          output:
+            status: [403]
+
+  - test_title: "Blind SQLi MySQL BENCHMARK - WAF should block"
+    test_id: 6
+    description: "CRS rule 942150/942160. MySQL BENCHMARK function triggers 403."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/?val=1+OR+BENCHMARK(5000000,MD5(1))"
+            method: "GET"
+            headers:
+              User-Agent: "caddy-waf-test/1.0"
+              Host: "localhost"
+          output:
+            status: [403]
+
+  - test_title: "SQL auth bypass pattern - WAF should block"
+    test_id: 7
+    description: "CRS rule 942100/942180. Auth bypass ' OR 1=1-- triggers 403."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/login?user=admin'+OR+1=1--"
+            method: "GET"
+            headers:
+              User-Agent: "caddy-waf-test/1.0"
+              Host: "localhost"
+          output:
+            status: [403]
+
+  - test_title: "SQL comment obfuscation - WAF should block"
+    test_id: 8
+    description: "CRS rule 942200. Inline comment obfuscation /**/ triggers 403."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/?query=SELECT/**/id/**/FROM/**/users"
+            method: "GET"
+            headers:
+              User-Agent: "caddy-waf-test/1.0"
+              Host: "localhost"
+          output:
+            status: [403]
+
+  - test_title: "SQL ORDER BY injection - WAF should block"
+    test_id: 9
+    description: "CRS rule 942110. ORDER BY sequence injection triggers 403."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/?sort=id+ORDER+BY+1,2,3--"
+            method: "GET"
+            headers:
+              User-Agent: "caddy-waf-test/1.0"
+              Host: "localhost"
+          output:
+            status: [403]
+
+  - test_title: "SQLi in Cookie header - WAF should block"
+    test_id: 10
+    description: "CRS rule 942100/942370. SQLi payload inside Cookie header triggers 403."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/"
+            method: "GET"
+            headers:
+              User-Agent: "caddy-waf-test/1.0"
+              Host: "localhost"
+              Cookie: "sessionid=1'+OR+'1'='1"
+          output:
+            status: [403]
+
+  - test_title: "SQLi in POST form body - WAF should block"
+    test_id: 11
+    description: "CRS rule 942100. SQLi payload submitted via POST body triggers 403."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/post"
+            method: "POST"
+            headers:
+              User-Agent: "caddy-waf-test/1.0"
+              Host: "localhost"
+              Content-Type: "application/x-www-form-urlencoded"
+            data: "username=admin'--&password=foo"
+          output:
+            status: [403]
+
+  - test_title: "PostgreSQL pg_catalog enumeration - WAF should block"
+    test_id: 12
+    description: "CRS rule 942140. Access to pg_catalog.pg_tables triggers 403."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/?tbl=pg_catalog.pg_tables"
+            method: "GET"
+            headers:
+              User-Agent: "caddy-waf-test/1.0"
+              Host: "localhost"
+          output:
+            status: [403]

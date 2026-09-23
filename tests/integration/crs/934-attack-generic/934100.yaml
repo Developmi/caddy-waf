@@ -1,0 +1,181 @@
+---
+meta:
+  author: "Developmi"
+  description: "CRS 4.29.0 Family 934 - Cloud Metadata, SSRF, Prototype Pollution & SSTI"
+  enabled: true
+  name: "crs-934-attack-generic"
+
+rule_id: 934000
+
+tests:
+  - test_title: "Cloud metadata IMDSv1 IP SSRF - WAF should block"
+    test_id: 1
+    description: "CRS rule 934110. Request targeting 169.254.169.254 metadata service triggers 403."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/?url=http://169.254.169.254/latest/meta-data/"
+            method: "GET"
+            headers:
+              User-Agent: "caddy-waf-test/1.0"
+              Host: "localhost"
+          output:
+            status: [403]
+
+  - test_title: "GCP Compute metadata hostname SSRF - WAF should block"
+    test_id: 2
+    description: "CRS rule 934110. Request targeting metadata.google.internal triggers 403."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/?proxy=http://metadata.google.internal/computeMetadata/v1/"
+            method: "GET"
+            headers:
+              User-Agent: "caddy-waf-test/1.0"
+              Host: "localhost"
+          output:
+            status: [403]
+
+  - test_title: "Kubernetes internal service SSRF - WAF should block"
+    test_id: 3
+    description: "CRS rule 934190. Request targeting kubernetes.default.svc triggers 403."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/?target=http://kubernetes.default.svc.cluster.local/api"
+            method: "GET"
+            headers:
+              User-Agent: "caddy-waf-test/1.0"
+              Host: "localhost"
+          output:
+            status: [403]
+
+  - test_title: "Node.js Prototype Pollution __proto__ - WAF should block"
+    test_id: 4
+    description: "CRS rule 934130. __proto__ property injection triggers 403."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/?__proto__[isAdmin]=true"
+            method: "GET"
+            headers:
+              User-Agent: "caddy-waf-test/1.0"
+              Host: "localhost"
+          output:
+            status: [403]
+
+  - test_title: "Node.js Prototype Pollution constructor.prototype - WAF should block"
+    test_id: 5
+    description: "CRS rule 934130. constructor.prototype injection triggers 403."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/?constructor.prototype.polluted=true"
+            method: "GET"
+            headers:
+              User-Agent: "caddy-waf-test/1.0"
+              Host: "localhost"
+          output:
+            status: [403]
+
+  - test_title: "Server-Side Template Injection (SSTI) in POST body - WAF should block"
+    test_id: 6
+    description: "CRS rule 934200. Template expression {{...}} with arithmetic/methods triggers 403."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/render"
+            method: "POST"
+            headers:
+              User-Agent: "caddy-waf-test/1.0"
+              Host: "localhost"
+              Content-Type: "application/x-www-form-urlencoded"
+            data: "template=%7B%7B7*%277%27%7D%7D"
+          output:
+            status: [403]
+
+  - test_title: "Node.js child_process require execution - WAF should block"
+    test_id: 7
+    description: "CRS rule 934101/932100. Node.js require('child_process') injection triggers 403."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/?code=require('child_process').execSync('id')"
+            method: "GET"
+            headers:
+              User-Agent: "caddy-waf-test/1.0"
+              Host: "localhost"
+          output:
+            status: [403]
+
+  - test_title: "Node.js dynamic eval code execution - WAF should block"
+    test_id: 8
+    description: "CRS rule 934100. JavaScript eval() execution attempt triggers 403."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/?run=eval('process.exit()')"
+            method: "GET"
+            headers:
+              User-Agent: "caddy-waf-test/1.0"
+              Host: "localhost"
+          output:
+            status: [403]
+
+  - test_title: "Node.js filesystem read attempt - WAF should block"
+    test_id: 9
+    description: "CRS rule 934101/930120. Node.js readFileSync /etc/passwd triggers 403."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/?file=fs.readFileSync('/etc/passwd')"
+            method: "GET"
+            headers:
+              User-Agent: "caddy-waf-test/1.0"
+              Host: "localhost"
+          output:
+            status: [403]
+
+  - test_title: "Node.js event loop DoS infinite loop - WAF should block"
+    test_id: 10
+    description: "CRS rule 934160. JavaScript while(true) loop injection triggers 403."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/?loop=while(true){}"
+            method: "GET"
+            headers:
+              User-Agent: "caddy-waf-test/1.0"
+              Host: "localhost"
+          output:
+            status: [403]

