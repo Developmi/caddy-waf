@@ -112,8 +112,33 @@ RUN cat > /etc/caddy/Caddyfile.default <<'EOF'
     }
 }
 
+(security_headers) {
+    header {
+        # Information disclosure suppression
+        -Server
+        -X-Powered-By
+        -X-AspNet-Version
+
+        # HTTP Security Headers
+        Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+        X-Content-Type-Options "nosniff"
+        X-Frame-Options "DENY"
+        Referrer-Policy "strict-origin-when-cross-origin"
+        Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=()"
+        X-Permitted-Cross-Domain-Policies "none"
+    }
+}
+
 :80 {
     import waf
+    import security_headers
+
+    # Native perimeter hardening: block sensitive files and dotfiles (defense in depth)
+    @sensitive_paths {
+        path /.git* /.env* /.aws* /.docker* *.sql *.htpasswd *.bak *.conf
+    }
+    respond @sensitive_paths "Forbidden" 403
+
     respond "Caddy WAF is running"
 }
 EOF

@@ -27,8 +27,13 @@ help:
 	@echo ""
 	@echo "Testing"
 	@echo "-------"
-	@echo "  make test           Run all checks (lint + WAF integration)"
-	@echo "  make test-waf       Run WAF integration tests against live container"
+	@echo "  make test           Run all checks (lint + WAF integration + bare-boot)"
+	@echo "  make test-waf       Run all WAF integration tests against live container"
+	@echo "  make test-baseline  Run baseline & false-positives suite (00-baseline)"
+	@echo "  make test-evasion   Run OWASP CRS evasion suite (01-evasion)"
+	@echo "  make test-hardening Run perimeter hardening & header suite (02-hardening)"
+	@echo "  make test-crs       Run all 12 OWASP CRS family suites (crs)"
+	@echo "  make test-suite     Run specific test suite (e.g. SUITE=crs/942-attack-sqli)"
 	@echo "  make test-boot      Run bare-boot regression test (baked default as UID 1337)"
 	@echo "  make test-clean     Clean up leftover test containers"
 	@echo ""
@@ -113,12 +118,28 @@ lint-security:
 	@echo "✓ Security lint passed."
 
 
-.PHONY: test test-waf test-clean
-test: lint test-waf                # Run all checks (lint + WAF integration)
+.PHONY: test test-waf test-baseline test-evasion test-hardening test-crs test-suite test-boot test-clean
+test: lint test-waf test-boot       # Run all checks (lint + WAF integration + bare boot)
 	@echo "✓ All tests passed."
 
-test-waf: tools                    # Run WAF integration tests against live container
+test-waf: tools                    # Run WAF integration tests against live container (all 122 tests)
 	@tools/test-integration.sh
+
+test-baseline: tools               # Run baseline & false-positives suite (00-baseline)
+	@tools/test-integration.sh tests/integration/00-baseline
+
+test-evasion: tools                # Run OWASP CRS evasion suite (01-evasion)
+	@tools/test-integration.sh tests/integration/01-evasion
+
+test-hardening: tools              # Run perimeter hardening & header suite (02-hardening)
+	@tools/test-integration.sh tests/integration/02-hardening
+
+test-crs: tools                    # Run all 12 OWASP CRS family suites (crs)
+	@tools/test-integration.sh tests/integration/crs
+
+test-suite: tools                  # Run specific test suite (e.g. make test-suite SUITE=crs/942-attack-sqli)
+	@if [ -z "$(SUITE)" ]; then echo "Error: specify SUITE (e.g. make test-suite SUITE=crs/942-attack-sqli)"; exit 1; fi
+	@tools/test-integration.sh $(SUITE)
 
 test-boot: tools                   # Run bare-boot regression test (baked default as UID 1337)
 	@tools/test-boot.sh

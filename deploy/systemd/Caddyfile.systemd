@@ -32,9 +32,9 @@
     # Structured JSON logging for observability
     log {
         output stdout
+        level "info"
         format json {
             time_format "iso8601"
-            level "info"
         }
     }
 }
@@ -69,21 +69,40 @@
     }
 }
 
+# Reusable Security Headers Snippet
+# ---------------------------------
+(security_headers) {
+    header {
+        # Information disclosure suppression
+        -Server
+        -X-Powered-By
+        -X-AspNet-Version
+
+        # HTTP Security Headers
+        Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+        X-Content-Type-Options "nosniff"
+        X-Frame-Options "DENY"
+        Referrer-Policy "strict-origin-when-cross-origin"
+        Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=()"
+        X-Permitted-Cross-Domain-Policies "none"
+    }
+}
+
 # Example 1: Simple static site with WAF (env-driven via --environ)
 # ------------------------------------------------------------------
 {$SITE_ADDRESS:example.com} {
     import waf
+    import security_headers
 
     tls {
         protocols tls1.2 tls1.3
     }
 
-    header {
-        Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
-        X-Content-Type-Options "nosniff"
-        X-Frame-Options "DENY"
-        Referrer-Policy "strict-origin-when-cross-origin"
+    # Native perimeter hardening: block sensitive files and dotfiles (defense in depth)
+    @sensitive_paths {
+        path /.git* /.env* /.aws* /.docker* *.sql *.htpasswd *.bak *.conf
     }
+    respond @sensitive_paths "Forbidden" 403
 
     respond "Caddy with Coraza WAF is working!" 200
 }
@@ -92,17 +111,17 @@
 # --------------------------------------------------------------------
 api.example.com {
     import waf
+    import security_headers
 
     tls {
         protocols tls1.2 tls1.3
     }
 
-    header {
-        Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
-        X-Content-Type-Options "nosniff"
-        X-Frame-Options "DENY"
-        Referrer-Policy "strict-origin-when-cross-origin"
+    # Native perimeter hardening: block sensitive files and dotfiles (defense in depth)
+    @sensitive_paths {
+        path /.git* /.env* /.aws* /.docker* *.sql *.htpasswd *.bak *.conf
     }
+    respond @sensitive_paths "Forbidden" 403
 
     reverse_proxy {$BACKEND_UPSTREAM:example-app:80}
 }
