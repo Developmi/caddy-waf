@@ -1,0 +1,79 @@
+---
+meta:
+  author: "Developmi"
+  description: "CRS 4.29.0 Family 921 - Protocol Attacks & Request Smuggling"
+  enabled: true
+  name: "crs-921-protocol-attack"
+
+rule_id: 921000
+
+tests:
+  - test_title: "HTTP Request Smuggling in query - WAF should block"
+    test_id: 1
+    description: "CRS rule 921110. Embedded HTTP request in parameter triggers 403."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/?q=GET+/secret+HTTP/1.1"
+            method: "GET"
+            headers:
+              User-Agent: "caddy-waf-test/1.0"
+              Host: "localhost"
+          output:
+            status: [403]
+
+  - test_title: "HTTP Response Splitting CRLF Location - WAF should block"
+    test_id: 2
+    description: "CRS rule 921120. CRLF with Location header injection triggers 403."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/?next=page%0d%0aLocation:%20http://evil.com"
+            method: "GET"
+            headers:
+              User-Agent: "caddy-waf-test/1.0"
+              Host: "localhost"
+          output:
+            status: [403]
+
+  - test_title: "HTTP Header Injection CRLF Set-Cookie - WAF should block"
+    test_id: 3
+    description: "CRS rule 921160. CRLF with Set-Cookie header injection triggers 403."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/?user=admin%0d%0aSet-Cookie:%20session=hijacked"
+            method: "GET"
+            headers:
+              User-Agent: "caddy-waf-test/1.0"
+              Host: "localhost"
+          output:
+            status: [403]
+
+  - test_title: "HTTP Request Smuggling in POST body - WAF should block"
+    test_id: 4
+    description: "CRS rule 921110. Embedded HTTP request in POST body triggers 403."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/post"
+            method: "POST"
+            headers:
+              User-Agent: "caddy-waf-test/1.0"
+              Host: "localhost"
+              Content-Type: "application/x-www-form-urlencoded"
+            data: "data=POST+/admin+HTTP/1.1"
+          output:
+            status: [403]

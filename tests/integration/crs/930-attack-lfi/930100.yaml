@@ -1,0 +1,147 @@
+---
+meta:
+  author: "Developmi"
+  description: "CRS 4.29.0 Family 930 - Local File Inclusion & Traversal"
+  enabled: true
+  name: "crs-930-attack-lfi"
+
+rule_id: 930000
+
+tests:
+  - test_title: "Path traversal ../../etc/passwd - WAF should block"
+    test_id: 1
+    description: "CRS rule 930110/930120. Traversal attempt to /etc/passwd triggers 403."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/?page=../../etc/passwd"
+            method: "GET"
+            headers:
+              User-Agent: "caddy-waf-test/1.0"
+              Host: "localhost"
+          output:
+            status: [403]
+
+  - test_title: "OS file access /etc/shadow - WAF should block"
+    test_id: 2
+    description: "CRS rule 930120. Access to /etc/shadow in query string triggers 403."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/?doc=/etc/shadow"
+            method: "GET"
+            headers:
+              User-Agent: "caddy-waf-test/1.0"
+              Host: "localhost"
+          output:
+            status: [403]
+
+  - test_title: "OS file access /proc/version - WAF should block"
+    test_id: 3
+    description: "CRS rule 930120. Access to /proc/version in query string triggers 403."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/?file=/proc/version"
+            method: "GET"
+            headers:
+              User-Agent: "caddy-waf-test/1.0"
+              Host: "localhost"
+          output:
+            status: [403]
+
+  - test_title: "Windows OS file c:\\boot.ini - WAF should block"
+    test_id: 4
+    description: "CRS rule 930120. Access to c:\\boot.ini triggers 403."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/?path=c:\\boot.ini"
+            method: "GET"
+            headers:
+              User-Agent: "caddy-waf-test/1.0"
+              Host: "localhost"
+          output:
+            status: [403]
+
+  - test_title: "Restricted file .htaccess - WAF should block"
+    test_id: 5
+    description: "CRS rule 930130. Access to .htaccess in URI triggers 403."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/.htaccess"
+            method: "GET"
+            headers:
+              User-Agent: "caddy-waf-test/1.0"
+              Host: "localhost"
+          output:
+            status: [403]
+
+  - test_title: "Restricted file web.config - WAF should block"
+    test_id: 6
+    description: "CRS rule 930130. Access to web.config in URI triggers 403."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/web.config"
+            method: "GET"
+            headers:
+              User-Agent: "caddy-waf-test/1.0"
+              Host: "localhost"
+          output:
+            status: [403]
+
+  - test_title: "URL encoded path traversal %2e%2e%2f - WAF should block"
+    test_id: 7
+    description: "CRS rule 930100/930110. Encoded traversal to /etc/hosts triggers 403."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/?file=%2e%2e%2f%2e%2e%2fetc%2fhosts"
+            method: "GET"
+            headers:
+              User-Agent: "caddy-waf-test/1.0"
+              Host: "localhost"
+          output:
+            status: [403]
+
+  - test_title: "OS file access in POST body - WAF should block"
+    test_id: 8
+    description: "CRS rule 930120. Access to /etc/passwd in POST body triggers 403."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/post"
+            method: "POST"
+            headers:
+              User-Agent: "caddy-waf-test/1.0"
+              Host: "localhost"
+              Content-Type: "application/x-www-form-urlencoded"
+            data: "target=/etc/passwd"
+          output:
+            status: [403]

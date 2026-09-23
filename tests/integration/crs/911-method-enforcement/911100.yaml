@@ -1,0 +1,77 @@
+---
+meta:
+  author: "Developmi"
+  description: "CRS 4.29.0 Rule 911100 - Method Enforcement"
+  enabled: true
+  name: "crs-911-method-enforcement"
+
+rule_id: 911100
+
+tests:
+  - test_title: "Blocked HTTP method TRACE - WAF should block"
+    test_id: 1
+    description: "Method TRACE not in allowed_methods policy triggers rule 911100."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/"
+            method: "TRACE"
+            headers:
+              User-Agent: "caddy-waf-test/1.0"
+              Host: "localhost"
+          output:
+            status: [403]
+
+  - test_title: "Blocked HTTP method TRACK - WAF should block"
+    test_id: 2
+    description: "Method TRACK not in allowed_methods policy triggers rule 911100."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/"
+            method: "TRACK"
+            headers:
+              User-Agent: "caddy-waf-test/1.0"
+              Host: "localhost"
+          output:
+            status: [403]
+
+  - test_title: "Blocked HTTP method DEBUG - WAF should block"
+    test_id: 3
+    description: "Method DEBUG not in allowed_methods policy triggers rule 911100."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/"
+            method: "DEBUG"
+            headers:
+              User-Agent: "caddy-waf-test/1.0"
+              Host: "localhost"
+          output:
+            status: [403]
+
+  - test_title: "Blocked arbitrary HTTP method JELLYFISH - WAF should block"
+    test_id: 4
+    description: "Arbitrary method not in allowed_methods policy triggers rule 911100."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/"
+            method: "JELLYFISH"
+            headers:
+              User-Agent: "caddy-waf-test/1.0"
+              Host: "localhost"
+          output:
+            status: [403]

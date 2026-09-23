@@ -125,12 +125,46 @@ jobs:
             trivy-results-arm64.sarif
           retention-days: 7
 
+  # Runs on pull requests AND tag pushes. Functional gate: verifies WAF blocking
+  # and bare-boot health before any release can be signed and published.
+  test:
+    name: WAF integration and boot tests
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Run WAF integration tests
+        run: |
+          set -o pipefail
+          make test-waf 2>&1 | tee go-ftw.log
+
+      - name: Run bare-boot regression test
+        run: make test-boot
+
+      - name: Tear down test stack
+        if: always()
+        run: make test-clean
+
+      - name: Upload go-ftw report on failure
+        if: failure()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: go-ftw-report
+          path: go-ftw.log
+          retention-days: 7
+
   # Tag pushes only (pull requests never reach this job). Carries the elevated
   # permissions a release needs — packages, attestations, and security-events
   # writes — so they can never be exercised from a pull_request context.
   publish:
     name: Publish multi-arch image
-    needs: scan
+    needs: [scan, test]
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
     runs-on: ubuntu-latest
     permissions:

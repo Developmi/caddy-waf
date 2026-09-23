@@ -1,0 +1,77 @@
+---
+meta:
+  author: "Developmi"
+  description: "CRS 4.29.0 Family 931 - Remote File Inclusion (RFI) & SSRF Schemes"
+  enabled: true
+  name: "crs-931-attack-rfi"
+
+rule_id: 931000
+
+tests:
+  - test_title: "RFI with direct IP address - WAF should block"
+    test_id: 1
+    description: "CRS rule 931100. URL payload with direct IPv4 address triggers 403."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/?include=http://192.168.1.50/malware.txt"
+            method: "GET"
+            headers:
+              User-Agent: "caddy-waf-test/1.0"
+              Host: "localhost"
+          output:
+            status: [403]
+
+  - test_title: "SSRF gopher wrapper scheme - WAF should block"
+    test_id: 2
+    description: "CRS rule 931130. gopher:// protocol wrapper triggers 403."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/?url=gopher://127.0.0.1:6379/_flushall"
+            method: "GET"
+            headers:
+              User-Agent: "caddy-waf-test/1.0"
+              Host: "localhost"
+          output:
+            status: [403]
+
+  - test_title: "SSRF dict wrapper scheme - WAF should block"
+    test_id: 3
+    description: "CRS rule 931130. dict:// protocol wrapper triggers 403."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/?fetch=dict://10.0.0.1:11211/stat"
+            method: "GET"
+            headers:
+              User-Agent: "caddy-waf-test/1.0"
+              Host: "localhost"
+          output:
+            status: [403]
+
+  - test_title: "SSRF ldap wrapper scheme - WAF should block"
+    test_id: 4
+    description: "CRS rule 931130. ldap:// protocol wrapper triggers 403."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/?endpoint=ldap://127.0.0.1:389/dc=example"
+            method: "GET"
+            headers:
+              User-Agent: "caddy-waf-test/1.0"
+              Host: "localhost"
+          output:
+            status: [403]

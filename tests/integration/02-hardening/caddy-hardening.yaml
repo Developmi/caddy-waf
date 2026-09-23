@@ -1,0 +1,111 @@
+---
+meta:
+  author: "Developmi"
+  description: "caddy-waf infrastructure and perimeter hardening suite"
+  enabled: true
+  name: "caddy-waf-hardening"
+
+rule_id: 999005
+
+tests:
+  - test_title: "AWS cloud credentials probing - WAF should block"
+    test_id: 1
+    description: "CRS rule 930130. Access to /.aws/credentials triggers 403."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/.aws/credentials"
+            method: "GET"
+            headers:
+              User-Agent: "caddy-waf-test/1.0"
+              Host: "localhost"
+          output:
+            status: [403]
+
+  - test_title: "Docker config probing - WAF should block"
+    test_id: 2
+    description: "CRS rule 930130. Access to /.docker/config.json triggers 403."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/.docker/config.json"
+            method: "GET"
+            headers:
+              User-Agent: "caddy-waf-test/1.0"
+              Host: "localhost"
+          output:
+            status: [403]
+
+  - test_title: "Htpasswd authentication file probing - WAF should block"
+    test_id: 3
+    description: "CRS rule 930130. Access to /.htpasswd triggers 403."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/.htpasswd"
+            method: "GET"
+            headers:
+              User-Agent: "caddy-waf-test/1.0"
+              Host: "localhost"
+          output:
+            status: [403]
+
+  - test_title: "Git repository metadata probing - WAF should block"
+    test_id: 4
+    description: "CRS rule 930130. Access to /.git/HEAD triggers 403."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/.git/HEAD"
+            method: "GET"
+            headers:
+              User-Agent: "caddy-waf-test/1.0"
+              Host: "localhost"
+          output:
+            status: [403]
+
+  - test_title: "Environment secret probing .env.local - WAF should block"
+    test_id: 5
+    description: "CRS rule 920440. Access to restricted file extension .env.local triggers 403."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/.env.local"
+            method: "GET"
+            headers:
+              User-Agent: "caddy-waf-test/1.0"
+              Host: "localhost"
+          output:
+            status: [403]
+
+  - test_title: "Database SQL dump probing - WAF should block"
+    test_id: 6
+    description: "CRS rule 920440. Access to restricted database dump extension .sql triggers 403."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/backup.sql"
+            method: "GET"
+            headers:
+              User-Agent: "caddy-waf-test/1.0"
+              Host: "localhost"
+          output:
+            status: [403]

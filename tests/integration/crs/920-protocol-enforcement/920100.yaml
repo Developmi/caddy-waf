@@ -1,0 +1,116 @@
+---
+meta:
+  author: "Developmi"
+  description: "CRS 4.29.0 Family 920 - Protocol Enforcement"
+  enabled: true
+  name: "crs-920-protocol-enforcement"
+
+rule_id: 920000
+
+tests:
+  - test_title: "Restricted file extension .bak - WAF should block"
+    test_id: 1
+    description: "CRS rule 920440. Access to backup file extension .bak triggers 403."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/database.bak"
+            method: "GET"
+            headers:
+              User-Agent: "caddy-waf-test/1.0"
+              Host: "localhost"
+          output:
+            status: [403]
+
+  - test_title: "Restricted file extension .env - WAF should block"
+    test_id: 2
+    description: "CRS rule 920440. Access to environment file extension .env triggers 403."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/app.env"
+            method: "GET"
+            headers:
+              User-Agent: "caddy-waf-test/1.0"
+              Host: "localhost"
+          output:
+            status: [403]
+
+  - test_title: "Restricted file extension .ini - WAF should block"
+    test_id: 3
+    description: "CRS rule 920440. Access to config file extension .ini triggers 403."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/php.ini"
+            method: "GET"
+            headers:
+              User-Agent: "caddy-waf-test/1.0"
+              Host: "localhost"
+          output:
+            status: [403]
+
+  - test_title: "Restricted HTTP header Proxy-Connection - WAF should block"
+    test_id: 4
+    description: "CRS rule 920450. Restricted header Proxy-Connection triggers 403."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/"
+            method: "GET"
+            headers:
+              User-Agent: "caddy-waf-test/1.0"
+              Host: "localhost"
+              Proxy-Connection: "keep-alive"
+          output:
+            status: [403]
+
+  - test_title: "Non-numeric Content-Length header - WAF should block"
+    test_id: 5
+    description: "CRS rule 920160. Non-numeric Content-Length header triggers 403."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/post"
+            method: "POST"
+            headers:
+              User-Agent: "caddy-waf-test/1.0"
+              Host: "localhost"
+              Content-Length: "invalid_length"
+            data: "test"
+          output:
+            status: [403]
+
+  - test_title: "GET request with body content - WAF should block"
+    test_id: 6
+    description: "CRS rule 920170. GET request containing body content triggers 403."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/"
+            method: "GET"
+            headers:
+              User-Agent: "caddy-waf-test/1.0"
+              Host: "localhost"
+              Content-Type: "application/x-www-form-urlencoded"
+            data: "unallowed_payload=true"
+          output:
+            status: [403]

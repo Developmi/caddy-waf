@@ -1,0 +1,77 @@
+---
+meta:
+  author: "Developmi"
+  description: "CRS 4.29.0 Family 943 - Session Fixation & Cookie Tampering"
+  enabled: true
+  name: "crs-943-attack-session-fixation"
+
+rule_id: 943000
+
+tests:
+  - test_title: "Session fixation phpsessid in query - WAF should block"
+    test_id: 1
+    description: "CRS rule 943120. phpsessid parameter in query string triggers 403."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/?phpsessid=1234567890abcdef"
+            method: "GET"
+            headers:
+              User-Agent: "caddy-waf-test/1.0"
+              Host: "localhost"
+          output:
+            status: [403]
+
+  - test_title: "Session fixation jsessionid in query - WAF should block"
+    test_id: 2
+    description: "CRS rule 943120. jsessionid parameter in query string triggers 403."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/?jsessionid=ABCD1234EFGH5678"
+            method: "GET"
+            headers:
+              User-Agent: "caddy-waf-test/1.0"
+              Host: "localhost"
+          output:
+            status: [403]
+
+  - test_title: "Session fixation connect.sid in query - WAF should block"
+    test_id: 3
+    description: "CRS rule 943110/943120. connect.sid parameter in query string triggers 403."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/?connect.sid=s%3A12345678"
+            method: "GET"
+            headers:
+              User-Agent: "caddy-waf-test/1.0"
+              Host: "localhost"
+          output:
+            status: [403]
+
+  - test_title: "Cookie injection via http-equiv set-cookie - WAF should block"
+    test_id: 4
+    description: "CRS rule 943100. http-equiv set-cookie manipulation in parameter triggers 403."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/?tag=%3Cmeta+http-equiv%3D%22set-cookie%22+content%3D%22session%3Devil%22%3E"
+            method: "GET"
+            headers:
+              User-Agent: "caddy-waf-test/1.0"
+              Host: "localhost"
+          output:
+            status: [403]
