@@ -109,3 +109,71 @@ tests:
               Host: "localhost"
           output:
             status: [403]
+
+  - test_title: "Backup file probing .bak - WAF/Caddy should block"
+    test_id: 7
+    description: "CRS rule 920440 / Caddy matcher. Access to backup file extension .bak triggers 403."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/database.bak"
+            method: "GET"
+            headers:
+              User-Agent: "caddy-waf-test/1.0"
+              Host: "localhost"
+          output:
+            status: [403]
+
+  - test_title: "Server config probing .conf - WAF/Caddy should block"
+    test_id: 8
+    description: "CRS rule 920440 / Caddy matcher. Access to configuration file extension .conf triggers 403."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/caddy.conf"
+            method: "GET"
+            headers:
+              User-Agent: "caddy-waf-test/1.0"
+              Host: "localhost"
+          output:
+            status: [403]
+
+  - test_title: "Root environment file probing .env - WAF/Caddy should block"
+    test_id: 9
+    description: "CRS rule 920440 / Caddy matcher. Access to root .env file triggers 403."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/.env"
+            method: "GET"
+            headers:
+              User-Agent: "caddy-waf-test/1.0"
+              Host: "localhost"
+          output:
+            status: [403]
+
+  - test_title: "Git config internal probing - WAF/Caddy should block"
+    test_id: 10
+    description: "CRS rule 930130 / Caddy matcher. Access to /.git/config triggers 403."
+    stages:
+      - stage:
+          input:
+            dest_addr: "127.0.0.1"
+            port: 9090
+            protocol: "http"
+            uri: "/.git/config"
+            method: "GET"
+            headers:
+              User-Agent: "caddy-waf-test/1.0"
+              Host: "localhost"
+          output:
+            status: [403]
