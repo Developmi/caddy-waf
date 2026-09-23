@@ -11,7 +11,7 @@
 
 ## Commands
 - **Run**: `docker compose up`
-- **Test**: `make test-waf` (go-ftw integration suite) + `docker compose up` manual validation
+- **Test**: `make test` (lint + WAF integration 122 tests + bare-boot) | Granular: `make test-baseline`, `make test-evasion`, `make test-hardening`, `make test-crs`, `make test-boot`
 - **Build**: `docker build -t caddy-waf .`
 - **Validate**: `docker compose config`
 - **Lint/Format**: N/A (no app source code)
@@ -19,7 +19,7 @@
 ## SDD Context
 - **CodeGraph indexed**: yes
 - **Graphify indexed**: yes (graphify-out/ present)
-- **Testing framework**: go-ftw integration suite (tests/integration, run via `make test-waf`)
+- **Testing framework**: go-ftw integration suite (tests/integration, run via `make test-waf` or `make test`)
 - **Strict TDD**: disabled - no test runner detected
 - **Quality tools**: Trivy (container scanning) | Cosign (signing) | Syft (SBOM)
 
@@ -34,17 +34,17 @@
 - **Security validation rule**: always contrast the CURRENT date against registered security issues. Validate only OPEN/active advisories (`.trivyignore` entries, SECURITY.md pending sections, base image and dependency versions) — never historical/closed ones unless the user asks. Re-check open advisories on every session and whenever upstream versions move (e.g., pending HIGHs awaiting a newer Caddy release).
 
 ## CI/CD
-- **Workflow**: `docker-build-scan-sign.yml` - scan → sign → push (multi-arch amd64+arm64, tag-triggered only)
-- **Workflow**: `test-waf.yml` - functional gate: runs `make test-waf` (go-ftw, 20-case OWASP CRS suite) on every PR and push to main
+- **Workflow**: `docker-build-scan-sign.yml` - scan → sign → push (multi-arch amd64+arm64, tag-triggered only, release gated on full test + scan passing)
+- **Workflow**: `test-waf.yml` - functional gate: runs `make test-waf` (go-ftw, 122-case OWASP CRS & hardening suite + header check) and `make test-boot` on every PR and push to main
 - **Registry**: `ghcr.io/developmi/caddy-waf`
 - **Triggers**: tags v* (releases) + PRs to main (validation)
 - **Scan gate**: Trivy fails build on CRITICAL/HIGH (ignores unfixed)
 
 ## Conventions
 - Commit style: Conventional Commits (`feat:`, `fix:`, `docs:`, `chore:`, `ci:`)
-- Versioning: Semantic Versioning (v3.5.4 current)
+- Versioning: Semantic Versioning (v3.5.5 current)
 - Branch naming: `feat/desc`, `fix/desc`, `docs/desc`, `chore/desc`, `ci/desc`
-- go-ftw integration tests via `make test-waf` (container starts on 127.0.0.1:9090) + manual validation
+- go-ftw integration tests via `make test-waf` (122 tests across 12 CRS families, baseline, false positives, perimeter hardening) + live header validation + bare-boot regression
 - WAF default: DetectionOnly (change to On after 7-14 day observation window)
 - Observability profiles (not in default `up`): `docker compose --profile observability-vm up -d` (VictoriaMetrics + Grafana) | `--profile observability-prom up -d` (Prometheus + Grafana); both scrape the same metrics/prometheus.yml from caddy-waf:2019 — admin /metrics must stay internal-only (never publish 2019)
 

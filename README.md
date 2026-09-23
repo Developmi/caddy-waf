@@ -81,7 +81,7 @@ Starting from v3.0.0, the image ships with updated Caddy 2.11.4, official upstre
 
 ### 1. Pull the Image
 ```bash
-docker pull ghcr.io/developmi/caddy-waf:v3.5.4
+docker pull ghcr.io/developmi/caddy-waf:v3.5.5
 ```
 
 ### 2. Create Environment File
@@ -229,7 +229,7 @@ volumes:
 ### Environment Variables
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `CADDY_WAF_IMAGE` | `ghcr.io/developmi/caddy-waf:v3.5.4` | Caddy WAF image reference |
+| `CADDY_WAF_IMAGE` | `ghcr.io/developmi/caddy-waf:v3.5.5` | Caddy WAF image reference |
 | `EXAMPLE_APP_IMAGE` | `containous/whoami:latest` | Demo backend image |
 | `SITE_ADDRESS` | `localhost` | Site address/server name used by Caddy |
 | `BACKEND_UPSTREAM` | `example-app:80` | Reverse proxy backend upstream |
@@ -315,21 +315,51 @@ curl -I https://yourdomain.com
 ### Security Scanning
 ```bash
 # Scan image with Trivy
-docker run --rm aquasec/trivy image ghcr.io/developmi/caddy-waf:v3.5.4
+docker run --rm aquasec/trivy image ghcr.io/developmi/caddy-waf:v3.5.5
 
 # Scan with Docker Scout
-docker scout quickview ghcr.io/developmi/caddy-waf:v3.5.4
+docker scout quickview ghcr.io/developmi/caddy-waf:v3.5.5
 ```
 
-### Integration Tests (go-ftw)
+### Integration Tests (go-ftw & Perimeter Hardening)
 
-The WAF behavior is verified with the [go-ftw](https://github.com/coreruleset/go-ftw) framework, the OWASP CRS testing tool:
+The WAF and perimeter defenses are rigorously verified using the [go-ftw](https://github.com/coreruleset/go-ftw) framework and automated HTTP assertion gates across **122 automated integration tests** structured under Screaming Architecture:
 
 ```bash
-make test-waf   # starts the test container (WAF in blocking mode) on 127.0.0.1:9090, runs the 20-case suite, tears down
+# General test suite (runs all linters + 122 WAF tests + live security headers + bare-boot regression)
+make test
+
+# Granular suites (run in milliseconds for fast feedback loops)
+make test-waf        # Runs all 122 integration tests + live security header verification
+make test-baseline   # Runs 00-baseline (12 tests: clean traffic + false-positive resilience)
+make test-evasion    # Runs 01-evasion (6 tests: double-encoding, fullwidth, bypass vectors)
+make test-hardening  # Runs 02-hardening (10 tests: .env, .git, .aws, Docker, .sql, .bak + headers)
+make test-crs        # Runs crs/ (94 tests across all 12 OWASP CRS v4.29.0 rule families)
+make test-suite SUITE=crs/942-attack-sqli  # Target any specific family or subdirectory
+make test-boot       # Runs bare-boot regression gate (proves baked container boots as UID 1337)
 ```
 
-The 20-case suite (tests/integration/) covers: baseline (health + SQLi/XSS/path-traversal), OWASP CRS core (RCE, PHP exec, RFI/SSRF, LFI, MSSQL, header injection, unicode XSS) and bypass scenarios (double-encoding, header/body payloads, fullwidth XSS, false-positive check) — mapped to OWASP Top 10 2025 categories (A03 Injection strong coverage). See [CONTRIBUTING.md](./CONTRIBUTING.md) for details.
+#### Suite Coverage Matrix (122 Tests)
+
+| Suite Domain | Tests | Focus & Attack Vectors Covered |
+|---|:---:|---|
+| **`00-baseline`** | 12 | Container health, clean GET/POST, and false-positive immunity against complex JSON, GraphQL, UTF-8 Spanish accents, Markdown, JWT Bearer tokens, and UUIDs. |
+| **`01-evasion`** | 6 | Anti-evasion against double URL encoding, fullwidth unicode scripts, header-based payload splitting, and body obfuscation. |
+| **`02-hardening`** | 10 | Perimeter defense-in-depth: native blocking of `.env`, `.git`, `.aws/credentials`, `.docker/config.json`, `.htpasswd`, `.sql` dumps, `.bak`, and `.conf` (active even in `DetectionOnly` mode). Automated verification of `Server` and `X-Powered-By` banner suppression + required security headers (`Permissions-Policy`, HSTS, CSP/Cross-Domain). |
+| **`crs/911-method`** | 4 | HTTP method enforcement (blocks TRACE, CONNECT, WebDAV arbitrary methods). |
+| **`crs/913-scanner`** | 6 | Security scanner detection (Nikto, sqlmap, Havij, Acunetix, Arachni). |
+| **`crs/920-protocol`** | 6 | HTTP protocol enforcement (missing Host, missing Accept, Range anomalies, URL limits). |
+| **`crs/921-attack-proto`** | 4 | Protocol-level attacks (HTTP Request Smuggling, response splitting, CRLF). |
+| **`crs/922-multipart`** | 4 | Multipart form/file upload validation (boundary evasion, header corruption). |
+| **`crs/930-attack-lfi`** | 8 | Local File Inclusion (dot-dot-slash traversal, absolute path probes, OS files). |
+| **`crs/931-attack-rfi`** | 4 | Remote File Inclusion (PHP wrappers, data://, SMB UNC paths, off-site inclusions). |
+| **`crs/932-attack-rce`** | 10 | Remote Code Execution & Unix/Windows shell injection (pipes, command chaining, backticks). |
+| **`crs/933-attack-php`** | 6 | PHP injection attacks (php://input, `system()`, `eval()`, open tags). |
+| **`crs/934-attack-generic`** | 10 | Application generic attacks: Cloud metadata SSRF (AWS IMDSv1, GCP, Kube API), Prototype Pollution (`__proto__`, `constructor.prototype`), SSTI (`{{...}}`), and Node.js/JS execution (`require('child_process')`, `eval()`, `fs.readFileSync()`, ReDoS). |
+| **`crs/941-attack-xss`** | 10 | Cross-Site Scripting (HTML tags, SVG vectors, event handlers, JavaScript URIs). |
+| **`crs/942-attack-sqli`** | 12 | SQL Injection (tautologies, UNION SELECT, blind boolean/sleep, comment syntax, MSSQL xp_cmdshell). |
+| **`crs/943-session-fix`** | 4 | Session fixation (session ID in URL parameters, Set-Cookie manipulation). |
+| **`crs/944-attack-java`** | 6 | Java attacks (Log4Shell JNDI injection, Remote Method Invocation, serialized payloads). |
 
 ---
 
