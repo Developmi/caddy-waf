@@ -22,7 +22,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/) · Versioning: [SemVer](
 
 ### Changed
 
-- **coraza-caddy**: upgraded from v2.6.0 to **v2.6.1** (`CORAZA_CADDY_REF`) — flush and hijack Unwrap fixes (#344); lifts `google.golang.org/grpc` to **v1.83.2**.
+- **coraza-caddy**: upgraded from v2.6.0 to **v2.6.1** (`CORAZA_CADDY_REF`) - flush and hijack Unwrap fixes (#344); lifts `google.golang.org/grpc` to **v1.83.2**.
 - **Security**: resolved `CVE-2026-84304` and `CVE-2026-84445` in the compiled binary; removed all suppressions from `.trivyignore`.
 - **Version alignment**: OCI `LABEL version` → **3.5.4**, `LABEL waf.coraza.version` → **2.6.1**, Compose/env/docs aligned to **v3.5.4**.
 
@@ -30,16 +30,16 @@ Format: [Keep a Changelog](https://keepachangelog.com/) · Versioning: [SemVer](
 
 ### Release note
 
-- **v3.5.0 and v3.5.1 were never published**: their tags were burned before any image was pushed — v3.5.0 by a 20-minute CI job timeout (raised to 45m in #27), v3.5.1 by the Trivy gate revealing new advisory **CVE-2026-84445** (grpc v1.82.1) at scan time. The `protect-tags-v` ruleset prevents deleting or rewriting those tags, so this identical image content ships as **v3.5.2** with the new finding suppressed.
+- **v3.5.0 and v3.5.1 were never published**: their tags were burned before any image was pushed - v3.5.0 by a 20-minute CI job timeout (raised to 45m in #27), v3.5.1 by the Trivy gate revealing new advisory **CVE-2026-84445** (grpc v1.82.1) at scan time. The `protect-tags-v` ruleset prevents deleting or rewriting those tags, so this identical image content ships as **v3.5.2** with the new finding suppressed.
 
 ### Changed
 
-- **coraza-caddy**: upgraded from v2.5.0 to **v2.6.0** (`CORAZA_CADDY_REF`) — WebSocket+WAF fixes (#262), client IP logging (#321), `tx_id_req_header` support (#248), WriteHeader handling (#330), HPACK docs (#329), grpc dependency lifted to v1.82.1 (#340). WAF engine coraza/v3 stays **v3.7.0** and OWASP CRS stays **v4.29.0** — engine, rule-set, and Caddyfile configuration unchanged.
+- **coraza-caddy**: upgraded from v2.5.0 to **v2.6.0** (`CORAZA_CADDY_REF`) - WebSocket+WAF fixes (#262), client IP logging (#321), `tx_id_req_header` support (#248), WriteHeader handling (#330), HPACK docs (#329), grpc dependency lifted to v1.82.1 (#340). WAF engine coraza/v3 stays **v3.7.0** and OWASP CRS stays **v4.29.0** - engine, rule-set, and Caddyfile configuration unchanged.
 - **Dockerfile**: base image stages digest-pinned to their multi-arch index digests (2.11.4 tag kept as comment for readability):
   - builder: `caddy:2.11.4-builder@sha256:b8f9c720f13f64c13dd42db28e8f38a3fab54c11fce4d93bda26d710c448dcfd`
   - final: `caddy:2.11.4@sha256:df7f1c2fb114453b951de51a98efc010db1655a92c2e86be6706714e2417a78d`
 - **Version alignment**: OCI `LABEL version` → **3.5.2** and `LABEL waf.coraza.version` → **2.6.0**.
-- **Security**: new pending advisory `CVE-2026-84445` (grpc v1.82.1, xDS DoS, not reachable) added to `.trivyignore` and SECURITY.md — two HIGH suppressions now tracked until Caddy ≥ 2.11.5.
+- **Security**: new pending advisory `CVE-2026-84445` (grpc v1.82.1, xDS DoS, not reachable) added to `.trivyignore` and SECURITY.md - two HIGH suppressions now tracked until Caddy ≥ 2.11.5.
 
 ### Known issues (waiting on Caddy ≥ 2.11.5)
 
@@ -49,40 +49,40 @@ Format: [Keep a Changelog](https://keepachangelog.com/) · Versioning: [SemVer](
 
 ### Changed
 
-- **OWASP CRS**: upgraded from 4.28.0 to **4.29.0** — anti-evasion improvements for rule 932 (backslash-prefix and quote evasion in shell commands), `stat` command detection at PL-2+, expanded web shell detection, and false-positive fixes (942190/942200/942390/953100; 930120 restores `node_modules` coverage; 932171 allows `json.` prefix). Tarball SHA256 pinned: `cedd55533de917b6e397352a67a31993da4c07816f1fefcc94eacf542fc86337`.
+- **OWASP CRS**: upgraded from 4.28.0 to **4.29.0** - anti-evasion improvements for rule 932 (backslash-prefix and quote evasion in shell commands), `stat` command detection at PL-2+, expanded web shell detection, and false-positive fixes (942190/942200/942390/953100; 930120 restores `node_modules` coverage; 932171 allows `json.` prefix). Tarball SHA256 pinned: `cedd55533de917b6e397352a67a31993da4c07816f1fefcc94eacf542fc86337`.
 - **CI**: Trivy upgraded from v0.73.0 to **v0.74.0** (setup-trivy action remains SHA-pinned).
-- **CI**: Actions bumps from dependabot PRs #11-#15 — `actions/checkout` 4.3.1→7.0.1, `actions/upload-artifact` 4.6.2→7.0.1, `docker/setup-buildx-action` 3.12.0→4.2.0, `sigstore/cosign-installer` bump, `actions/attest-build-provenance` bump.
+- **CI**: Actions bumps from dependabot PRs #11-#15 - `actions/checkout` 4.3.1→7.0.1, `actions/upload-artifact` 4.6.2→7.0.1, `docker/setup-buildx-action` 3.12.0→4.2.0, `sigstore/cosign-installer` bump, `actions/attest-build-provenance` bump.
 - **Version alignment**: OCI `LABEL version`, Compose default image tag, `.env.example`, `pyproject.toml`/`uv.lock`, AGENTS.md, README.md, SECURITY.md, and bug report template aligned to **v3.4.0**.
 
 ### Added
 
-- **Tests**: integration suite expanded from 4 to **20 go-ftw cases** covering OWASP Top 10 2025 — baseline (4) + OWASP CRS core (10: SQLi, XSS, MSSQL, RCE, PHP exec, RFI/SSRF, LFI, header injection, unicode XSS) + bypass (6: false-positive check, double-encoding, header-based payloads, POST JSON body, fullwidth XSS). Documented across AGENTS.md, ROADMAP.md, README.md, CONTRIBUTING.md, PR template, and incident-response runbook.
+- **Tests**: integration suite expanded from 4 to **20 go-ftw cases** covering OWASP Top 10 2025 - baseline (4) + OWASP CRS core (10: SQLi, XSS, MSSQL, RCE, PHP exec, RFI/SSRF, LFI, header injection, unicode XSS) + bypass (6: false-positive check, double-encoding, header-based payloads, POST JSON body, fullwidth XSS). Documented across AGENTS.md, ROADMAP.md, README.md, CONTRIBUTING.md, PR template, and incident-response runbook.
 - **docs**: SECURITY.md documents 5 additional resolved advisories (CVE-2026-45135, CVE-2026-30852, CVE-2026-45692, CVE-2026-52846, GHSA-j8px-rmrx-76h9) plus a "Caddy advisories - not applicable" section; CVE-2026-27590 corrected to fixed-in 2.11.1; ROADMAP.md corrected Alpine 3.23 EOL (2027-11-01) and verified coraza version alignment (plugin v2.5.0 = engine v3.7.0).
 
 ### Known issues (waiting on Caddy ≥ 2.11.5)
 
-- Unchanged from 3.3.2 — `CVE-2026-56852`, `GHSA-hrxh-6v49-42gf`, `CVE-2026-46600` (tracked in `.trivyignore`) and `GHSA-6365-7ppr-5r92` (Moderate, documented in SECURITY.md).
+- Unchanged from 3.3.2 - `CVE-2026-56852`, `GHSA-hrxh-6v49-42gf`, `CVE-2026-46600` (tracked in `.trivyignore`) and `GHSA-6365-7ppr-5r92` (Moderate, documented in SECURITY.md).
 
 ## [3.3.2] - 2026-08-14
 
 ### Added
 
-- **Dockerfile**: WAF is now **active by default** in the baked config — `coraza_waf` runs first (`order coraza_waf first`), `SecRuleEngine DetectionOnly`, `SecAuditEngine RelevantOnly`, JSON audit log to `/data/logs/coraza-audit.log`, and a build-time grep gate fails the image if the WAF directives are missing.
+- **Dockerfile**: WAF is now **active by default** in the baked config - `coraza_waf` runs first (`order coraza_waf first`), `SecRuleEngine DetectionOnly`, `SecAuditEngine RelevantOnly`, JSON audit log to `/data/logs/coraza-audit.log`, and a build-time grep gate fails the image if the WAF directives are missing.
 - **Dockerfile**: `/data/logs` is created and owned by UID 1337 so Coraza can write the audit log at runtime (contract §7/D6).
 - **CI**: dual-architecture Trivy scan (amd64 + arm64) with SARIF upload and CRITICAL/HIGH exit-code gate on both architectures.
-- **Tests**: new bare-boot regression gate `make test-boot` (`tools/test-boot.sh`) — asserts the image starts healthy with the baked default config as UID 1337 (no mounts).
+- **Tests**: new bare-boot regression gate `make test-boot` (`tools/test-boot.sh`) - asserts the image starts healthy with the baked default config as UID 1337 (no mounts).
 - **deploy/systemd**: tracked `Caddyfile.systemd` zero-trust variant (admin API bound to loopback only).
 - **.env.example**: image pinned to `:v3.3.2` (no `:latest`); removed obsolete `CADDY_ADAPTER`.
 
 ### Fixed
 
-- **Dockerfile**: baked default config could not boot as UID 1337 — `caddy validate` at build time (root) made Coraza create `/data/logs/coraza-audit.log` as root; the file is now re-chowned (`chown -R 1337:1337 /data/logs`) right after validation.
+- **Dockerfile**: baked default config could not boot as UID 1337 - `caddy validate` at build time (root) made Coraza create `/data/logs/coraza-audit.log` as root; the file is now re-chowned (`chown -R 1337:1337 /data/logs`) right after validation.
 - **docs**: corrected `Caddyfile.systemd` admin citation in `docs/deployment-checklist.md` (lines 21-25).
 
 ### Changed
 
 - **Version alignment**: OCI `LABEL version`, Compose default image tag, `.env.example`, `pyproject.toml`/`uv.lock`, AGENTS.md, README.md, SECURITY.md, and bug report template aligned to **v3.3.2**.
-- **Known issues (waiting on Caddy ≥ 2.11.5)**: unchanged from 3.3.1 — `CVE-2026-56852`, `GHSA-hrxh-6v49-42gf`, `CVE-2026-46600` (tracked in `.trivyignore`) and `GHSA-6365-7ppr-5r92` (Moderate, documented in SECURITY.md).
+- **Known issues (waiting on Caddy ≥ 2.11.5)**: unchanged from 3.3.1 - `CVE-2026-56852`, `GHSA-hrxh-6v49-42gf`, `CVE-2026-46600` (tracked in `.trivyignore`) and `GHSA-6365-7ppr-5r92` (Moderate, documented in SECURITY.md).
 
 ## [3.3.1] - 2026-08-11
 
@@ -93,14 +93,14 @@ Format: [Keep a Changelog](https://keepachangelog.com/) · Versioning: [SemVer](
 
 ### Changed
 
-- **Dockerfile**: HEALTHCHECK now checks the Caddy admin `/metrics` endpoint (`curl -fs http://127.0.0.1:2019/metrics`) instead of process-only `pgrep` — also detects hung processes and verifies the admin API responds. `curl` is used because busybox `wget` resolves `localhost` to `::1` and fails.
+- **Dockerfile**: HEALTHCHECK now checks the Caddy admin `/metrics` endpoint (`curl -fs http://127.0.0.1:2019/metrics`) instead of process-only `pgrep` - also detects hung processes and verifies the admin API responds. `curl` is used because busybox `wget` resolves `localhost` to `::1` and fails.
 - **docker-compose.yml**: healthcheck mirrored to the same `/metrics` check (Compose healthcheck overrides the image's).
 - **Version alignment**: OCI `LABEL version`, Compose default image tag, `pyproject.toml`/`uv.lock`, AGENTS.md, README.md, and SECURITY.md aligned to **v3.3.1**.
 
 ### Known issues (waiting on Caddy ≥ 2.11.5)
 
-- **`CVE-2026-46600`** — golang.org/x/net v0.55.0 (embedded in the Caddy 2.11.4 binary), DoS via invalid DNS record parsing (`dns/dnsmessage`; fixed in x/net v0.56.0). Tracked in `.trivyignore` until a patched Caddy release exists (the finding was identified by the CI Trivy gate on 2026-08-14, after this release).
-  - **Impact**: low for this deployment — DoS-class only; Caddy core and the `caddy-dns/cloudflare` module do not parse raw DNS wire messages here.
+- **`CVE-2026-46600`** - golang.org/x/net v0.55.0 (embedded in the Caddy 2.11.4 binary), DoS via invalid DNS record parsing (`dns/dnsmessage`; fixed in x/net v0.56.0). Tracked in `.trivyignore` until a patched Caddy release exists (the finding was identified by the CI Trivy gate on 2026-08-14, after this release).
+  - **Impact**: low for this deployment - DoS-class only; Caddy core and the `caddy-dns/cloudflare` module do not parse raw DNS wire messages here.
   - **Action**: remove the entry from `.trivyignore` and upgrade the base image to Caddy ≥ 2.11.5 as soon as it ships (also resolves `CVE-2026-56852` and `GHSA-hrxh-6v49-42gf`). Also tracked in SECURITY.md → Pending advisories.
 
 ## [3.3.0] - 2026-08-11
@@ -110,8 +110,8 @@ Format: [Keep a Changelog](https://keepachangelog.com/) · Versioning: [SemVer](
 - **hadolint**: upgraded from 2.14.0 to **2.15.1** (local tooling and `lint.yml`).
 - **go-ftw**: upgraded from 2.4.0 to **2.5.0**.
 - **Trivy**: upgraded from v0.72.0 to **v0.73.0** in CI (`setup-trivy` action remains SHA-pinned at v0.3.1).
-- **Dockerfile**: widened `apk upgrade` from `c-ares curl libcurl` to **all packages** — pulls current Alpine 3.23 security fixes (openssl/libssl 3.5.7, curl 8.20.0, zlib 1.3.2, busybox, musl, ca-certificates) on every rebuild.
-- **Dockerfile**: HEALTHCHECK converted to JSON form (`CMD ["pgrep", "caddy"]`) — required by hadolint 2.15.x rule DL3025.
+- **Dockerfile**: widened `apk upgrade` from `c-ares curl libcurl` to **all packages** - pulls current Alpine 3.23 security fixes (openssl/libssl 3.5.7, curl 8.20.0, zlib 1.3.2, busybox, musl, ca-certificates) on every rebuild.
+- **Dockerfile**: HEALTHCHECK converted to JSON form (`CMD ["pgrep", "caddy"]`) - required by hadolint 2.15.x rule DL3025.
 - **Version alignment**: OCI `LABEL version`, Compose default image tag, `pyproject.toml`/`uv.lock`, AGENTS.md, README.md, and SECURITY.md aligned to **v3.3.0**.
 - **AGENTS.md**: fixed stale notes (caddy-dns/cloudflare v0.2.4, real SHA256 checksums in Dockerfile, test suite documentation).
 
@@ -122,8 +122,8 @@ Format: [Keep a Changelog](https://keepachangelog.com/) · Versioning: [SemVer](
 ### Known issues (waiting on Caddy ≥ 2.11.5)
 
 - **Two HIGH findings in the Caddy 2.11.4 binary**, tracked in `.trivyignore` until a patched Caddy release exists:
-  - `CVE-2026-56852` — golang.org/x/text v0.37.0, DoS via invalid UTF-8 (fixed in x/text v0.39.0).
-  - `GHSA-hrxh-6v49-42gf` — google.golang.org/grpc v1.81.0, xDS RBAC + HTTP/2 (fixed in grpc v1.82.1).
+  - `CVE-2026-56852` - golang.org/x/text v0.37.0, DoS via invalid UTF-8 (fixed in x/text v0.39.0).
+  - `GHSA-hrxh-6v49-42gf` - google.golang.org/grpc v1.81.0, xDS RBAC + HTTP/2 (fixed in grpc v1.82.1).
   - **Impact**: low for this deployment (DoS-class only, gRPC/xDS not used by Caddy core here; reverse-proxy only).
   - **Action**: remove both entries from `.trivyignore` and upgrade the base image to Caddy ≥ 2.11.5 as soon as it ships. Also tracked in SECURITY.md → Pending advisories.
 
@@ -137,7 +137,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/) · Versioning: [SemVer](
 
 ### Added
 
-- **Lint workflow** (`.github/workflows/lint.yml`) — runs `yamllint`, `actionlint`, `hadolint`, and `zizmor` on PRs, main, and tags. All linters are blocking; failures prevent merge or release.
+- **Lint workflow** (`.github/workflows/lint.yml`) - runs `yamllint`, `actionlint`, `hadolint`, and `zizmor` on PRs, main, and tags. All linters are blocking; failures prevent merge or release.
 
 ### Fixed
 
@@ -263,6 +263,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/) · Versioning: [SemVer](
 - README.md and README.es.md with setup instructions.
 
 <!-- Version links for Keep a Changelog -->
+[3.5.5]: https://github.com/Developmi/caddy-waf/compare/v3.5.4...v3.5.5
 [3.5.4]: https://github.com/Developmi/caddy-waf/compare/v3.5.2...v3.5.4
 [3.5.2]: https://github.com/Developmi/caddy-waf/compare/v3.4.0...v3.5.2
 [3.4.0]: https://github.com/Developmi/caddy-waf/compare/v3.3.2...v3.4.0
