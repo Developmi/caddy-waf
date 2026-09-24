@@ -237,8 +237,9 @@ observability stack enabled, scrape this endpoint with either backend:
 - `caddy_reverse_proxy_upstreams_healthy` - Backend upstream health (0/1)
 - `caddy_config_last_reload_successful` - Config reload status
 
-> **Note:** coraza-caddy v2.5.0 does not export `coraza_waf_*` metrics (upstream
-> limitation). WAF rule IDs and decisions are in the JSON audit log on stdout.
+> **Note:** coraza-caddy (up to v2.6.1) does not export `coraza_waf_*` metrics
+> (upstream limitation tracked in [coraza-caddy#82](https://github.com/corazawaf/coraza-caddy/issues/82)).
+> WAF rule IDs and decisions are in the JSON audit log on stdout.
 
 See [README.md: Observability](README.md#-observability-metrics--dashboards)
 for the dual-backend (VictoriaMetrics + Prometheus) setup with Grafana.
@@ -248,9 +249,9 @@ for the dual-backend (VictoriaMetrics + Prometheus) setup with Grafana.
 ```caddyfile
 log {
     output stdout
+    level "info"
     format json {
         time_format "iso8601"
-        level "info"
     }
 }
 
