@@ -11,8 +11,8 @@ body:
     id: image-version
     attributes:
       label: Image version
-      description: Tag of ghcr.io/developmi/caddy-waf (e.g. v3.5.4) or commit SHA
-      placeholder: v3.5.4
+      description: Tag of ghcr.io/developmi/caddy-waf (e.g. v3.5.5) or commit SHA
+      placeholder: v3.5.5
     validations:
       required: true
   - type: dropdown

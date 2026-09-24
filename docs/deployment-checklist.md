@@ -1,6 +1,6 @@
 # Deployment checklist
 
-Run these checklists for every deployment of caddy-waf — Docker Compose and
+Run these checklists for every deployment of caddy-waf - Docker Compose and
 systemd (bare-metal). Kubernetes is **out of scope** and covered later.
 
 The WAF defaults to `SecRuleEngine DetectionOnly` (Caddyfile.example:56): it logs
@@ -25,7 +25,7 @@ README.md:228-235).
 | `SITE_ADDRESS` | `localhost` | Site address / server name | Set to your public domain when serving TLS via Let's Encrypt |
 | `BACKEND_UPSTREAM` | `example-app:80` | Reverse proxy target | Point to your real backend (service name on the compose network, or host:port) |
 | `ACME_EMAIL` | empty | Let's Encrypt certificate issuance | Set to a monitored mailbox (expiry warnings) |
-| `CADDY_WAF_IMAGE` | `ghcr.io/developmi/caddy-waf:v3.5.4` | Image to run | Prefer an immutable digest (`@sha256:...`) in production |
+| `CADDY_WAF_IMAGE` | `ghcr.io/developmi/caddy-waf:v3.5.5` | Image to run | Prefer an immutable digest (`@sha256:...`) in production |
 
 - [ ] `.env` exists and has real values (`cp .env.example .env`, then edit)
 - [ ] Runtime `Caddyfile` exists (`cp Caddyfile.example Caddyfile`) and matches
@@ -75,11 +75,11 @@ The unit runs `/usr/bin/caddy run --environ --config /etc/caddy/Caddyfile` as
 the `caddy-waf` user, so the runtime config and WAF rules live on disk, not in
 a container:
 
-- `/etc/caddy/Caddyfile` — site config for systemd, deployed from
+- `/etc/caddy/Caddyfile` - site config for systemd, deployed from
   `deploy/systemd/Caddyfile.systemd` (zero-trust variant: admin API bound to
-  loopback only). Do NOT reuse the compose runtime file — its admin bind
+  loopback only). Do NOT reuse the compose runtime file - its admin bind
   assumes the container network
-- `/etc/caddy/coraza.conf` and `/etc/caddy/owasp-crs/` — Coraza + CRS rules
+- `/etc/caddy/coraza.conf` and `/etc/caddy/owasp-crs/` - Coraza + CRS rules
   referenced by the Caddyfile `Include` directives
 - State lands in `/var/lib/caddy-waf` (systemd `StateDirectory=caddy-waf`)
 
@@ -134,15 +134,15 @@ a container:
       (`restart: unless-stopped`, `Restart=on-failure`)
 - [ ] Healthcheck passes: compose probes `curl -fs http://127.0.0.1:2019/metrics`
       every 30s (docker-compose.yml:40-45)
-- [ ] Admin `/metrics` is reachable only on the internal network — port 2019 is
+- [ ] Admin `/metrics` is reachable only on the internal network - port 2019 is
       **never** published to the host (Caddyfile.example:16-20); verify it is not
       published: `docker compose ps` shows only 80/443 on the host
-- [ ] systemd: admin API is bound to **loopback only** (Caddyfile.systemd:21-25) —
+- [ ] systemd: admin API is bound to **loopback only** (Caddyfile.systemd:21-25) -
       `ss -ltn` shows 2019 listening on `127.0.0.1`, never `*`
 - [ ] WAF is in `DetectionOnly` (Caddyfile.example:56) unless your observation window
-      is over — never enable `On` on day one
+      is over - never enable `On` on day one
 - [ ] A real request passes through: `curl -I https://yourdomain.com`
-- [ ] Audit log line appears for your request (JSON, `waf_rule_id` present) —
+- [ ] Audit log line appears for your request (JSON, `waf_rule_id` present) -
       confirms Coraza is processing traffic
 - [ ] Metrics flow to your scrape target (observability profile):
       `docker compose --profile observability-vm up -d` or
@@ -152,7 +152,7 @@ a container:
 
 | Environment | Steps |
 |-------------|-------|
-| Docker Compose | 1. Restore the previous runtime `Caddyfile` (and `.env` image pin) from backup. 2. `docker compose up -d --force-recreate` — certificates persist in the `caddy_data` volume, no re-issuance storm |
+| Docker Compose | 1. Restore the previous runtime `Caddyfile` (and `.env` image pin) from backup. 2. `docker compose up -d --force-recreate` - certificates persist in the `caddy_data` volume, no re-issuance storm |
 | systemd | 1. Restore previous `/etc/caddy/Caddyfile` (and rules) from backup. 2. `sudo systemctl reload caddy-waf` for config-only rollback, or `sudo systemctl restart caddy-waf` |
 
 If the rollback is caused by WAF blocking, first switch the site to
