@@ -4,7 +4,7 @@
 
 # Caddy WAF | Developmi
 
-_Protect your web applications with enterprise-grade WAF in under 5 minutes - eliminate false-positive risk during deployment and slash SOC2 audit prep time._
+_Hardened Caddy web server distribution with Coraza WAF and OWASP CRS v4 - tested with 122 integration cases, signed supply chain (Cosign/SLSA), and safe DetectionOnly staged rollout._
 
 [![Tech](https://img.shields.io/badge/Caddy_v2.11.4_|_Coraza_v2.6.1-green?style=for-the-badge&logo=caddy&logoColor=white)](https://caddyserver.com)
 [![Docker](https://img.shields.io/badge/Docker_|_READY-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://hub.docker.com)
@@ -43,7 +43,7 @@ _Protect your web applications with enterprise-grade WAF in under 5 minutes - el
 
 **Problem:** Deploying a web application firewall typically requires weeks of tuning, dedicated appliances, and specialized security expertise. Most WAF solutions block legitimate traffic on day one, disrupting your users and forcing you to disable protections you just deployed.
 
-**This project solves that.** It packages Caddy - the web server that automatically provisions TLS - with Coraza WAF and the OWASP Core Rule Set into a single hardened container. The WAF defaults to **DetectionOnly mode**, giving you a safe observation window before enforcement. You get 290+ protection rules covering SQL injection, XSS, command injection, and the entire OWASP Top 10 - without blocking a single legitimate request until you're ready.
+**This project solves that.** It packages Caddy - the web server with automatic TLS - with Coraza WAF and the OWASP Core Rule Set into a single hardened container. The WAF defaults to **DetectionOnly mode**, giving you a safe observation window before enforcement. It comes preconfigured with OWASP CRS v4.29.0 covering SQL injection, XSS, command injection, and OWASP Top 10 vectors across 12 rule families - allowing you to baseline legitimate application traffic and tune exclusions during observation before enforcing active blocking.
 
 Starting from v3.0.0, the image ships with updated Caddy 2.11.4, official upstream rate limiting and DNS plugins, and native security header support - giving the project full control over maintenance cadence, security patches, and feature development.
 
@@ -58,8 +58,8 @@ Starting from v3.0.0, the image ships with updated Caddy 2.11.4, official upstre
 
 #### 🛡️ WAF Capabilities
 - **Coraza WAF v2.6.1**: Modern, high-performance web application firewall engine
-- **OWASP CRS v4.29.0**: Latest Core Rule Set with 290+ protection rules
-- **DetectionOnly by default**: Prevents false positives in new deployments
+- **OWASP CRS v4.29.0**: Core Rule Set covering SQLi, XSS, RCE, and protocol violations across 12 rule families
+- **DetectionOnly by default**: Mitigates false-positive operational risk during initial rollout
 - **Audit logging**: JSON audit logs to stdout for easy monitoring
 - **Rate limiting**: Built-in rate limiting via `mholt/caddy-ratelimit`
 - **Security headers**: Automated security header injection via Caddy's native `header` directive
@@ -99,7 +99,7 @@ cp Caddyfile.example Caddyfile
 ### 4. Build Your Custom Image (Recommended for your own distribution)
 ```bash
 docker build -t your-registry/your-caddy-waf:custom \
-  --build-arg CORAZA_CADDY_REF=v2.5.0 \
+  --build-arg CORAZA_CADDY_REF=v2.6.1 \
   --build-arg CADDY_RATELIMIT_REF=5625512 \
   --build-arg CADDY_DNS_CLOUDFLARE_REF=v0.2.4 \
   .
@@ -138,7 +138,7 @@ caddy-waf/
 ├── grafana/                  # Provisioned datasources + dashboards
 ├── Dockerfile                # Multi-stage build with pinned plugins
 ├── docker-compose.yml        # Production-grade compose with security hardening
-├── Caddyfile                 # Runtime configuration — untracked, generated from Caddyfile.example (WAF + TLS + reverse proxy)
+├── Caddyfile                 # Runtime configuration - untracked, generated from Caddyfile.example (WAF + TLS + reverse proxy)
 ├── Caddyfile.example         # Templated configuration with 5 deployment examples
 ├── .env.example              # Environment variable template (3 groups)
 ├── TUNING.md                 # WAF tuning guide per application type
@@ -155,7 +155,7 @@ caddy-waf/
 flowchart LR
     Client[Client] -->|HTTPS :443| Caddy[Caddy v2.11.4]
     Caddy -->|WAF layer| Coraza[Coraza WAF v2.6.1]
-    Coraza -->|OWASP CRS v4.29.0| Rules[290+ Rules]
+    Coraza -->|OWASP CRS v4.29.0| Rules[CRS v4 Rules]
     Coraza -->|Decision| Action{Allow?}
     Action -->|Yes| Backend[Upstream Backend]
     Action -->|No| Block[Block + Audit Log]
@@ -260,7 +260,7 @@ docker compose up -d
 ### Build from source
 ```bash
 docker build \
-  --build-arg CORAZA_CADDY_REF=v2.5.0 \
+  --build-arg CORAZA_CADDY_REF=v2.6.1 \
   --build-arg CADDY_RATELIMIT_REF=5625512 \
   --build-arg CADDY_DNS_CLOUDFLARE_REF=v0.2.4 \
   -t caddy-waf:custom .
@@ -268,7 +268,7 @@ docker build \
 
 ### Systemd deployment (bare-metal)
 The unit runs on the **host network namespace**, so it uses the zero-trust
-config `deploy/systemd/Caddyfile.systemd` — the admin API is bound to loopback
+config `deploy/systemd/Caddyfile.systemd` - the admin API is bound to loopback
 only (`admin localhost:2019`). Never use `0.0.0.0:2019` on a host network: the
 admin API accepts config POSTs.
 
@@ -392,9 +392,9 @@ The Caddy admin endpoint (`:2019/metrics`) exposes real Prometheus metrics:
 - `caddy_reverse_proxy_upstreams_healthy` - Backend upstream health (0/1)
 - `caddy_config_last_reload_successful` - Config reload status
 
-> **Note:** coraza-caddy v2.5.0 does not export `coraza_waf_*` metrics (upstream
-> limitation). WAF rule IDs and decisions are available in the JSON audit log on
-> stdout, not on `/metrics`.
+> **Note:** coraza-caddy (up to v2.6.1) does not export `coraza_waf_*` metrics
+> (upstream limitation tracked in [coraza-caddy#82](https://github.com/corazawaf/coraza-caddy/issues/82)).
+> WAF rule IDs and decisions are available in the JSON audit log on stdout, not on `/metrics`.
 
 ---
 
@@ -413,7 +413,7 @@ docker compose --profile observability-vm up -d
 docker compose --profile observability-prom up -d
 ```
 
-Profile services are **not** started by plain `docker compose up` — default
+Profile services are **not** started by plain `docker compose up` - default
 behavior is unchanged. Grafana is bound to loopback only (127.0.0.1), with
 anonymous read access so the dashboard opens without login
 (admin UI: `admin` / `admin`, override with `GRAFANA_ADMIN_USER` /
@@ -421,7 +421,7 @@ anonymous read access so the dashboard opens without login
 
 ### How it works
 
-- `metrics/prometheus.yml` — single canonical scrape config, mounted read-only:
+- `metrics/prometheus.yml` - single canonical scrape config, mounted read-only:
   VictoriaMetrics consumes it via `-promscrape.config`, Prometheus via
   `--config.file`. Targets the internal `caddy-waf:2019`.
 - Caddyfile.example exposes the admin endpoint (`/metrics`) on `0.0.0.0:2019` and
@@ -434,7 +434,7 @@ anonymous read access so the dashboard opens without login
 
 ### Security
 
-Port `2019` (Caddy admin API) is **never published to the host** — the admin
+Port `2019` (Caddy admin API) is **never published to the host** - the admin
 API can accept config POSTs, so it stays strictly inside the internal Docker
 network. Scraping happens over the `caddy-network` bridge only. Backends
 (VictoriaMetrics:8428, Prometheus:9090) are also internal-only.
@@ -477,7 +477,7 @@ See [SECURITY.md](./SECURITY.md) for:
 
 | Version | Supported |
 |---------|-----------|
-| 3.3.x   | ✅ Yes (current) |
+| 3.5.x   | ✅ Yes (current) |
 | 2.0.x   | ❌ No     |
 | 1.0.x   | ❌ No     |
 
@@ -489,10 +489,6 @@ Security advisories and resolved CVEs are documented in [SECURITY.md](./SECURITY
 
 ---
 
-
-
----
-
 ## 📋 Changelog
 
 See [CHANGELOG.md](./CHANGELOG.md) for the full version history.
@@ -500,7 +496,8 @@ The project follows [Keep a Changelog](https://keepachangelog.com/) and [Semanti
 
 | Version | Date | Highlights |
 |---------|------|------------|
-| [3.5.4](./CHANGELOG.md#353---2026-09-21) | 2026-09-21 | Coraza WAF 2.6.1, grpc v1.83.2, CVE-2026-84304 & CVE-2026-84445 resolved, empty .trivyignore |
+| [3.5.5](./CHANGELOG.md#355---2026-09-23) | 2026-09-23 | 122-test integration matrix (12 CRS families), granular test runners, native Caddy perimeter hardening & banner suppression, CI test gate |
+| [3.5.4](./CHANGELOG.md#354---2026-09-21) | 2026-09-21 | Coraza WAF 2.6.1, grpc v1.83.2, CVE-2026-84304 & CVE-2026-84445 resolved, empty .trivyignore |
 | [3.5.2](./CHANGELOG.md#352---2026-09-09) | 2026-09-09 | coraza-caddy v2.6.0 (WebSocket+WAF fixes, grpc v1.82.1), digest-pinned base, CI/CD hardening |
 | [3.4.0](./CHANGELOG.md#340---2026-08-24) | 2026-08-24 | OWASP CRS 4.29.0, Trivy v0.74.0, 20-case integration suite (OWASP Top 10 2025), Actions bumps |
 | [3.3.2](./CHANGELOG.md#332---2026-08-14) | 2026-08-14 | WAF default active (DetectionOnly), dual-arch scanning, boot regression gate, systemd variant tracked |
@@ -523,7 +520,7 @@ This project follows [Conventional Commits](https://www.conventionalcommits.org/
 - **Roadmap:** [ROADMAP.md](ROADMAP.md)
 
 ### Commercial Support
-For enterprise support, custom configurations, or security consulting:
+For commercial support, custom configurations, or security consulting:
 - **Website:** [developmi.com](https://developmi.com)
 - **Email:** miguel@developmi.com
 - **GitHub:** [developmi](https://github.com/developmi)
@@ -538,7 +535,7 @@ Licensed under the [MIT License](./LICENSE).
 ## 🙏 Acknowledgments
 
 - [Caddy Server](https://caddyserver.com) - Amazing web server with automatic HTTPS
-- [Coraza WAF](https://coraza.io) - Enterprise-grade WAF engine
+- [Coraza WAF](https://coraza.io) - Open-source OWASP Coraza WAF engine
 - [OWASP Core Rule Set](https://coreruleset.org) - Industry-standard protection rules
 - [Developmi](https://developmi.com) - DevOps & Security consulting
 
