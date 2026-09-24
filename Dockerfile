@@ -28,14 +28,14 @@ LABEL org.opencontainers.image.description="Production-ready Caddy web server wi
 LABEL org.opencontainers.image.licenses="MIT"
 LABEL maintainer="Miguel Lozano"
 LABEL vendor="Developmi"
-LABEL version="3.5.4"
+LABEL version="3.5.5"
 LABEL waf.coraza.version="2.6.1"
 LABEL waf.owasp-crs.version="4.29.0"
 
 # Copy the custom binary
 COPY --from=builder /usr/bin/caddy /usr/bin/caddy
 
-# Upgrade all base image packages — pulls current Alpine 3.23 security fixes
+# Upgrade all base image packages - pulls current Alpine 3.23 security fixes
 # (openssl/libssl, musl, busybox, zlib, ca-certificates, curl, c-ares, ...)
 RUN apk upgrade --no-cache
 
@@ -75,7 +75,7 @@ RUN mkdir -p /data/logs && \
     chmod -R 755 /etc/caddy/owasp-crs && \
     chmod 644 /etc/caddy/coraza.conf
 
-# Default Caddyfile — ACTIVE WAF baseline (DetectionOnly).
+# Default Caddyfile - ACTIVE WAF baseline (DetectionOnly).
 # The image CMD runs `caddy run --config /etc/caddy/Caddyfile`, so the loaded
 # default is this file; Caddyfile.default is the reference copy. Replace both
 # with a volume mount (/etc/caddy/Caddyfile) for real deployments.
