@@ -1,7 +1,7 @@
 ---
 meta:
   author: "Developmi"
-  description: "CRS 4.29.0 Family 932 - Remote Code Execution (RCE)"
+  description: "CRS 4.30.0 Family 932 - Remote Code Execution (RCE)"
   enabled: true
   name: "crs-932-attack-rce"
 

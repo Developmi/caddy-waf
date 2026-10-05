@@ -1,7 +1,7 @@
 ---
 meta:
   author: "Developmi"
-  description: "CRS 4.29.0 Family 941 - Cross-Site Scripting (XSS)"
+  description: "CRS 4.30.0 Family 941 - Cross-Site Scripting (XSS)"
   enabled: true
   name: "crs-941-attack-xss"
 

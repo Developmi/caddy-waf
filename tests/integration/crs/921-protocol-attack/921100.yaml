@@ -1,7 +1,7 @@
 ---
 meta:
   author: "Developmi"
-  description: "CRS 4.29.0 Family 921 - Protocol Attacks & Request Smuggling"
+  description: "CRS 4.30.0 Family 921 - Protocol Attacks & Request Smuggling"
   enabled: true
   name: "crs-921-protocol-attack"
 

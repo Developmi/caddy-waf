@@ -43,9 +43,9 @@ _Hardened Caddy web server distribution with Coraza WAF and OWASP CRS v4 - teste
 
 **Problem:** Deploying a web application firewall typically requires weeks of tuning, dedicated appliances, and specialized security expertise. Most WAF solutions block legitimate traffic on day one, disrupting your users and forcing you to disable protections you just deployed.
 
-**This project solves that.** It packages Caddy - the web server with automatic TLS - with Coraza WAF and the OWASP Core Rule Set into a single hardened container. The WAF defaults to **DetectionOnly mode**, giving you a safe observation window before enforcement. It comes preconfigured with OWASP CRS v4.29.0 covering SQL injection, XSS, command injection, and OWASP Top 10 vectors across 12 rule families - allowing you to baseline legitimate application traffic and tune exclusions during observation before enforcing active blocking.
+**This project solves that.** It packages Caddy - the web server with automatic TLS - with Coraza WAF and the OWASP Core Rule Set into a single hardened container. The WAF defaults to **DetectionOnly mode**, giving you a safe observation window before enforcement. It comes preconfigured with OWASP CRS v4.30.0 covering SQL injection, XSS, command injection, and OWASP Top 10 vectors across 12 rule families - allowing you to baseline legitimate application traffic and tune exclusions during observation before enforcing active blocking.
 
-Starting from v3.0.0, the image ships with updated Caddy 2.11.4, official upstream rate limiting and DNS plugins, and native security header support - giving the project full control over maintenance cadence, security patches, and feature development.
+Starting from v3.0.0, the image ships with updated Caddy 2.11.7, official upstream rate limiting and DNS plugins, and native security header support - giving the project full control over maintenance cadence, security patches, and feature development.
 
 ### ✨ Features
 
@@ -58,7 +58,7 @@ Starting from v3.0.0, the image ships with updated Caddy 2.11.4, official upstre
 
 #### 🛡️ WAF Capabilities
 - **Coraza WAF v2.6.1**: Modern, high-performance web application firewall engine
-- **OWASP CRS v4.29.0**: Core Rule Set covering SQLi, XSS, RCE, and protocol violations across 12 rule families
+- **OWASP CRS v4.30.0**: Core Rule Set covering SQLi, XSS, RCE, and protocol violations across 12 rule families
 - **DetectionOnly by default**: Mitigates false-positive operational risk during initial rollout
 - **Audit logging**: JSON audit logs to stdout for easy monitoring
 - **Rate limiting**: Built-in rate limiting via `mholt/caddy-ratelimit`
@@ -153,9 +153,9 @@ caddy-waf/
 
 ```mermaid
 flowchart LR
-    Client[Client] -->|HTTPS :443| Caddy[Caddy v2.11.4]
+    Client[Client] -->|HTTPS :443| Caddy[Caddy v2.11.7]
     Caddy -->|WAF layer| Coraza[Coraza WAF v2.6.1]
-    Coraza -->|OWASP CRS v4.29.0| Rules[CRS v4 Rules]
+    Coraza -->|OWASP CRS v4.30.0| Rules[CRS v4 Rules]
     Coraza -->|Decision| Action{Allow?}
     Action -->|Yes| Backend[Upstream Backend]
     Action -->|No| Block[Block + Audit Log]
@@ -334,7 +334,7 @@ make test-waf        # Runs all 122 integration tests + live security header ver
 make test-baseline   # Runs 00-baseline (12 tests: clean traffic + false-positive resilience)
 make test-evasion    # Runs 01-evasion (6 tests: double-encoding, fullwidth, bypass vectors)
 make test-hardening  # Runs 02-hardening (10 tests: .env, .git, .aws, Docker, .sql, .bak + headers)
-make test-crs        # Runs crs/ (94 tests across all 12 OWASP CRS v4.29.0 rule families)
+make test-crs        # Runs crs/ (94 tests across all 12 OWASP CRS v4.30.0 rule families)
 make test-suite SUITE=crs/942-attack-sqli  # Target any specific family or subdirectory
 make test-boot       # Runs bare-boot regression gate (proves baked container boots as UID 1337)
 ```

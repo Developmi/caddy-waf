@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 Format: [Keep a Changelog](https://keepachangelog.com/) · Versioning: [SemVer](https://semver.org/)
 
+## [Unreleased]
+
+### Changed
+
+- **Caddy Upgrade**: upgraded base image from Caddy 2.11.4 to **2.11.7** (digest-pinned multi-arch index digests). Resolves `GHSA-6365-7ppr-5r92` (wrong-upstream connection under `forward_auth` + `reverse_proxy`). Incorporates Slowloris idle timeouts, request header limits (16 KiB), and fixes for HTTP/2 stream handling and RFC 10036 `Incremental` header.
+- **OWASP CRS Upgrade**: upgraded Core Rule Set from 4.29.0 to **4.30.0** with pinned SHA256 checksum verification (`a4bb3688ef6205b64471a9ccbf0d7b024eb8edf39b97c6f6c0006e7a948f8550`).
+- **CI Dependencies**: bumped `docker/setup-qemu-action` to v4.4.0, `docker/build-push-action` to v7.4.0, and `astral-sh/setup-uv` to v10.2.0.
+
 ## [3.5.5] - 2026-09-23
 
 ### Added

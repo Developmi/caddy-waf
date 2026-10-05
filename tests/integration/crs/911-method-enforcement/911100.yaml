@@ -1,7 +1,7 @@
 ---
 meta:
   author: "Developmi"
-  description: "CRS 4.29.0 Rule 911100 - Method Enforcement"
+  description: "CRS 4.30.0 Rule 911100 - Method Enforcement"
   enabled: true
   name: "crs-911-method-enforcement"
 
