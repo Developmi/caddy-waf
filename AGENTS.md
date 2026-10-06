@@ -3,7 +3,7 @@
 ## Stack
 - **Type**: Docker infrastructure / deployment (no Go source code)
 - **Base image**: Caddy 2.11.7 (Alpine-based)
-- **WAF Engine**: Coraza WAF 2.6.1 (via coraza-caddy plugin)
+- **WAF Engine**: Coraza WAF v3.7.0 (via coraza-caddy plugin v2.6.1)
 - **Rule Set**: OWASP CRS 4.30.0
 - **Additional plugins**: caddy-ratelimit (0.1.0, pinned 5625512), caddy-dns/cloudflare (0.2.4)
 - **Language**: Go (build-time only via xcaddy builder image)
@@ -42,9 +42,9 @@
 
 ## Conventions
 - Commit style: Conventional Commits (`feat:`, `fix:`, `docs:`, `chore:`, `ci:`)
-- Versioning: Semantic Versioning (v3.5.5 current)
+- Versioning: Semantic Versioning (v3.6.0 current)
 - Branch naming: `feat/desc`, `fix/desc`, `docs/desc`, `chore/desc`, `ci/desc`
-- go-ftw integration tests via `make test-waf` (122 tests across 12 CRS families, baseline, false positives, perimeter hardening) + live header validation + bare-boot regression
+- go-ftw integration tests via `make test-waf` (122 tests across 12 CRS families, baseline, false positives, perimeter hardening) + live header validation (CSP, HSTS, no banners) + active rate limit burst test + bare-boot regression
 - WAF default: DetectionOnly (change to On after 7-14 day observation window)
 - Observability profiles (not in default `up`): `docker compose --profile observability-vm up -d` (VictoriaMetrics + Grafana) | `--profile observability-prom up -d` (Prometheus + Grafana); both scrape the same metrics/prometheus.yml from caddy-waf:2019 — admin /metrics must stay internal-only (never publish 2019)
 

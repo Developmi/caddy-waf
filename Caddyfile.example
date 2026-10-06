@@ -82,6 +82,21 @@
         Referrer-Policy "strict-origin-when-cross-origin"
         Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=()"
         X-Permitted-Cross-Domain-Policies "none"
+
+        # Content Security Policy (OWASP secure baseline - adapt for application-specific assets)
+        Content-Security-Policy "default-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self';"
+    }
+}
+
+# Reusable Rate Limiting Snippet (caddy-ratelimit)
+# -----------------------------------------------
+(rate_limiting) {
+    rate_limit {
+        zone default {
+            key {remote_host}
+            events 100
+            window 1m
+        }
     }
 }
 
@@ -90,6 +105,7 @@
 example.com, www.example.com {
     import waf
     import security_headers
+    import rate_limiting
 
     tls {
         protocols tls1.2 tls1.3
@@ -104,8 +120,8 @@ example.com, www.example.com {
     respond "Caddy with Coraza WAF is working!" 200
 }
 
-# Example 2: Reverse proxy to a backend service with WAF
-# -------------------------------------------------------
+# Example 2: Reverse proxy to a backend service with WAF & API Rate Limiting
+# ---------------------------------------------------------------------------
 api.example.com {
     import waf
     import security_headers
@@ -120,20 +136,37 @@ api.example.com {
     }
     respond @sensitive_paths "Forbidden" 403
 
+    # Dedicated API rate limit zone (e.g. 60 requests per minute per IP)
+    rate_limit {
+        zone api_zone {
+            key {remote_host}
+            events 60
+            window 1m
+        }
+    }
+
     reverse_proxy example-app:80 {
         # Configure trusted proxies explicitly if there is an upstream LB.
         # trusted_proxies static private_ranges
     }
 }
 
-# Example 3: Static file server with WAF
-# ---------------------------------------
+# Example 3: Static file server with WAF & Security Headers
+# ---------------------------------------------------------
 assets.example.com {
     import waf
+    import security_headers
+    import rate_limiting
 
     tls {
         protocols tls1.2 tls1.3
     }
+
+    # Native perimeter hardening
+    @sensitive_paths {
+        path /.git* /.env* /.aws* /.docker* *.sql *.htpasswd *.bak *.conf
+    }
+    respond @sensitive_paths "Forbidden" 403
 
     root * /usr/share/caddy
     file_server
@@ -143,10 +176,18 @@ assets.example.com {
 # ------------------------------------------------------------
 app.example.com {
     import waf
+    import security_headers
+    import rate_limiting
 
     tls {
         protocols tls1.2 tls1.3
     }
+
+    # Native perimeter hardening
+    @sensitive_paths {
+        path /.git* /.env* /.aws* /.docker* *.sql *.htpasswd *.bak *.conf
+    }
+    respond @sensitive_paths "Forbidden" 403
 
     root * /var/www/html
     php_fastcgi php-fpm:9000
@@ -160,10 +201,18 @@ ws.example.com {
     # For WebSockets, you might need to adjust CRS rules
     # or create specific exceptions in crs-setup.conf
     import waf
+    import security_headers
+    import rate_limiting
 
     tls {
         protocols tls1.2 tls1.3
     }
+
+    # Native perimeter hardening
+    @sensitive_paths {
+        path /.git* /.env* /.aws* /.docker* *.sql *.htpasswd *.bak *.conf
+    }
+    respond @sensitive_paths "Forbidden" 403
 
     reverse_proxy websocket-backend:8080 {
         # WebSocket specific headers

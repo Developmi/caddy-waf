@@ -37,6 +37,7 @@ Every completed item links to the exact commit or PR that delivered it — verif
 | 10. Granular Makefile test targets | → `f1bf460` (#36) | Fast targets (`make test-baseline`, `make test-evasion`, `make test-hardening`, `make test-crs`, `make test-suite SUITE=...`) |
 | 11. Mandatory CI Functional Test Gate | → `58e8be2` (#35) | Releases gated on full `make test-waf` + `make test-boot` passing green before Cosign signing and push |
 | 12. Version alignment & anti-hype cleanup | → `c68449d` (#37) | Version bump v3.5.5, documentation alignment across OCI labels, compose, checklist, and removal of marketing hype |
+| 13. Caddy 2.11.7, CRS v4.30.0, CSP baseline & active rate limiting | → `v3.6.0` | Upgraded Caddy to 2.11.7 and CRS to v4.30.0; integrated OpenSSF Best Practices passing badge; enforced CSP baseline, active rate limiting snippet, and example hardening |
 
 **Observability note:** The same `metrics/prometheus.yml` feeds both backends (VictoriaMetrics via `-promscrape.config`, Prometheus via `--config.file`) — Caddy's `/metrics` output needs no changes. Admin `:2019` remains internal-only.
 
@@ -70,7 +71,7 @@ Production-ready Kubernetes manifests: Deployment, Service, ConfigMap, Ingress, 
 Develop automated, reproducible load testing suites (k6 or Locust) measuring requests/second, p95/p99 latency overhead, and resource consumption comparing raw Caddy vs Caddy + Coraza WAF (PL1 through PL4).
 
 ### 3. Alpine 3.24 base image migration
-The image runs on Alpine 3.23 (tied to official `caddy:2.11.4` base). Migrate to Alpine 3.24 once Caddy publishes official upstream images on it. Build-time `apk upgrade` keeps current packages patched.
+The image runs on Alpine 3.23 (tied to official `caddy:2.11.7` base). Migrate to Alpine 3.24 once Caddy publishes official upstream images on it. Build-time `apk upgrade` keeps current packages patched.
 
 ### 4. mTLS remote administration
 Enable Caddy's remote admin listener with mutual TLS (`admin.remote` on `:2021`) using local PKI CA and client certificate authentication for integration with `caddy-waf-ui`.

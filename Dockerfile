@@ -28,7 +28,7 @@ LABEL org.opencontainers.image.description="Production-ready Caddy web server wi
 LABEL org.opencontainers.image.licenses="MIT"
 LABEL maintainer="Miguel Lozano"
 LABEL vendor="Developmi"
-LABEL version="3.5.5"
+LABEL version="3.6.0"
 LABEL waf.coraza.version="2.6.1"
 LABEL waf.owasp-crs.version="4.30.0"
 
@@ -88,6 +88,7 @@ RUN cat > /etc/caddy/Caddyfile.default <<'EOF'
     admin localhost:2019
 
     order coraza_waf first
+    order rate_limit before basicauth
 
     log {
         output stdout
@@ -126,12 +127,26 @@ RUN cat > /etc/caddy/Caddyfile.default <<'EOF'
         Referrer-Policy "strict-origin-when-cross-origin"
         Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=()"
         X-Permitted-Cross-Domain-Policies "none"
+
+        # Content Security Policy (OWASP secure baseline)
+        Content-Security-Policy "default-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self';"
+    }
+}
+
+(rate_limiting) {
+    rate_limit {
+        zone default {
+            key {remote_host}
+            events 100
+            window 1m
+        }
     }
 }
 
 :80 {
     import waf
     import security_headers
+    import rate_limiting
 
     # Native perimeter hardening: block sensitive files and dotfiles (defense in depth)
     @sensitive_paths {

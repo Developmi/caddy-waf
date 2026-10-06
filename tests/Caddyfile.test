@@ -1,5 +1,6 @@
 {
     order coraza_waf first
+    order rate_limit before basicauth
     log {
         output stdout
         format json
@@ -38,12 +39,25 @@
         Referrer-Policy "strict-origin-when-cross-origin"
         Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=()"
         X-Permitted-Cross-Domain-Policies "none"
+
+        # Content Security Policy (OWASP secure baseline)
+        Content-Security-Policy "default-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self';"
     }
 }
 
 :80 {
     import waf
     import security_headers
+
+    # Rate limiting test endpoint: allows 2 requests per 5s window, 3rd triggers 429
+    @rate_limited path /rate-limited
+    rate_limit @rate_limited {
+        zone test_burst {
+            key {remote_host}
+            events 2
+            window 5s
+        }
+    }
 
     # Native perimeter hardening: block sensitive files and dotfiles (defense in depth)
     @sensitive_paths {

@@ -3,13 +3,21 @@
 All notable changes to this project will be documented in this file.
 Format: [Keep a Changelog](https://keepachangelog.com/) · Versioning: [SemVer](https://semver.org/)
 
-## [Unreleased]
+## [3.6.0] - 2026-10-05
+
+### Added
+
+- **OpenSSF Best Practices (Passing)**: Earned official OpenSSF CII Best Practices passing badge, certifying adherence to open source security, supply chain, and governance criteria.
+- **Content Security Policy (CSP) Baseline**: Added standard OWASP CSP header (`default-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self';`) to `(security_headers)` across all Caddyfile templates and Dockerfile default configuration, validated by CI live header tests.
+- **Active Rate Limiting Architecture**: Integrated reusable `(rate_limiting)` snippet (`mholt/caddy-ratelimit`) with global directive ordering and live automated burst testing (verifying HTTP 429 Too Many Requests enforcement).
+- **Hardening Coverage in All Templates**: Applied `(security_headers)`, `(rate_limiting)`, and `@sensitive_paths` matchers across all example site blocks in `Caddyfile.example` (static, PHP, WebSocket, and reverse proxy).
 
 ### Changed
 
-- **Caddy Upgrade**: upgraded base image from Caddy 2.11.4 to **2.11.7** (digest-pinned multi-arch index digests). Resolves `GHSA-6365-7ppr-5r92` (wrong-upstream connection under `forward_auth` + `reverse_proxy`). Incorporates Slowloris idle timeouts, request header limits (16 KiB), and fixes for HTTP/2 stream handling and RFC 10036 `Incremental` header.
-- **OWASP CRS Upgrade**: upgraded Core Rule Set from 4.29.0 to **4.30.0** with pinned SHA256 checksum verification (`a4bb3688ef6205b64471a9ccbf0d7b024eb8edf39b97c6f6c0006e7a948f8550`).
-- **CI Dependencies**: bumped `docker/setup-qemu-action` to v4.4.0, `docker/build-push-action` to v7.4.0, and `astral-sh/setup-uv` to v10.2.0.
+- **Caddy Upgrade**: Upgraded base image from Caddy 2.11.4 to **2.11.7** (digest-pinned multi-arch index digests). Resolves `GHSA-6365-7ppr-5r92` (`forward_auth` + `reverse_proxy` routing issue). Incorporates Slowloris idle timeouts, request header limits (16 KiB), and fixes for HTTP/2 reverse proxy panics and RFC 10036 `Incremental` header.
+- **OWASP CRS Upgrade**: Upgraded Core Rule Set from 4.29.0 to **4.30.0** with pinned SHA256 checksum verification (`a4bb3688ef6205b64471a9ccbf0d7b024eb8edf39b97c6f6c0006e7a948f8550`).
+- **CI Dependencies**: Bumped `docker/setup-qemu-action` to v4.4.0, `docker/build-push-action` to v7.4.0, and `astral-sh/setup-uv` to v10.2.0.
+- **Version Alignment**: OCI `LABEL version` → **3.6.0** in Dockerfile.
 
 ## [3.5.5] - 2026-09-23
 
@@ -271,6 +279,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/) · Versioning: [SemVer](
 - README.md and README.es.md with setup instructions.
 
 <!-- Version links for Keep a Changelog -->
+[3.6.0]: https://github.com/Developmi/caddy-waf/compare/v3.5.5...v3.6.0
 [3.5.5]: https://github.com/Developmi/caddy-waf/compare/v3.5.4...v3.5.5
 [3.5.4]: https://github.com/Developmi/caddy-waf/compare/v3.5.2...v3.5.4
 [3.5.2]: https://github.com/Developmi/caddy-waf/compare/v3.4.0...v3.5.2

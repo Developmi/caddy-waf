@@ -57,12 +57,12 @@ Starting from v3.0.0, the image ships with updated Caddy 2.11.7, official upstre
 - **Structured logging**: JSON logs for SIEM integration
 
 #### 🛡️ WAF Capabilities
-- **Coraza WAF v2.6.1**: Modern, high-performance web application firewall engine
+- **Coraza WAF v3.7.0 (via coraza-caddy v2.6.1)**: Modern, high-performance web application firewall engine
 - **OWASP CRS v4.30.0**: Core Rule Set covering SQLi, XSS, RCE, and protocol violations across 12 rule families
 - **DetectionOnly by default**: Mitigates false-positive operational risk during initial rollout
 - **Audit logging**: JSON audit logs to stdout for easy monitoring
-- **Rate limiting**: Built-in rate limiting via `mholt/caddy-ratelimit`
-- **Security headers**: Automated security header injection via Caddy's native `header` directive
+- **Rate limiting**: Built-in and active rate limiting via `mholt/caddy-ratelimit` with reusable snippet and burst test verification
+- **Security headers & CSP**: Automated security header injection (HSTS, nosniff, DENY, Permissions-Policy, and Content Security Policy)
 
 #### 🚀 Production Ready
 - **Optimized Alpine base**: Small footprint (~45MB compressed)
@@ -81,7 +81,7 @@ Starting from v3.0.0, the image ships with updated Caddy 2.11.7, official upstre
 
 ### 1. Pull the Image
 ```bash
-docker pull ghcr.io/developmi/caddy-waf:v3.5.5
+docker pull ghcr.io/developmi/caddy-waf:v3.6.0
 ```
 
 ### 2. Create Environment File
@@ -229,7 +229,7 @@ volumes:
 ### Environment Variables
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `CADDY_WAF_IMAGE` | `ghcr.io/developmi/caddy-waf:v3.5.5` | Caddy WAF image reference |
+| `CADDY_WAF_IMAGE` | `ghcr.io/developmi/caddy-waf:v3.6.0` | Caddy WAF image reference |
 | `EXAMPLE_APP_IMAGE` | `containous/whoami:latest` | Demo backend image |
 | `SITE_ADDRESS` | `localhost` | Site address/server name used by Caddy |
 | `BACKEND_UPSTREAM` | `example-app:80` | Reverse proxy backend upstream |
@@ -315,10 +315,10 @@ curl -I https://yourdomain.com
 ### Security Scanning
 ```bash
 # Scan image with Trivy
-docker run --rm aquasec/trivy image ghcr.io/developmi/caddy-waf:v3.5.5
+docker run --rm aquasec/trivy image ghcr.io/developmi/caddy-waf:v3.6.0
 
 # Scan with Docker Scout
-docker scout quickview ghcr.io/developmi/caddy-waf:v3.5.5
+docker scout quickview ghcr.io/developmi/caddy-waf:v3.6.0
 ```
 
 ### Integration Tests (go-ftw & Perimeter Hardening)
@@ -477,7 +477,8 @@ See [SECURITY.md](./SECURITY.md) for:
 
 | Version | Supported |
 |---------|-----------|
-| 3.5.x   | ✅ Yes (current) |
+| 3.6.x   | ✅ Yes (current) |
+| 3.5.x   | ❌ No     |
 | 2.0.x   | ❌ No     |
 | 1.0.x   | ❌ No     |
 
@@ -496,6 +497,7 @@ The project follows [Keep a Changelog](https://keepachangelog.com/) and [Semanti
 
 | Version | Date | Highlights |
 |---------|------|------------|
+| [3.6.0](./CHANGELOG.md#360---2026-10-05) | 2026-10-05 | Caddy 2.11.7, OWASP CRS 4.30.0, OpenSSF Best Practices passing badge, CSP baseline, active rate limiting |
 | [3.5.5](./CHANGELOG.md#355---2026-09-23) | 2026-09-23 | 122-test integration matrix (12 CRS families), granular test runners, native Caddy perimeter hardening & banner suppression, CI test gate |
 | [3.5.4](./CHANGELOG.md#354---2026-09-21) | 2026-09-21 | Coraza WAF 2.6.1, grpc v1.83.2, CVE-2026-84304 & CVE-2026-84445 resolved, empty .trivyignore |
 | [3.5.2](./CHANGELOG.md#352---2026-09-09) | 2026-09-09 | coraza-caddy v2.6.0 (WebSocket+WAF fixes, grpc v1.82.1), digest-pinned base, CI/CD hardening |
