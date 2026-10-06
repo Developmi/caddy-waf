@@ -11,8 +11,8 @@ _Hardened Caddy web server distribution with Coraza WAF and OWASP CRS v4 - teste
 [![CI](https://img.shields.io/badge/CI-Passing-brightgreen?style=for-the-badge&logo=githubactions&logoColor=white)](https://github.com/developmi/caddy-waf/actions)
 [![Supply Chain](https://img.shields.io/badge/Supply_Chain-Cosign_|_Trivy-4A90D9?style=for-the-badge)](https://github.com/developmi/caddy-waf/actions)
 [![Status](https://img.shields.io/badge/Status-Production_Active-brightgreen?style=for-the-badge)](https://github.com/developmi/caddy-waf/pkgs/container/caddy-waf)
-[![License](https://img.shields.io/badge/License-MIT_©_Miguel_Lozano_|_Developmi-blue?style=for-the-badge)](LICENSE)
-[![OpenSSF Best Practices](https://www.bestpractices.dev/projects/15124/badge)](https://www.bestpractices.dev/projects/15124)
+[![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)](LICENSE)
+[![OpenSSF Best Practices](https://img.shields.io/cii/level/15124?style=for-the-badge&label=OPENSSF%20BEST%20PRACTICES)](https://www.bestpractices.dev/projects/15124)
 ![Maintainer](https://img.shields.io/badge/Maintainer-Miguel_Lozano_|_Cloud_&_Infrastructure_Engineer-black?style=for-the-badge)
 
 > Curated by [Miguel Lozano](https://developmi.com) • [GitHub](https://github.com/developmi) • [Container Registry](https://github.com/developmi/caddy-waf/pkgs/container/caddy-waf)
