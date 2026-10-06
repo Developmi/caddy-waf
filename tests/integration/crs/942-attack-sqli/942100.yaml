@@ -1,7 +1,7 @@
 ---
 meta:
   author: "Developmi"
-  description: "CRS 4.29.0 Family 942 - SQL Injection (SQLi)"
+  description: "CRS 4.30.0 Family 942 - SQL Injection (SQLi)"
   enabled: true
   name: "crs-942-attack-sqli"
 

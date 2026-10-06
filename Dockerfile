@@ -1,6 +1,6 @@
 # Build Stage
-# caddy:2.11.4-builder pinned to its multi-arch index digest (tag comment for readability)
-FROM caddy:2.11.4-builder@sha256:403d237d0bb16d2e62b1f93ca9ebb4953ecbb78aee5986765713a39f9263a5b4 AS builder
+# caddy:2.11.7-builder pinned to its multi-arch index digest (tag comment for readability)
+FROM caddy:2.11.7-builder@sha256:a576be4d0ba99e7259e98268cbac2e2c897feeab8b7b49885cd3cac5409523f8 AS builder
 
 # Build args for deterministic plugin references.
 # coraza-caddy: https://github.com/corazawaf/coraza-caddy/releases/tag/v2.6.1
@@ -17,8 +17,8 @@ RUN xcaddy build \
     --with github.com/caddy-dns/cloudflare@${CADDY_DNS_CLOUDFLARE_REF}
 
 # Final Stage
-# caddy:2.11.4 pinned to its multi-arch index digest (tag comment for readability)
-FROM caddy:2.11.4@sha256:13ba145cba2f3e28fa801994876e4c086d1b95d5aa2a520a734765ffb6b12017
+# caddy:2.11.7 pinned to its multi-arch index digest (tag comment for readability)
+FROM caddy:2.11.7@sha256:d76116d819d5162f464b0f2cd09bd28c568a86148c7bc539ce17c33eb22d8bbb
 SHELL ["/bin/ash", "-eo", "pipefail", "-c"]
 
 # Container metadata
@@ -30,7 +30,7 @@ LABEL maintainer="Miguel Lozano"
 LABEL vendor="Developmi"
 LABEL version="3.5.5"
 LABEL waf.coraza.version="2.6.1"
-LABEL waf.owasp-crs.version="4.29.0"
+LABEL waf.owasp-crs.version="4.30.0"
 
 # Copy the custom binary
 COPY --from=builder /usr/bin/caddy /usr/bin/caddy
@@ -48,10 +48,10 @@ ARG CORAZA_CONF_SHA256=fea02902c81b2b9691746e08b934dea5ded6382aa7b561c31b9edef00
 RUN mkdir -p /etc/caddy/owasp-crs /tmp/downloads && \
     # Ensure wget and tar are available (Alpine base includes them)
     apk add --no-cache wget=1.25.0-r2 tar=1.35-r4 && \
-    # Download OWASP CRS v4.29.0 source archive with SHA256 verification
-    wget -q -O /tmp/downloads/coreruleset.tar.gz https://github.com/coreruleset/coreruleset/archive/refs/tags/v4.29.0.tar.gz && \
+    # Download OWASP CRS v4.30.0 source archive with SHA256 verification
+    wget -q -O /tmp/downloads/coreruleset.tar.gz https://github.com/coreruleset/coreruleset/archive/refs/tags/v4.30.0.tar.gz && \
     # Verify SHA256 checksum
-    echo "cedd55533de917b6e397352a67a31993da4c07816f1fefcc94eacf542fc86337  /tmp/downloads/coreruleset.tar.gz" | sha256sum -c - && \
+    echo "a4bb3688ef6205b64471a9ccbf0d7b024eb8edf39b97c6f6c0006e7a948f8550  /tmp/downloads/coreruleset.tar.gz" | sha256sum -c - && \
     tar xzf /tmp/downloads/coreruleset.tar.gz -C /etc/caddy/owasp-crs --strip-components=1 && \
     rm -f /tmp/downloads/coreruleset.tar.gz && \
     # Prepare CRS Setup file

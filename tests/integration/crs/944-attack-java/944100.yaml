@@ -1,7 +1,7 @@
 ---
 meta:
   author: "Developmi"
-  description: "CRS 4.29.0 Family 944 - Java Attacks & Log4Shell"
+  description: "CRS 4.30.0 Family 944 - Java Attacks & Log4Shell"
   enabled: true
   name: "crs-944-attack-java"
 

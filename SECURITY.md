@@ -271,13 +271,15 @@ The following advisories do not affect this project. Listed for transparency.
 
 ---
 
-## Pending advisories (waiting on Caddy ≥ 2.11.5)
+## Pending advisories
 
-The advisory below affects the Caddy 2.11.4 configuration surface and has **no patched Caddy release yet**. It is a Moderate configuration-surface advisory documented here for transparency (not flagged by Trivy's CRITICAL/HIGH gate). It will be resolved when the base image moves to Caddy ≥ 2.11.5.
+There are currently **no pending advisories**. All previously known CVEs and GHSA advisories are resolved in the current base image and plugin dependencies.
 
-| Advisory | Component | Severity | Impact for this project | Fixed in |
-|----------|-----------|----------|------------------------|----------|
-| `GHSA-6365-7ppr-5r92` | Caddy `forward_auth` + `reverse_proxy` (configuration surface) | Moderate | Wrong-upstream connection under specific `forward_auth` configurations — verify production Caddyfile does not use the affected pattern | Caddy 2.11.5 (unreleased) |
+**Resolved in Caddy 2.11.7 (2026-10-05)** — upgrading the Caddy base image to `v2.11.7` resolved `GHSA-6365-7ppr-5r92`:
+
+| Advisory | Component (before) | Fixed in |
+|----------|--------------------|----------|
+| `GHSA-6365-7ppr-5r92` | Caddy `forward_auth` + `reverse_proxy` | Caddy 2.11.6+ (#7859) |
 
 **Resolved in coraza-caddy v2.6.1 (2026-09-21)** — upgrading `CORAZA_CADDY_REF` to `v2.6.1` lifted `google.golang.org/grpc` to `v1.83.2`, completely resolving both findings in the compiled binary without requiring `.trivyignore` suppressions:
 
@@ -294,8 +296,6 @@ The advisory below affects the Caddy 2.11.4 configuration surface and has **no p
 | `GHSA-hrxh-6v49-42gf` | google.golang.org/grpc v1.81.0 (embedded in Caddy binary) | grpc v1.82.1 (coraza-caddy v2.6.0) |
 | `CVE-2026-46600` | golang.org/x/net v0.55.0 (embedded in Caddy binary) | x/net v0.56.0 (rebuilt binary) |
 | `CVE-2026-56854` | golang.org/x/crypto v0.52.0 (embedded in Caddy binary) | x/crypto v0.55.0 (rebuilt binary) |
-
-**Action on Caddy ≥ 2.11.5 release**: upgrade the base image and remove the pending `GHSA-6365-7ppr-5r92` note.
 
 ## Timeline
 
@@ -317,6 +317,9 @@ The advisory below affects the Caddy 2.11.4 configuration surface and has **no p
 | **2026-09-09** | caddy-waf **v3.5.2** released - coraza-caddy v2.6.0 (WebSocket+WAF fixes, grpc v1.82.1), digest-pinned Caddy base, CI/CD hardening (SHA256-verified tools, least-privilege workflow); v3.5.0/v3.5.1 tags burned before publishing |
 | **2026-09-21** | caddy-waf **v3.5.4** released - coraza-caddy v2.6.1 (flush/hijack fixes, grpc v1.83.2 resolves CVE-2026-84304 and CVE-2026-84445, empty .trivyignore) |
 | **2026-08-14** | caddy-waf **v3.3.2** released - WAF active by default (DetectionOnly), dual-arch scanning, bare-boot regression gate (make test-boot), systemd Caddyfile variant tracked |
+| **2026-10-03** | Caddy 2.11.6 released - fixes GHSA-6365-7ppr-5r92 |
+| **2026-10-05** | Caddy 2.11.7 released - fixes HTTP/2 reverse_proxy panic and stream drop regressions |
+| **2026-10-05** | OWASP CRS v4.30.0 released |
 
 ---
 

@@ -1,7 +1,7 @@
 ---
 meta:
   author: "Developmi"
-  description: "CRS 4.29.0 Family 943 - Session Fixation & Cookie Tampering"
+  description: "CRS 4.30.0 Family 943 - Session Fixation & Cookie Tampering"
   enabled: true
   name: "crs-943-attack-session-fixation"
 

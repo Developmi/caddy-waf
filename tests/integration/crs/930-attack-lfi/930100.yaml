@@ -1,7 +1,7 @@
 ---
 meta:
   author: "Developmi"
-  description: "CRS 4.29.0 Family 930 - Local File Inclusion & Traversal"
+  description: "CRS 4.30.0 Family 930 - Local File Inclusion & Traversal"
   enabled: true
   name: "crs-930-attack-lfi"
 
