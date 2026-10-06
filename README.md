@@ -57,7 +57,7 @@ Starting from v3.0.0, the image ships with updated Caddy 2.11.7, official upstre
 - **Structured logging**: JSON logs for SIEM integration
 
 #### 🛡️ WAF Capabilities
-- **Coraza WAF v2.6.1**: Modern, high-performance web application firewall engine
+- **Coraza WAF v3.7.0 (via coraza-caddy v2.6.1)**: Modern, high-performance web application firewall engine
 - **OWASP CRS v4.30.0**: Core Rule Set covering SQLi, XSS, RCE, and protocol violations across 12 rule families
 - **DetectionOnly by default**: Mitigates false-positive operational risk during initial rollout
 - **Audit logging**: JSON audit logs to stdout for easy monitoring
@@ -81,7 +81,7 @@ Starting from v3.0.0, the image ships with updated Caddy 2.11.7, official upstre
 
 ### 1. Pull the Image
 ```bash
-docker pull ghcr.io/developmi/caddy-waf:v3.5.5
+docker pull ghcr.io/developmi/caddy-waf:v3.6.0
 ```
 
 ### 2. Create Environment File
@@ -229,7 +229,7 @@ volumes:
 ### Environment Variables
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `CADDY_WAF_IMAGE` | `ghcr.io/developmi/caddy-waf:v3.5.5` | Caddy WAF image reference |
+| `CADDY_WAF_IMAGE` | `ghcr.io/developmi/caddy-waf:v3.6.0` | Caddy WAF image reference |
 | `EXAMPLE_APP_IMAGE` | `containous/whoami:latest` | Demo backend image |
 | `SITE_ADDRESS` | `localhost` | Site address/server name used by Caddy |
 | `BACKEND_UPSTREAM` | `example-app:80` | Reverse proxy backend upstream |
@@ -315,10 +315,10 @@ curl -I https://yourdomain.com
 ### Security Scanning
 ```bash
 # Scan image with Trivy
-docker run --rm aquasec/trivy image ghcr.io/developmi/caddy-waf:v3.5.5
+docker run --rm aquasec/trivy image ghcr.io/developmi/caddy-waf:v3.6.0
 
 # Scan with Docker Scout
-docker scout quickview ghcr.io/developmi/caddy-waf:v3.5.5
+docker scout quickview ghcr.io/developmi/caddy-waf:v3.6.0
 ```
 
 ### Integration Tests (go-ftw & Perimeter Hardening)
@@ -477,7 +477,8 @@ See [SECURITY.md](./SECURITY.md) for:
 
 | Version | Supported |
 |---------|-----------|
-| 3.5.x   | ✅ Yes (current) |
+| 3.6.x   | ✅ Yes (current) |
+| 3.5.x   | ❌ No     |
 | 2.0.x   | ❌ No     |
 | 1.0.x   | ❌ No     |
 

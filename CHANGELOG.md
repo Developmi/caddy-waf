@@ -279,6 +279,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/) · Versioning: [SemVer](
 - README.md and README.es.md with setup instructions.
 
 <!-- Version links for Keep a Changelog -->
+[3.6.0]: https://github.com/Developmi/caddy-waf/compare/v3.5.5...v3.6.0
 [3.5.5]: https://github.com/Developmi/caddy-waf/compare/v3.5.4...v3.5.5
 [3.5.4]: https://github.com/Developmi/caddy-waf/compare/v3.5.2...v3.5.4
 [3.5.2]: https://github.com/Developmi/caddy-waf/compare/v3.4.0...v3.5.2

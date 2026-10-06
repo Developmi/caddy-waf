@@ -20,7 +20,7 @@ Mode matters:
 | `DetectionOnly` (default, Caddyfile.example:56) | Coraza logs the match, **never blocks** | Blocked users cannot come from the WAF - look at your backend, network, or rate limiter |
 | `On` | Coraza blocks with 403 (Coraza's default) | A 403 with `waf_rule_id` in the audit log is a real WAF block |
 
-Note: CRS 4.29.0 is intentionally sensitive (covering SQLi, XSS,
+Note: CRS 4.30.0 is intentionally sensitive (covering SQLi, XSS,
 command injection, path traversal). Payloads that *look* like an attack - e.g.
 a search for `1; DROP TABLE`, an email containing `<script>`, or URLs with
 encoded path segments - are routinely flagged. In `DetectionOnly` these show
@@ -48,7 +48,7 @@ up only as log entries; after switching to `On` they become user-facing 403s.
    WAF and compare. The go-ftw integration suite covers the baseline:
 
    ```bash
-    make test-waf        # starts the test container on 127.0.0.1:9090, runs 20 OWASP CRS cases, tears down
+    make test-waf        # starts the test container on 127.0.0.1:9090, runs 122 automated integration cases, tears down
    ```
 
    For the suspect rule, check the rule definition and its exclusion advice:
@@ -116,7 +116,7 @@ sudo systemctl restart caddy-waf                             # systemd
 
 ## Verify the fix
 
-- [ ] `make test-waf` passes (20/20 go-ftw cases)
+- [ ] `make test-waf` passes (122/122 integration cases)
 - [ ] The previously blocked request now succeeds (200) with `SecRuleEngine On`
 - [ ] The excluded rule no longer appears in the audit log for that request
 - [ ] Other rules still block real attack payloads (spot-check with

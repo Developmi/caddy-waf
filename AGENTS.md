@@ -3,7 +3,7 @@
 ## Stack
 - **Type**: Docker infrastructure / deployment (no Go source code)
 - **Base image**: Caddy 2.11.7 (Alpine-based)
-- **WAF Engine**: Coraza WAF 2.6.1 (via coraza-caddy plugin)
+- **WAF Engine**: Coraza WAF v3.7.0 (via coraza-caddy plugin v2.6.1)
 - **Rule Set**: OWASP CRS 4.30.0
 - **Additional plugins**: caddy-ratelimit (0.1.0, pinned 5625512), caddy-dns/cloudflare (0.2.4)
 - **Language**: Go (build-time only via xcaddy builder image)

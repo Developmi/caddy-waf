@@ -4,7 +4,8 @@
 
 | Version | Supported |
 |---------|-----------|
-| 3.5.x   | ✅ Yes (current) |
+| 3.6.x   | ✅ Yes (current) |
+| 3.5.x   | ❌ No - upgrade to 3.6.x |
 | 2.0.x   | ❌ No - migrated to Developmi, upgrade to 3.0.x |
 | 1.0.x   | ❌ No |
 
@@ -253,7 +254,7 @@ All CVEs listed below are resolved in **caddy-waf v3.0.0** (Caddy ≥ 2.11.4) an
 
 ### OWASP CRS - not affected
 
-The following CVEs affect older OWASP CRS versions. **caddy-waf v3.4.0+ ships CRS v4.29.0 and is not affected.** Listed for transparency.
+The following CVEs affect older OWASP CRS versions. **caddy-waf v3.6.0+ ships CRS v4.30.0 and is not affected.** Listed for transparency.
 
 | CVE | CVSS | Fixed In | Description |
 |-----|------|----------|-------------|
@@ -266,7 +267,7 @@ The following advisories do not affect this project. Listed for transparency.
 
 | Advisory | Severity | Description | Why not applicable |
 |----------|----------|-------------|--------------------|
-| `GHSA-wwhq-w58m-w29c` | High (no CVE) | Bypass of the CVE-2026-30852 fix - literal keys in `vars_regexp` (e.g. `tenant_id`) still double-expand and leak `{env.*}` / `{file.*}` placeholders | Affects Caddy <= 2.11.2 only (no patched release); caddy-waf ships Caddy 2.11.4 - out of affected range |
+| `GHSA-wwhq-w58m-w29c` | High (no CVE) | Bypass of the CVE-2026-30852 fix - literal keys in `vars_regexp` (e.g. `tenant_id`) still double-expand and leak `{env.*}` / `{file.*}` placeholders | Affects Caddy <= 2.11.2 only (no patched release); caddy-waf ships Caddy 2.11.7 - out of affected range |
 | `GHSA-gx7w-56w6-g48x` | Moderate | Remote admin authorization bypass on PKI endpoints via prefix-based path matching | Remote admin is not enabled in this project (admin listener is localhost-only) - not reachable. Re-verify before adopting roadmap item 6 (mTLS remote admin) |
 
 ---
