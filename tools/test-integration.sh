@@ -47,13 +47,25 @@ if echo "$HEADERS" | grep -qi '^X-Powered-By:'; then
 fi
 
 # Verify required security headers are present
-for header in "Strict-Transport-Security" "X-Content-Type-Options: nosniff" "X-Frame-Options: DENY" "Referrer-Policy: strict-origin-when-cross-origin" "Permissions-Policy" "X-Permitted-Cross-Domain-Policies: none"; do
+for header in "Strict-Transport-Security" "X-Content-Type-Options: nosniff" "X-Frame-Options: DENY" "Referrer-Policy: strict-origin-when-cross-origin" "Permissions-Policy" "X-Permitted-Cross-Domain-Policies: none" "Content-Security-Policy"; do
     if ! echo "$HEADERS" | grep -qi "^${header}"; then
         echo "✗ FAIL: Missing required security header: $header"
         exit 1
     fi
 done
 echo "✓ Native security headers and banner suppression verified."
+
+echo ""
+echo "=== Verifying active rate limiting (burst protection) ==="
+CODE1="$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:9090/rate-limited)"
+CODE2="$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:9090/rate-limited)"
+CODE3="$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:9090/rate-limited)"
+if [[ "$CODE1" == "200" && "$CODE2" == "200" && "$CODE3" == "429" ]]; then
+    echo "✓ Active rate limiting verified (burst triggered HTTP 429 Too Many Requests)."
+else
+    echo "✗ FAIL: Rate limiting test unexpected response codes: $CODE1, $CODE2, $CODE3 (expected 200, 200, 429)"
+    exit 1
+fi
 
 echo ""
 echo "=== Cleaning up ==="

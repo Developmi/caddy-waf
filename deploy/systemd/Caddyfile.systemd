@@ -85,6 +85,21 @@
         Referrer-Policy "strict-origin-when-cross-origin"
         Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=()"
         X-Permitted-Cross-Domain-Policies "none"
+
+        # Content Security Policy (OWASP secure baseline - adapt for application-specific assets)
+        Content-Security-Policy "default-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self';"
+    }
+}
+
+# Reusable Rate Limiting Snippet (caddy-ratelimit)
+# -----------------------------------------------
+(rate_limiting) {
+    rate_limit {
+        zone default {
+            key {remote_host}
+            events 100
+            window 1m
+        }
     }
 }
 
@@ -93,6 +108,7 @@
 {$SITE_ADDRESS:example.com} {
     import waf
     import security_headers
+    import rate_limiting
 
     tls {
         protocols tls1.2 tls1.3
@@ -122,6 +138,15 @@ api.example.com {
         path /.git* /.env* /.aws* /.docker* *.sql *.htpasswd *.bak *.conf
     }
     respond @sensitive_paths "Forbidden" 403
+
+    # Dedicated API rate limit zone (e.g. 60 requests per minute per IP)
+    rate_limit {
+        zone api_zone {
+            key {remote_host}
+            events 60
+            window 1m
+        }
+    }
 
     reverse_proxy {$BACKEND_UPSTREAM:example-app:80}
 }

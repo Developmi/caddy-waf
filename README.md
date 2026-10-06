@@ -61,8 +61,8 @@ Starting from v3.0.0, the image ships with updated Caddy 2.11.7, official upstre
 - **OWASP CRS v4.30.0**: Core Rule Set covering SQLi, XSS, RCE, and protocol violations across 12 rule families
 - **DetectionOnly by default**: Mitigates false-positive operational risk during initial rollout
 - **Audit logging**: JSON audit logs to stdout for easy monitoring
-- **Rate limiting**: Built-in rate limiting via `mholt/caddy-ratelimit`
-- **Security headers**: Automated security header injection via Caddy's native `header` directive
+- **Rate limiting**: Built-in and active rate limiting via `mholt/caddy-ratelimit` with reusable snippet and burst test verification
+- **Security headers & CSP**: Automated security header injection (HSTS, nosniff, DENY, Permissions-Policy, and Content Security Policy)
 
 #### 🚀 Production Ready
 - **Optimized Alpine base**: Small footprint (~45MB compressed)
@@ -496,6 +496,7 @@ The project follows [Keep a Changelog](https://keepachangelog.com/) and [Semanti
 
 | Version | Date | Highlights |
 |---------|------|------------|
+| [3.6.0](./CHANGELOG.md#360---2026-10-05) | 2026-10-05 | Caddy 2.11.7, OWASP CRS 4.30.0, OpenSSF Best Practices passing badge, CSP baseline, active rate limiting |
 | [3.5.5](./CHANGELOG.md#355---2026-09-23) | 2026-09-23 | 122-test integration matrix (12 CRS families), granular test runners, native Caddy perimeter hardening & banner suppression, CI test gate |
 | [3.5.4](./CHANGELOG.md#354---2026-09-21) | 2026-09-21 | Coraza WAF 2.6.1, grpc v1.83.2, CVE-2026-84304 & CVE-2026-84445 resolved, empty .trivyignore |
 | [3.5.2](./CHANGELOG.md#352---2026-09-09) | 2026-09-09 | coraza-caddy v2.6.0 (WebSocket+WAF fixes, grpc v1.82.1), digest-pinned base, CI/CD hardening |
