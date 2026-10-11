@@ -65,6 +65,7 @@ node_modules/
 .output/
 
 # Internal AI Agents
+.agents
 .aider*
 .codegraph*
 .atl*
