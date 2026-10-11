@@ -28,8 +28,14 @@ jobs:
           set -o pipefail
           make test-waf 2>&1 | tee go-ftw.log
 
+      - name: Run container security scan (Trivy)
+        run: make test-security
+
       - name: Run bare-boot regression test
         run: make test-boot
+
+      - name: Run container kernel hardening asserts
+        run: make test-kernel
 
       - name: Tear down test stack
         if: always()

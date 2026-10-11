@@ -38,6 +38,7 @@ Every completed item links to the exact commit or PR that delivered it — verif
 | 11. Mandatory CI Functional Test Gate | → `58e8be2` (#35) | Releases gated on full `make test-waf` + `make test-boot` passing green before Cosign signing and push |
 | 12. Version alignment & anti-hype cleanup | → `c68449d` (#37) | Version bump v3.5.5, documentation alignment across OCI labels, compose, checklist, and removal of marketing hype |
 | 13. Caddy 2.11.7, CRS v4.30.0, CSP baseline & active rate limiting | → `v3.6.0` | Upgraded Caddy to 2.11.7 and CRS to v4.30.0; integrated OpenSSF Best Practices passing badge; enforced CSP baseline, active rate limiting snippet, and example hardening |
+| 14. Coraza v3.8.1 (coraza-caddy v2.6.2) & Kernel Hardening Asserts | → `v3.6.1` | Mitigated 6 Coraza GHSA advisories; added `tools/test-hardening.sh` (`make test-kernel`) asserting UID 1337, CapEff dropped, read-only rootfs, and tmpfs noexec |
 
 **Observability note:** The same `metrics/prometheus.yml` feeds both backends (VictoriaMetrics via `-promscrape.config`, Prometheus via `--config.file`) — Caddy's `/metrics` output needs no changes. Admin `:2019` remains internal-only.
 

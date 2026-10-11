@@ -27,7 +27,8 @@ help:
 	@echo ""
 	@echo "Testing"
 	@echo "-------"
-	@echo "  make test           Run all checks (lint + WAF integration + bare-boot)"
+	@echo "  make test           Run all checks (lint + trivy scan + WAF integration + bare-boot + kernel)"
+	@echo "  make test-security  Run Trivy container scan (fails on HIGH or CRITICAL findings)"
 	@echo "  make test-waf       Run all WAF integration tests against live container"
 	@echo "  make test-baseline  Run baseline & false-positives suite (00-baseline)"
 	@echo "  make test-evasion   Run OWASP CRS evasion suite (01-evasion)"
@@ -35,6 +36,7 @@ help:
 	@echo "  make test-crs       Run all 12 OWASP CRS family suites (crs)"
 	@echo "  make test-suite     Run specific test suite (e.g. SUITE=crs/942-attack-sqli)"
 	@echo "  make test-boot      Run bare-boot regression test (baked default as UID 1337)"
+	@echo "  make test-kernel    Run container kernel hardening asserts (UID 1337, CapEff, RO, noexec)"
 	@echo "  make test-clean     Clean up leftover test containers"
 	@echo ""
 
@@ -60,6 +62,11 @@ tools:
 	GOFTW_SHA256_LINUX_ARM64=$(GOFTW_SHA256_LINUX_ARM64) \
 	GOFTW_SHA256_DARWIN_AMD64=$(GOFTW_SHA256_DARWIN_AMD64) \
 	GOFTW_SHA256_DARWIN_ARM64=$(GOFTW_SHA256_DARWIN_ARM64) \
+	TRIVY_VERSION=$(TRIVY_VERSION) \
+	TRIVY_SHA256_LINUX_AMD64=$(TRIVY_SHA256_LINUX_AMD64) \
+	TRIVY_SHA256_LINUX_ARM64=$(TRIVY_SHA256_LINUX_ARM64) \
+	TRIVY_SHA256_DARWIN_AMD64=$(TRIVY_SHA256_DARWIN_AMD64) \
+	TRIVY_SHA256_DARWIN_ARM64=$(TRIVY_SHA256_DARWIN_ARM64) \
 	./tools/install.sh
 	@echo "✓ Development tools are ready."
 
@@ -83,6 +90,7 @@ doctor:
 	@printf "%-18s %s\n" "yamllint" "$$(uv run yamllint --version | awk '{print $$2}')"
 	@printf "%-18s %s\n" "zizmor" "$$(uv run zizmor --version | awk '{print $$2}')"
 	@printf "%-18s %s\n" "go-ftw" "$$($(TOOLS)/go-ftw --version 2>/dev/null | head -1 | awk '{print $$3}' || echo 'not installed')"
+	@printf "%-18s %s\n" "trivy" "$$($(TOOLS)/trivy --version 2>/dev/null | head -1 | awk '{print $$2}' || echo 'not installed')"
 	@echo
 
 .PHONY: lint
@@ -118,9 +126,15 @@ lint-security:
 	@echo "✓ Security lint passed."
 
 
-.PHONY: test test-waf test-baseline test-evasion test-hardening test-crs test-suite test-boot test-clean
-test: lint test-waf test-boot       # Run all checks (lint + WAF integration + bare boot)
+.PHONY: test test-waf test-baseline test-evasion test-hardening test-crs test-suite test-boot test-kernel test-security test-clean
+test: lint test-security test-waf test-boot test-kernel       # Run all checks (lint + trivy scan + WAF integration + bare boot + kernel asserts)
 	@echo "✓ All tests passed."
+
+test-security: tools              # Run Trivy vulnerability scan against container image (gate on HIGH/CRITICAL)
+	@echo "==> Security (Trivy container scan)"
+	@docker image inspect caddy-waf:local >/dev/null 2>&1 || docker build -t caddy-waf:local .
+	@$(TOOLS)/trivy image --exit-code 1 --severity HIGH,CRITICAL caddy-waf:local
+	@echo "✓ Trivy container security scan passed (0 HIGH, 0 CRITICAL)."
 
 test-waf: tools                    # Run WAF integration tests against live container (all 122 tests)
 	@tools/test-integration.sh
@@ -143,6 +157,9 @@ test-suite: tools                  # Run specific test suite (e.g. make test-sui
 
 test-boot: tools                   # Run bare-boot regression test (baked default as UID 1337)
 	@tools/test-boot.sh
+
+test-kernel: tools                 # Run container kernel hardening asserts (UID 1337, CapEff, RO, noexec)
+	@tools/test-hardening.sh
 
 test-clean:                        # Force cleanup any leftover test containers
 	@docker compose -f docker-compose.yml -f docker-compose.test.yml down -v 2>/dev/null || true

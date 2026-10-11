@@ -276,6 +276,26 @@ The following advisories do not affect this project. Listed for transparency.
 
 There are currently **no pending advisories**. All previously known CVEs and GHSA advisories are resolved in the current base image and plugin dependencies.
 
+**Resolved in Go 1.27.2 & x/net v0.61.0 (2026-10-11)** — compiling Caddy with `GOTOOLCHAIN=go1.27.2` and updating `golang.org/x/net` to `v0.61.0` in the builder stage resolved 4 HIGH vulnerabilities detected by Trivy in `usr/bin/caddy`:
+
+| Advisory | Component (before) | Fixed by |
+|----------|--------------------|----------|
+| `CVE-2026-78667` | Go stdlib v1.27.1 `net/http` DoS via crafted HTTP Range headers | Go 1.27.2 toolchain pin (`GOTOOLCHAIN=go1.27.2`) |
+| `CVE-2026-78669` | Go stdlib v1.27.1 `net/http/internal/http2` DoS via excessive HTTP/2 SETTINGS frames | Go 1.27.2 toolchain pin (`GOTOOLCHAIN=go1.27.2`) |
+| `CVE-2026-97031` | Go stdlib v1.27.1 `crypto/tls` DoS via multiple ECH outer extension references | Go 1.27.2 toolchain pin (`GOTOOLCHAIN=go1.27.2`) |
+| `CVE-2026-78669` | `golang.org/x/net` v0.59.0 HTTP/2 SETTINGS frame DoS | `golang.org/x/net` v0.61.0 replacement in `xcaddy build` |
+
+**Resolved in coraza-caddy v2.6.2 (2026-10-10)** — upgrading `CORAZA_CADDY_REF` to `v2.6.2` incorporates Coraza `v3.8.1`, resolving 6 upstream Coraza engine advisories:
+
+| Advisory | Component (before) | Fixed by |
+|----------|--------------------|----------|
+| `GHSA-6gcq-wc29-5xf2` (CVE-2026-107826) | Coraza JSON body processor unbounded stack overflow (`gjson.Valid`) | Coraza v3.8.1 (coraza-caddy v2.6.2) |
+| `GHSA-6r3q-mjv7-xr8m` (CVE-2026-41510) | Coraza silent argument drop at `SecArgumentsLimit` parameter flooding bypass | Coraza v3.8.1 (coraza-caddy v2.6.2) |
+| `GHSA-5gj4-9gm7-2fx2` | Coraza body processor JSON key collision vulnerability | Coraza v3.8.1 (coraza-caddy v2.6.2) |
+| `GHSA-w253-m66g-rx24` | Coraza file descriptor leak during request processing | Coraza v3.8.1 (coraza-caddy v2.6.2) |
+| `GHSA-3wr7-993q-jrff` | Coraza JSON processor resource exhaustion (DoS) | Coraza v3.8.1 (coraza-caddy v2.6.2) |
+| `GHSA-g4qm-m288-5cp9` (CVE-2026-107835) | Coraza cookie parser confusion via untrimmed ASCII control characters | Coraza v3.8.1 (coraza-caddy v2.6.2) |
+
 **Resolved in Caddy 2.11.7 (2026-10-05)** — upgrading the Caddy base image to `v2.11.7` resolved `GHSA-6365-7ppr-5r92`:
 
 | Advisory | Component (before) | Fixed in |
@@ -318,9 +338,11 @@ There are currently **no pending advisories**. All previously known CVEs and GHS
 | **2026-09-09** | caddy-waf **v3.5.2** released - coraza-caddy v2.6.0 (WebSocket+WAF fixes, grpc v1.82.1), digest-pinned Caddy base, CI/CD hardening (SHA256-verified tools, least-privilege workflow); v3.5.0/v3.5.1 tags burned before publishing |
 | **2026-09-21** | caddy-waf **v3.5.4** released - coraza-caddy v2.6.1 (flush/hijack fixes, grpc v1.83.2 resolves CVE-2026-84304 and CVE-2026-84445, empty .trivyignore) |
 | **2026-08-14** | caddy-waf **v3.3.2** released - WAF active by default (DetectionOnly), dual-arch scanning, bare-boot regression gate (make test-boot), systemd Caddyfile variant tracked |
+| **2026-10-02** | Coraza v3.8.1 released - fixes GHSA-6gcq-wc29-5xf2, GHSA-6r3q-mjv7-xr8m, GHSA-5gj4-9gm7-2fx2, GHSA-w253-m66g-rx24, GHSA-3wr7-993q-jrff, GHSA-g4qm-m288-5cp9 |
 | **2026-10-03** | Caddy 2.11.6 released - fixes GHSA-6365-7ppr-5r92 |
 | **2026-10-05** | Caddy 2.11.7 released - fixes HTTP/2 reverse_proxy panic and stream drop regressions |
 | **2026-10-05** | OWASP CRS v4.30.0 released |
+| **2026-10-10** | coraza-caddy v2.6.2 released and integrated into caddy-waf (Coraza v3.8.1) |
 
 ---
 

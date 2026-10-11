@@ -11,6 +11,7 @@ mkdir -p "$BIN"
 : "${HADOLINT_VERSION:?}"
 : "${GOLANGCI_VERSION:?}"
 : "${GOFTW_VERSION:?}"
+: "${TRIVY_VERSION:?}"
 
 INSTALLED=0
 
@@ -184,10 +185,52 @@ install_golangci() {
     rm -rf "$TMP"
 }
 
+install_trivy() {
+    [[ "${REINSTALL:-}" = "1" ]] && rm -f "$BIN/trivy"
+    [[ -x "$BIN/trivy" ]] && return
+
+    # Check if host already has a functional trivy
+    if command -v trivy >/dev/null 2>&1; then
+        echo "Using host trivy ($(trivy --version 2>/dev/null | head -1))..."
+        ln -sf "$(command -v trivy)" "$BIN/trivy"
+        return
+    fi
+
+    INSTALLED=1
+
+    echo "Installing trivy v${TRIVY_VERSION}..."
+
+    local os_title arch_title
+    case "$OS" in
+        linux) os_title="Linux" ;;
+        darwin) os_title="macOS" ;;
+    esac
+    case "$ARCH" in
+        amd64) arch_title="64bit" ;;
+        arm64) arch_title="ARM64" ;;
+    esac
+
+    TMP="$(mktemp -d)"
+    TARBALL="$TMP/trivy.tar.gz"
+
+    download \
+        "https://github.com/aquasecurity/trivy/releases/download/v${TRIVY_VERSION}/trivy_${TRIVY_VERSION}_${os_title}-${arch_title}.tar.gz" \
+        "$TARBALL"
+    local expected
+    expected="$(expected_sha TRIVY)"
+    verify_sha256 "$TARBALL" "$expected"
+
+    tar -xz -C "$TMP" -f "$TARBALL"
+    install "$TMP/trivy" "$BIN/trivy"
+
+    rm -rf "$TMP"
+}
+
 install_actionlint
 install_hadolint
 install_golangci
 install_goftw
+install_trivy
 
 if [[ "$INSTALLED" -eq 1 ]]; then
     echo
