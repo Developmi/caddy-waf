@@ -3,6 +3,24 @@
 All notable changes to this project will be documented in this file.
 Format: [Keep a Changelog](https://keepachangelog.com/) · Versioning: [SemVer](https://semver.org/)
 
+## [3.6.1] - 2026-10-11
+
+### Security
+
+- **Coraza WAF Engine Upgrade**: Upgraded Coraza WAF upstream to **v3.8.1** via `coraza-caddy` plugin **v2.6.2** (resolving 6 active security advisories: `GHSA-6gcq-wc29-5xf2` [CVE-2026-107826], `GHSA-6r3q-mjv7-xr8m` [CVE-2026-41510], `GHSA-5gj4-9gm7-2fx2`, `GHSA-w253-m66g-rx24`, `GHSA-3wr7-993q-jrff`, `GHSA-g4qm-m288-5cp9` [CVE-2026-107835]).
+- **Checksum Verification**: Verified `coraza.conf-recommended v3.8.1` against pinned SHA256 checksum (`372f7fde584115d9192d46023e9debd4cd59b62c30e9ca0eddc59bc1d1e63891`).
+
+### Added
+
+- **Kernel Hardening & Runtime Asserts**: Added `tools/test-hardening.sh` and granular target `make test-kernel` to verify non-root UID 1337 execution, effective capability confinement (`CapEff: 0000000000000400` / `NET_BIND_SERVICE` only), read-only rootfs write rejection (`EROFS`), and tmpfs execution rejection (`noexec`).
+- **CI Hardening Gate**: Integrated `make test-kernel` into `.github/workflows/test-waf.yml`.
+
+### Changed
+
+- **Dockerfile Layer Optimization**: Consolidated multi-stage `RUN` instructions in `Dockerfile` to eliminate intermediary layer overhead and resolve Hadolint DL3059 warnings.
+- **Development Tooling**: Upgraded `go-ftw` to **2.6.1** and `golangci-lint` to **2.14.0** with verified multi-platform SHA256 checksums in `tools/versions.mk`.
+- **Version Alignment**: OCI `LABEL version` → **3.6.1** in Dockerfile.
+
 ## [3.6.0] - 2026-10-05
 
 ### Added

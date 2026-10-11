@@ -6,7 +6,7 @@
 
 _Hardened Caddy web server distribution with Coraza WAF and OWASP CRS v4 - tested with 122 integration cases, signed supply chain (Cosign/SLSA), and safe DetectionOnly staged rollout._
 
-[![Tech](https://img.shields.io/badge/Caddy_v2.11.7_|_Coraza_v2.6.1-green?style=for-the-badge&logo=caddy&logoColor=white)](https://caddyserver.com)
+[![Tech](https://img.shields.io/badge/Caddy_v2.11.7_|_Coraza_v2.6.2-green?style=for-the-badge&logo=caddy&logoColor=white)](https://caddyserver.com)
 [![Docker](https://img.shields.io/badge/Docker_|_READY-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://hub.docker.com)
 [![CI](https://img.shields.io/badge/CI-Passing-brightgreen?style=for-the-badge&logo=githubactions&logoColor=white)](https://github.com/developmi/caddy-waf/actions)
 [![Supply Chain](https://img.shields.io/badge/Supply_Chain-Cosign_|_Trivy-4A90D9?style=for-the-badge)](https://github.com/developmi/caddy-waf/actions)
@@ -57,7 +57,7 @@ Starting from v3.0.0, the image ships with updated Caddy 2.11.7, official upstre
 - **Structured logging**: JSON logs for SIEM integration
 
 #### 🛡️ WAF Capabilities
-- **Coraza WAF v3.7.0 (via coraza-caddy v2.6.1)**: Modern, high-performance web application firewall engine
+- **Coraza WAF v3.8.1 (via coraza-caddy v2.6.2)**: Modern, high-performance web application firewall engine
 - **OWASP CRS v4.30.0**: Core Rule Set covering SQLi, XSS, RCE, and protocol violations across 12 rule families
 - **DetectionOnly by default**: Mitigates false-positive operational risk during initial rollout
 - **Audit logging**: JSON audit logs to stdout for easy monitoring
@@ -81,7 +81,7 @@ Starting from v3.0.0, the image ships with updated Caddy 2.11.7, official upstre
 
 ### 1. Pull the Image
 ```bash
-docker pull ghcr.io/developmi/caddy-waf:v3.6.0
+docker pull ghcr.io/developmi/caddy-waf:v3.6.1
 ```
 
 ### 2. Create Environment File
@@ -99,7 +99,7 @@ cp Caddyfile.example Caddyfile
 ### 4. Build Your Custom Image (Recommended for your own distribution)
 ```bash
 docker build -t your-registry/your-caddy-waf:custom \
-  --build-arg CORAZA_CADDY_REF=v2.6.1 \
+  --build-arg CORAZA_CADDY_REF=v2.6.2 \
   --build-arg CADDY_RATELIMIT_REF=5625512 \
   --build-arg CADDY_DNS_CLOUDFLARE_REF=v0.2.4 \
   .
@@ -154,7 +154,7 @@ caddy-waf/
 ```mermaid
 flowchart LR
     Client[Client] -->|HTTPS :443| Caddy[Caddy v2.11.7]
-    Caddy -->|WAF layer| Coraza[Coraza WAF v2.6.1]
+    Caddy -->|WAF layer| Coraza[Coraza WAF v2.6.2]
     Coraza -->|OWASP CRS v4.30.0| Rules[CRS v4 Rules]
     Coraza -->|Decision| Action{Allow?}
     Action -->|Yes| Backend[Upstream Backend]
@@ -229,14 +229,14 @@ volumes:
 ### Environment Variables
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `CADDY_WAF_IMAGE` | `ghcr.io/developmi/caddy-waf:v3.6.0` | Caddy WAF image reference |
+| `CADDY_WAF_IMAGE` | `ghcr.io/developmi/caddy-waf:v3.6.1` | Caddy WAF image reference |
 | `EXAMPLE_APP_IMAGE` | `containous/whoami:latest` | Demo backend image |
 | `SITE_ADDRESS` | `localhost` | Site address/server name used by Caddy |
 | `BACKEND_UPSTREAM` | `example-app:80` | Reverse proxy backend upstream |
 | `ACME_EMAIL` | (empty) | Email for Let's Encrypt certificates |
 
 ### Plugins Included
-- `github.com/corazawaf/coraza-caddy/v2@v2.6.1` - Coraza WAF integration
+- `github.com/corazawaf/coraza-caddy/v2@v2.6.2` - Coraza WAF integration
 - `github.com/mholt/caddy-ratelimit@v0.1.0` - Rate limiting (DDoS protection)
 
 > **Note:** `caddy-ratelimit` development is active but releases are not tagged beyond `v0.1.0`. This image pins the module by commit SHA (`5625512`) to include post-tag fixes. See [Dockerfile](./Dockerfile) for the pinned reference.
@@ -260,7 +260,7 @@ docker compose up -d
 ### Build from source
 ```bash
 docker build \
-  --build-arg CORAZA_CADDY_REF=v2.6.1 \
+  --build-arg CORAZA_CADDY_REF=v2.6.2 \
   --build-arg CADDY_RATELIMIT_REF=5625512 \
   --build-arg CADDY_DNS_CLOUDFLARE_REF=v0.2.4 \
   -t caddy-waf:custom .
@@ -315,10 +315,10 @@ curl -I https://yourdomain.com
 ### Security Scanning
 ```bash
 # Scan image with Trivy
-docker run --rm aquasec/trivy image ghcr.io/developmi/caddy-waf:v3.6.0
+docker run --rm aquasec/trivy image ghcr.io/developmi/caddy-waf:v3.6.1
 
 # Scan with Docker Scout
-docker scout quickview ghcr.io/developmi/caddy-waf:v3.6.0
+docker scout quickview ghcr.io/developmi/caddy-waf:v3.6.1
 ```
 
 ### Integration Tests (go-ftw & Perimeter Hardening)
@@ -497,6 +497,7 @@ The project follows [Keep a Changelog](https://keepachangelog.com/) and [Semanti
 
 | Version | Date | Highlights |
 |---------|------|------------|
+| [3.6.1](./CHANGELOG.md#361---2026-10-11) | 2026-10-11 | Coraza WAF v3.8.1 (coraza-caddy v2.6.2, 6 GHSA advisories resolved), container kernel hardening asserts (`make test-kernel`) |
 | [3.6.0](./CHANGELOG.md#360---2026-10-05) | 2026-10-05 | Caddy 2.11.7, OWASP CRS 4.30.0, OpenSSF Best Practices passing badge, CSP baseline, active rate limiting |
 | [3.5.5](./CHANGELOG.md#355---2026-09-23) | 2026-09-23 | 122-test integration matrix (12 CRS families), granular test runners, native Caddy perimeter hardening & banner suppression, CI test gate |
 | [3.5.4](./CHANGELOG.md#354---2026-09-21) | 2026-09-21 | Coraza WAF 2.6.1, grpc v1.83.2, CVE-2026-84304 & CVE-2026-84445 resolved, empty .trivyignore |
