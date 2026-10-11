@@ -3,10 +3,10 @@
 FROM caddy:2.11.7-builder@sha256:a576be4d0ba99e7259e98268cbac2e2c897feeab8b7b49885cd3cac5409523f8 AS builder
 
 # Build args for deterministic plugin references.
-# coraza-caddy: https://github.com/corazawaf/coraza-caddy/releases/tag/v2.6.1
+# coraza-caddy: https://github.com/corazawaf/coraza-caddy/releases/tag/v2.6.2
 # caddy-ratelimit: https://github.com/mholt/caddy-ratelimit (no release tags beyond v0.1.0 - pinned by commit SHA)
 # caddy-dns/cloudflare: https://github.com/caddy-dns/cloudflare/releases/tag/v0.2.4
-ARG CORAZA_CADDY_REF=v2.6.1
+ARG CORAZA_CADDY_REF=v2.6.2
 ARG CADDY_RATELIMIT_REF=5625512
 ARG CADDY_DNS_CLOUDFLARE_REF=v0.2.4
 
@@ -28,8 +28,8 @@ LABEL org.opencontainers.image.description="Production-ready Caddy web server wi
 LABEL org.opencontainers.image.licenses="MIT"
 LABEL maintainer="Miguel Lozano"
 LABEL vendor="Developmi"
-LABEL version="3.6.0"
-LABEL waf.coraza.version="2.6.1"
+LABEL version="3.6.1"
+LABEL waf.coraza.version="2.6.2"
 LABEL waf.owasp-crs.version="4.30.0"
 
 # Copy the custom binary
@@ -42,7 +42,7 @@ RUN apk upgrade --no-cache
 # --- WAF SETUP ---
 
 # Validate this checksum from Coraza upstream before each release.
-ARG CORAZA_CONF_SHA256=fea02902c81b2b9691746e08b934dea5ded6382aa7b561c31b9edef00cc5c956
+ARG CORAZA_CONF_SHA256=372f7fde584115d9192d46023e9debd4cd59b62c30e9ca0eddc59bc1d1e63891
 
 # Install dependencies, download CRS and configure WAF in a single layer
 RUN mkdir -p /etc/caddy/owasp-crs /tmp/downloads && \
@@ -56,8 +56,8 @@ RUN mkdir -p /etc/caddy/owasp-crs /tmp/downloads && \
     rm -f /tmp/downloads/coreruleset.tar.gz && \
     # Prepare CRS Setup file
     cp /etc/caddy/owasp-crs/crs-setup.conf.example /etc/caddy/owasp-crs/crs-setup.conf && \
-    # Download base Coraza configuration v3.7.0
-    wget -q -O /tmp/downloads/coraza.conf https://raw.githubusercontent.com/corazawaf/coraza/v3.7.0/coraza.conf-recommended && \
+    # Download base Coraza configuration v3.8.1
+    wget -q -O /tmp/downloads/coraza.conf https://raw.githubusercontent.com/corazawaf/coraza/v3.8.1/coraza.conf-recommended && \
     echo "$CORAZA_CONF_SHA256  /tmp/downloads/coraza.conf" | sha256sum -c - && \
     mv /tmp/downloads/coraza.conf /etc/caddy/coraza.conf && \
     rm -rf /tmp/downloads && \
@@ -158,24 +158,14 @@ RUN cat > /etc/caddy/Caddyfile.default <<'EOF'
 }
 EOF
 
-# Loaded default: the config Caddy actually starts with (CMD default).
-RUN cp /etc/caddy/Caddyfile.default /etc/caddy/Caddyfile
-
-# Validate Caddy and WAF configuration
-RUN caddy validate --config /etc/caddy/Caddyfile.default --adapter caddyfile
-
-# Coraza provisions /data/logs/coraza-audit.log as root during the validate above;
-# re-chown so the baked default config boots as UID 1337 (contract §7/D6).
-RUN chown -R 1337:1337 /data/logs
-
-# Build-time release gate: the baked default MUST enable the WAF (contract §9).
-# A bare `docker run` of this image must never serve traffic without Coraza.
-RUN grep -q 'coraza_waf' /etc/caddy/Caddyfile && \
+# Baked default config, validation, permissions, and release gate
+RUN cp /etc/caddy/Caddyfile.default /etc/caddy/Caddyfile && \
+    caddy validate --config /etc/caddy/Caddyfile.default --adapter caddyfile && \
+    chown -R 1337:1337 /data/logs && \
+    grep -q 'coraza_waf' /etc/caddy/Caddyfile && \
     grep -q 'SecRuleEngine DetectionOnly' /etc/caddy/Caddyfile && \
-    grep -q 'SecAuditLog /data/logs/coraza-audit.log' /etc/caddy/Caddyfile
-
-## Ensure caddy user exists with UID 1337 and GID 1337 (align with hardening suite)
-RUN id -u caddy 2>/dev/null || (addgroup -g 1337 -S caddy && adduser -u 1337 -S caddy -G caddy)
+    grep -q 'SecAuditLog /data/logs/coraza-audit.log' /etc/caddy/Caddyfile && \
+    (id -u caddy >/dev/null 2>&1 || (addgroup -g 1337 -S caddy && adduser -u 1337 -S caddy -G caddy))
 
 # Switch to non-privileged user (UID 1337)
 USER 1337:1337
