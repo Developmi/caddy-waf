@@ -31,6 +31,9 @@ jobs:
       - name: Run bare-boot regression test
         run: make test-boot
 
+      - name: Run container kernel hardening asserts
+        run: make test-kernel
+
       - name: Tear down test stack
         if: always()
         run: make test-clean

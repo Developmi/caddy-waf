@@ -35,6 +35,7 @@ help:
 	@echo "  make test-crs       Run all 12 OWASP CRS family suites (crs)"
 	@echo "  make test-suite     Run specific test suite (e.g. SUITE=crs/942-attack-sqli)"
 	@echo "  make test-boot      Run bare-boot regression test (baked default as UID 1337)"
+	@echo "  make test-kernel    Run container kernel hardening asserts (UID 1337, CapEff, RO, noexec)"
 	@echo "  make test-clean     Clean up leftover test containers"
 	@echo ""
 
@@ -118,8 +119,8 @@ lint-security:
 	@echo "✓ Security lint passed."
 
 
-.PHONY: test test-waf test-baseline test-evasion test-hardening test-crs test-suite test-boot test-clean
-test: lint test-waf test-boot       # Run all checks (lint + WAF integration + bare boot)
+.PHONY: test test-waf test-baseline test-evasion test-hardening test-crs test-suite test-boot test-kernel test-clean
+test: lint test-waf test-boot test-kernel       # Run all checks (lint + WAF integration + bare boot + kernel asserts)
 	@echo "✓ All tests passed."
 
 test-waf: tools                    # Run WAF integration tests against live container (all 122 tests)
@@ -143,6 +144,9 @@ test-suite: tools                  # Run specific test suite (e.g. make test-sui
 
 test-boot: tools                   # Run bare-boot regression test (baked default as UID 1337)
 	@tools/test-boot.sh
+
+test-kernel: tools                 # Run container kernel hardening asserts (UID 1337, CapEff, RO, noexec)
+	@tools/test-hardening.sh
 
 test-clean:                        # Force cleanup any leftover test containers
 	@docker compose -f docker-compose.yml -f docker-compose.test.yml down -v 2>/dev/null || true
