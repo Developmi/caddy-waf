@@ -9,9 +9,11 @@ Format: [Keep a Changelog](https://keepachangelog.com/) · Versioning: [SemVer](
 
 - **Coraza WAF Engine Upgrade**: Upgraded Coraza WAF upstream to **v3.8.1** via `coraza-caddy` plugin **v2.6.2** (resolving 6 active security advisories: `GHSA-6gcq-wc29-5xf2` [CVE-2026-107826], `GHSA-6r3q-mjv7-xr8m` [CVE-2026-41510], `GHSA-5gj4-9gm7-2fx2`, `GHSA-w253-m66g-rx24`, `GHSA-3wr7-993q-jrff`, `GHSA-g4qm-m288-5cp9` [CVE-2026-107835]).
 - **Checksum Verification**: Verified `coraza.conf-recommended v3.8.1` against pinned SHA256 checksum (`372f7fde584115d9192d46023e9debd4cd59b62c30e9ca0eddc59bc1d1e63891`).
+- **Binary CVE Mitigations (Go 1.27.2 & x/net)**: Compiled Caddy with `GOTOOLCHAIN=go1.27.2` and updated `golang.org/x/net` to `v0.61.0` in builder stage, eliminating 4 HIGH vulnerabilities (`CVE-2026-78667`, `CVE-2026-78669`, `CVE-2026-97031`) with 0 Trivy findings in `usr/bin/caddy`.
 
 ### Added
 
+- **Trivy Container Security Gate**: Integrated Trivy v0.74.0+ into `tools/` with automatic host detection and fallback download, added dedicated `make test-security` target (failing builds on any HIGH/CRITICAL finding), and enforced as a required step in unified `make test` and `.github/workflows/test-waf.yml`.
 - **Kernel Hardening & Runtime Asserts**: Added `tools/test-hardening.sh` and granular target `make test-kernel` to verify non-root UID 1337 execution, effective capability confinement (`CapEff: 0000000000000400` / `NET_BIND_SERVICE` only), read-only rootfs write rejection (`EROFS`), and tmpfs execution rejection (`noexec`).
 - **CI Hardening Gate**: Integrated `make test-kernel` into `.github/workflows/test-waf.yml`.
 

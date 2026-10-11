@@ -276,6 +276,15 @@ The following advisories do not affect this project. Listed for transparency.
 
 There are currently **no pending advisories**. All previously known CVEs and GHSA advisories are resolved in the current base image and plugin dependencies.
 
+**Resolved in Go 1.27.2 & x/net v0.61.0 (2026-10-11)** — compiling Caddy with `GOTOOLCHAIN=go1.27.2` and updating `golang.org/x/net` to `v0.61.0` in the builder stage resolved 4 HIGH vulnerabilities detected by Trivy in `usr/bin/caddy`:
+
+| Advisory | Component (before) | Fixed by |
+|----------|--------------------|----------|
+| `CVE-2026-78667` | Go stdlib v1.27.1 `net/http` DoS via crafted HTTP Range headers | Go 1.27.2 toolchain pin (`GOTOOLCHAIN=go1.27.2`) |
+| `CVE-2026-78669` | Go stdlib v1.27.1 `net/http/internal/http2` DoS via excessive HTTP/2 SETTINGS frames | Go 1.27.2 toolchain pin (`GOTOOLCHAIN=go1.27.2`) |
+| `CVE-2026-97031` | Go stdlib v1.27.1 `crypto/tls` DoS via multiple ECH outer extension references | Go 1.27.2 toolchain pin (`GOTOOLCHAIN=go1.27.2`) |
+| `CVE-2026-78669` | `golang.org/x/net` v0.59.0 HTTP/2 SETTINGS frame DoS | `golang.org/x/net` v0.61.0 replacement in `xcaddy build` |
+
 **Resolved in coraza-caddy v2.6.2 (2026-10-10)** — upgrading `CORAZA_CADDY_REF` to `v2.6.2` incorporates Coraza `v3.8.1`, resolving 6 upstream Coraza engine advisories:
 
 | Advisory | Component (before) | Fixed by |

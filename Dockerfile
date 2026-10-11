@@ -2,6 +2,8 @@
 # caddy:2.11.7-builder pinned to its multi-arch index digest (tag comment for readability)
 FROM caddy:2.11.7-builder@sha256:a576be4d0ba99e7259e98268cbac2e2c897feeab8b7b49885cd3cac5409523f8 AS builder
 
+ENV GOTOOLCHAIN=go1.27.2
+
 # Build args for deterministic plugin references.
 # coraza-caddy: https://github.com/corazawaf/coraza-caddy/releases/tag/v2.6.2
 # caddy-ratelimit: https://github.com/mholt/caddy-ratelimit (no release tags beyond v0.1.0 - pinned by commit SHA)
@@ -10,11 +12,12 @@ ARG CORAZA_CADDY_REF=v2.6.2
 ARG CADDY_RATELIMIT_REF=5625512
 ARG CADDY_DNS_CLOUDFLARE_REF=v0.2.4
 
-# Build Caddy with fully pinned plugin refs.
+# Build Caddy with fully pinned plugin refs and security replacement for x/net.
 RUN xcaddy build \
     --with github.com/corazawaf/coraza-caddy/v2@${CORAZA_CADDY_REF} \
     --with github.com/mholt/caddy-ratelimit@${CADDY_RATELIMIT_REF} \
-    --with github.com/caddy-dns/cloudflare@${CADDY_DNS_CLOUDFLARE_REF}
+    --with github.com/caddy-dns/cloudflare@${CADDY_DNS_CLOUDFLARE_REF} \
+    --replace golang.org/x/net=golang.org/x/net@v0.61.0
 
 # Final Stage
 # caddy:2.11.7 pinned to its multi-arch index digest (tag comment for readability)

@@ -11,7 +11,7 @@
 
 ## Commands
 - **Run**: `docker compose up`
-- **Test**: `make test` (lint + WAF integration 122 tests + bare-boot + kernel asserts) | Granular: `make test-baseline`, `make test-evasion`, `make test-hardening`, `make test-crs`, `make test-boot`, `make test-kernel`
+- **Test**: `make test` (lint + test-security + WAF integration 122 tests + bare-boot + kernel asserts) | Granular: `make test-baseline`, `make test-evasion`, `make test-hardening`, `make test-crs`, `make test-boot`, `make test-kernel`, `make test-security`
 - **Build**: `docker build -t caddy-waf .`
 - **Validate**: `docker compose config`
 - **Lint/Format**: N/A (no app source code)
