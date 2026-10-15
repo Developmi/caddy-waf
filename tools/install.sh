@@ -187,13 +187,23 @@ install_golangci() {
 
 install_trivy() {
     [[ "${REINSTALL:-}" = "1" ]] && rm -f "$BIN/trivy"
-    [[ -x "$BIN/trivy" ]] && return
 
     # Check if host already has a functional trivy
     if command -v trivy >/dev/null 2>&1; then
         echo "Using host trivy ($(trivy --version 2>/dev/null | head -1))..."
+        rm -f "$BIN/trivy"
         ln -sf "$(command -v trivy)" "$BIN/trivy"
         return
+    fi
+
+    # If host trivy is absent and $BIN/trivy exists, check its version
+    if [[ -e "$BIN/trivy" || -L "$BIN/trivy" ]]; then
+        local current_version
+        current_version="$("$BIN/trivy" --version 2>/dev/null | head -1 | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' || echo "")"
+        if [[ "$current_version" == "$TRIVY_VERSION" ]]; then
+            return
+        fi
+        rm -f "$BIN/trivy"
     fi
 
     INSTALLED=1
