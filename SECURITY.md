@@ -334,15 +334,17 @@ There are currently **no pending advisories**. All previously known CVEs and GHS
 | **2026-07-10** | GHSA-6365-7ppr-5r92 and GHSA-j8px-rmrx-76h9 published |
 | **2026-08-11** | caddy-waf **v3.3.0** released - tool bumps (hadolint 2.15.1, go-ftw 2.5.0, Trivy v0.73.0), full `apk upgrade`, JSON-form HEALTHCHECK, version alignment |
 | **2026-08-11** | caddy-waf **v3.3.1** released - HEALTHCHECK via admin `/metrics` (curl), resource limits (mem 512m, 1 CPU), JSON-file log rotation (50m × 5) |
+| **2026-08-14** | caddy-waf **v3.3.2** released - WAF active by default (DetectionOnly), dual-arch scanning, bare-boot regression gate (make test-boot), systemd Caddyfile variant tracked |
 | **2026-08-24** | caddy-waf **v3.4.0** released - OWASP CRS 4.29.0 (anti-evasion 932 + FP fixes), Trivy v0.74.0, integration suite 20 cases (OWASP Top 10 2025) |
 | **2026-09-09** | caddy-waf **v3.5.2** released - coraza-caddy v2.6.0 (WebSocket+WAF fixes, grpc v1.82.1), digest-pinned Caddy base, CI/CD hardening (SHA256-verified tools, least-privilege workflow); v3.5.0/v3.5.1 tags burned before publishing |
 | **2026-09-21** | caddy-waf **v3.5.4** released - coraza-caddy v2.6.1 (flush/hijack fixes, grpc v1.83.2 resolves CVE-2026-84304 and CVE-2026-84445, empty .trivyignore) |
-| **2026-08-14** | caddy-waf **v3.3.2** released - WAF active by default (DetectionOnly), dual-arch scanning, bare-boot regression gate (make test-boot), systemd Caddyfile variant tracked |
 | **2026-10-02** | Coraza v3.8.1 released - fixes GHSA-6gcq-wc29-5xf2, GHSA-6r3q-mjv7-xr8m, GHSA-5gj4-9gm7-2fx2, GHSA-w253-m66g-rx24, GHSA-3wr7-993q-jrff, GHSA-g4qm-m288-5cp9 |
 | **2026-10-03** | Caddy 2.11.6 released - fixes GHSA-6365-7ppr-5r92 |
 | **2026-10-05** | Caddy 2.11.7 released - fixes HTTP/2 reverse_proxy panic and stream drop regressions |
 | **2026-10-05** | OWASP CRS v4.30.0 released |
+| **2026-10-05** | caddy-waf **v3.6.0** released - Caddy 2.11.7, OWASP CRS v4.30.0, coraza-caddy v2.6.1, active rate limiting, CSP baseline |
 | **2026-10-10** | coraza-caddy v2.6.2 released and integrated into caddy-waf (Coraza v3.8.1) |
+| **2026-10-11** | caddy-waf **v3.6.1** released - coraza-caddy v2.6.2 (Coraza v3.8.1 resolves 6 GHSAs), Go 1.27.2 toolchain, test-security gate |
 
 ---
 
