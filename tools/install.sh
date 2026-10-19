@@ -63,7 +63,14 @@ verify_sha256() {
     local file="$1"
     local expected="$2"
     local actual
-    actual="$(shasum -a 256 "$file" | awk '{print $1}')"
+    if command -v sha256sum >/dev/null 2>&1; then
+        actual="$(sha256sum "$file" | awk '{print $1}')"
+    elif command -v shasum >/dev/null 2>&1; then
+        actual="$(shasum -a 256 "$file" | awk '{print $1}')"
+    else
+        echo "ERROR: neither sha256sum nor shasum found" >&2
+        exit 1
+    fi
     if [[ "$actual" != "$expected" ]]; then
         echo "ERROR: SHA256 mismatch for $(basename "$file")" >&2
         echo "  expected: ${expected}" >&2
