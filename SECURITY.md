@@ -345,6 +345,7 @@ There are currently **no pending advisories**. All previously known CVEs and GHS
 | **2026-10-05** | caddy-waf **v3.6.0** released - Caddy 2.11.7, OWASP CRS v4.30.0, coraza-caddy v2.6.1, active rate limiting, CSP baseline |
 | **2026-10-10** | coraza-caddy v2.6.2 released and integrated into caddy-waf (Coraza v3.8.1) |
 | **2026-10-11** | caddy-waf **v3.6.1** released - coraza-caddy v2.6.2 (Coraza v3.8.1 resolves 6 GHSAs), Go 1.27.2 toolchain, test-security gate |
+| **2026-10-28** | Routine tooling & toolchain upgrade - Go 1.27.3, Trivy v0.76.1, go-ftw v2.6.2 |
 
 ---
 
