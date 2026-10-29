@@ -42,7 +42,7 @@
 
 ## Conventions
 - Commit style: Conventional Commits (`feat:`, `fix:`, `docs:`, `chore:`, `ci:`)
-- Versioning: Semantic Versioning (v3.6.1 current)
+- Versioning: Semantic Versioning (v3.6.2 current)
 - Branch naming: `feat/desc`, `fix/desc`, `docs/desc`, `chore/desc`, `ci/desc`
 - go-ftw integration tests via `make test-waf` (122 tests across 12 CRS families, baseline, false positives, perimeter hardening) + live header validation (CSP, HSTS, no banners) + active rate limit burst test + bare-boot regression + kernel asserts (`make test-kernel`)
 - WAF default: DetectionOnly (change to On after 7-14 day observation window)
