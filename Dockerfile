@@ -12,12 +12,13 @@ ARG CORAZA_CADDY_REF=v2.6.2
 ARG CADDY_RATELIMIT_REF=5625512
 ARG CADDY_DNS_CLOUDFLARE_REF=v0.2.4
 
-# Build Caddy with fully pinned plugin refs and security replacement for x/net.
+# Build Caddy with fully pinned plugin refs and security replacements.
 RUN xcaddy build \
     --with github.com/corazawaf/coraza-caddy/v2@${CORAZA_CADDY_REF} \
     --with github.com/mholt/caddy-ratelimit@${CADDY_RATELIMIT_REF} \
     --with github.com/caddy-dns/cloudflare@${CADDY_DNS_CLOUDFLARE_REF} \
-    --replace golang.org/x/net=golang.org/x/net@v0.61.0
+    --replace golang.org/x/net=golang.org/x/net@v0.61.0 \
+    --replace github.com/go-jose/go-jose/v4=github.com/go-jose/go-jose/v4@v4.1.6
 
 # Final Stage
 # caddy:2.11.7 pinned to its multi-arch index digest (tag comment for readability)

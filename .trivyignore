@@ -1,9 +1,7 @@
 # Trivy ignore file — caddy-waf
 #
-# No active suppressions.
-#
-# Previous suppressions (CVE-2026-84304, CVE-2026-84445) in google.golang.org/grpc
-# were resolved by upgrading coraza-caddy to v2.6.1, which lifted grpc to v1.83.2.
-#
-# Keep this file empty of ignored CVEs unless an unpatched vulnerability with
-# documented risk assessment strictly requires temporary suppression.
+# CVE-2026-116587 (HIGH): Go JOSE DoS when parsing JWKs with RSA keys.
+# Upstream released v4.1.6 (applied via --replace in Dockerfile), but v3 has no
+# patched release (first_patched_version is null). Pinned transitively via
+# smallstep/crypto in Caddy PKI. Untrusted JWKs are not parsed in standard WAF operation.
+CVE-2026-116587
