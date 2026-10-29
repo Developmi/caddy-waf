@@ -272,9 +272,12 @@ The following advisories do not affect this project. Listed for transparency.
 
 ---
 
-## Pending advisories
+## Active & Pending advisories
 
-There are currently **no pending advisories**. All previously known CVEs and GHSA advisories are resolved in the current base image and plugin dependencies.
+| Advisory | Component | Severity | Status & Assessment |
+|----------|-----------|----------|---------------------|
+| `CVE-2026-116587` | `github.com/go-jose/go-jose/v4` | HIGH | Mitigated: patched to `v4.1.6` via `xcaddy build --replace` in `Dockerfile`. |
+| `CVE-2026-116587` | `github.com/go-jose/go-jose/v3` | HIGH | Unpatched upstream (`v3.0.5` is latest; `first_patched_version` is null). Transitive dependency via `smallstep/crypto` in Caddy PKI. Untrusted JWKs are not parsed or accepted in standard WAF reverse-proxy deployment; temporarily suppressed in `.trivyignore`. |
 
 **Resolved in Go 1.27.2 & x/net v0.61.0 (2026-10-11)** — compiling Caddy with `GOTOOLCHAIN=go1.27.2` and updating `golang.org/x/net` to `v0.61.0` in the builder stage resolved 4 HIGH vulnerabilities detected by Trivy in `usr/bin/caddy`:
 
@@ -345,6 +348,7 @@ There are currently **no pending advisories**. All previously known CVEs and GHS
 | **2026-10-05** | caddy-waf **v3.6.0** released - Caddy 2.11.7, OWASP CRS v4.30.0, coraza-caddy v2.6.1, active rate limiting, CSP baseline |
 | **2026-10-10** | coraza-caddy v2.6.2 released and integrated into caddy-waf (Coraza v3.8.1) |
 | **2026-10-11** | caddy-waf **v3.6.1** released - coraza-caddy v2.6.2 (Coraza v3.8.1 resolves 6 GHSAs), Go 1.27.2 toolchain, test-security gate |
+| **2026-10-28** | Routine tooling & toolchain upgrade - Go 1.27.3, Trivy v0.76.1, go-ftw v2.6.2; mitigated CVE-2026-116587 (go-jose/v4 to v4.1.6, suppressed unpatched v3) |
 
 ---
 
