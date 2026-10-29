@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 Format: [Keep a Changelog](https://keepachangelog.com/) · Versioning: [SemVer](https://semver.org/)
 
+## [3.6.2] - 2026-10-28
+
+### Security
+
+- **CVE-2026-116587 Mitigation**: Replaced `github.com/go-jose/go-jose/v4` with patched release **v4.1.6** via `xcaddy build --replace`, eliminating DoS vulnerability when parsing JWKs containing RSA keys. Documented unpatched transitive `go-jose/v3` (v3.0.5) in `.trivyignore` and `SECURITY.md` (untrusted JWKs are not parsed in standard reverse-proxy operation).
+
+### Changed
+
+- **Go Toolchain**: Updated toolchain pin to `GOTOOLCHAIN=go1.27.3` in `Dockerfile`.
+- **Development & Testing Tooling**: Upgraded Trivy to **0.76.1** and `go-ftw` to **2.6.2** with verified multi-architecture SHA-256 digests in `tools/versions.mk`.
+- **CI Workflows**: Updated `aquasecurity/setup-trivy` step to `v0.76.1` in `.github/workflows/docker-build-scan-sign.yml`.
+- **Version Alignment**: OCI `LABEL version` → **3.6.2** in `Dockerfile`.
+
 ## [3.6.1] - 2026-10-11
 
 ### Security
