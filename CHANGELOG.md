@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 Format: [Keep a Changelog](https://keepachangelog.com/) · Versioning: [SemVer](https://semver.org/)
 
+## [3.6.3] - 2026-11-04
+
+### Security
+
+- **Upstream Security Bump (`go-jose/v4`)**: Updated `github.com/go-jose/go-jose/v4` to **v4.1.8** via `xcaddy build --replace`, incorporating upstream fixes for 5 security advisories (GHSA-r39w-98wm-9pp6, GHSA-27pc-rm86-68pq, GHSA-p9j4-2j95-j4rv, GHSA-v6h2-qj3f-2h6v, GHSA-c67m-wr4h-2ccg) and adding ML-DSA support.
+
+### Changed
+
+- **Version Alignment**: OCI `LABEL version` → **3.6.3** in `Dockerfile`.
+
 ## [3.6.2] - 2026-10-28
 
 ### Security
