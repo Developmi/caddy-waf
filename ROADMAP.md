@@ -40,6 +40,7 @@ Every completed item links to the exact commit or PR that delivered it — verif
 | 13. Caddy 2.11.7, CRS v4.30.0, CSP baseline & active rate limiting | → `v3.6.0` | Upgraded Caddy to 2.11.7 and CRS to v4.30.0; integrated OpenSSF Best Practices passing badge; enforced CSP baseline, active rate limiting snippet, and example hardening |
 | 14. Coraza v3.8.1 (coraza-caddy v2.6.2) & Kernel Hardening Asserts | → `v3.6.1` | Mitigated 6 Coraza GHSA advisories; added `tools/test-hardening.sh` (`make test-kernel`) asserting UID 1337, CapEff dropped, read-only rootfs, and tmpfs noexec |
 | 15. CVE-2026-116587 Mitigation & Toolchain Alignment | → `v3.6.2` | Mitigated CVE-2026-116587 (go-jose/v4 to v4.1.6, suppressed unpatched v3); updated Go toolchain to 1.27.3, Trivy to 0.76.1, and go-ftw to 2.6.2 |
+| 16. Upstream go-jose/v4 Security Bump | → `v3.6.3` | Upgraded `go-jose/v4` to `v4.1.8`, mitigating 5 additional upstream security advisories (GHSA-r39w-98wm-9pp6, etc.) and adding ML-DSA support |
 
 **Observability note:** The same `metrics/prometheus.yml` feeds both backends (VictoriaMetrics via `-promscrape.config`, Prometheus via `--config.file`) — Caddy's `/metrics` output needs no changes. Admin `:2019` remains internal-only.
 
