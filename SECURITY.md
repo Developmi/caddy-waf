@@ -279,6 +279,12 @@ The following advisories do not affect this project. Listed for transparency.
 | `CVE-2026-116587` | `github.com/go-jose/go-jose/v4` | HIGH | Mitigated: patched to `v4.1.8` via `xcaddy build --replace` in `Dockerfile` (incorporating upstream fixes for GHSA-r39w-98wm-9pp6, GHSA-27pc-rm86-68pq, GHSA-p9j4-2j95-j4rv, GHSA-v6h2-qj3f-2h6v, GHSA-c67m-wr4h-2ccg). |
 | `CVE-2026-116587` | `github.com/go-jose/go-jose/v3` | HIGH | Unpatched upstream (`v3.0.5` is latest; `first_patched_version` is null). Transitive dependency via `smallstep/crypto` in Caddy PKI. Untrusted JWKs are not parsed or accepted in standard WAF reverse-proxy deployment; temporarily suppressed in `.trivyignore`. |
 
+**Resolved in x/net v0.62.0 (2026-11-07)** — updating `golang.org/x/net` to `v0.62.0` in the builder stage resolved 1 HIGH vulnerability detected by Trivy in `usr/bin/caddy`:
+
+| Advisory | Component (before) | Fixed by |
+|----------|--------------------|----------|
+| `CVE-2026-78661` | `golang.org/x/net` v0.61.0 `golang.org/x/net/html` DoS via crafted HTML input | `golang.org/x/net` v0.62.0 replacement in `xcaddy build` |
+
 **Resolved in Go 1.27.2 & x/net v0.61.0 (2026-10-11)** — compiling Caddy with `GOTOOLCHAIN=go1.27.2` and updating `golang.org/x/net` to `v0.61.0` in the builder stage resolved 4 HIGH vulnerabilities detected by Trivy in `usr/bin/caddy`:
 
 | Advisory | Component (before) | Fixed by |

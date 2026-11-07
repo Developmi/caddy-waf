@@ -17,7 +17,7 @@ RUN xcaddy build \
     --with github.com/corazawaf/coraza-caddy/v2@${CORAZA_CADDY_REF} \
     --with github.com/mholt/caddy-ratelimit@${CADDY_RATELIMIT_REF} \
     --with github.com/caddy-dns/cloudflare@${CADDY_DNS_CLOUDFLARE_REF} \
-    --replace golang.org/x/net=golang.org/x/net@v0.61.0 \
+    --replace golang.org/x/net=golang.org/x/net@v0.62.0 \
     --replace github.com/go-jose/go-jose/v4=github.com/go-jose/go-jose/v4@v4.1.8
 
 # Final Stage
