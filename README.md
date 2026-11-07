@@ -47,6 +47,9 @@ _Hardened Caddy web server distribution with Coraza WAF and OWASP CRS v4 - teste
 
 Starting from v3.0.0, the image ships with updated Caddy 2.11.7, official upstream rate limiting and DNS plugins, and native security header support - giving the project full control over maintenance cadence, security patches, and feature development.
 
+> [!NOTE]
+> **Independent Distribution:** This repository (`developmi/caddy-waf`) is an independent open-source distribution engineered around OWASP Coraza WAF, OWASP CRS v4, and automated container hardening. It is unaffiliated with and distinct from other community projects with similar naming (such as `fabriziosalmi/caddy-waf`).
+
 ### ✨ Features
 
 #### 🔒 Security First
@@ -524,8 +527,8 @@ This project follows [Conventional Commits](https://www.conventionalcommits.org/
 - **Advanced configuration:** [TUNING.md](TUNING.md)
 - **Roadmap:** [ROADMAP.md](ROADMAP.md)
 
-### Commercial Support
-For commercial support, custom configurations, or security consulting:
+### Consulting & Engineering Support
+Developmi is an independent security engineering practice by Miguel Lozano (not a company). For architecture reviews, custom configurations, or specialized consulting:
 - **Website:** [developmi.com](https://developmi.com)
 - **Email:** miguel@developmi.com
 - **GitHub:** [developmi](https://github.com/developmi)
