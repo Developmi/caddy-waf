@@ -356,6 +356,7 @@ The following advisories do not affect this project. Listed for transparency.
 | **2026-10-11** | caddy-waf **v3.6.1** released - coraza-caddy v2.6.2 (Coraza v3.8.1 resolves 6 GHSAs), Go 1.27.2 toolchain, test-security gate |
 | **2026-10-28** | Routine tooling & toolchain upgrade - Go 1.27.3, Trivy v0.76.1, go-ftw v2.6.2; mitigated CVE-2026-116587 (go-jose/v4 to v4.1.6, suppressed unpatched v3) |
 | **2026-11-04** | caddy-waf **v3.6.3** released - Upgraded go-jose/v4 to v4.1.8 (mitigating 5 upstream security advisories) |
+| **2026-11-07** | caddy-waf **v3.6.4** released - Upgraded golang.org/x/net to v0.62.0 (mitigating CVE-2026-78661) |
 
 ---
 
