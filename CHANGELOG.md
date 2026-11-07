@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 Format: [Keep a Changelog](https://keepachangelog.com/) · Versioning: [SemVer](https://semver.org/)
 
+## [3.6.4] - 2026-11-07
+
+### Security
+
+- **CVE-2026-78661 Mitigation (`golang.org/x/net`)**: Updated `golang.org/x/net` from `v0.61.0` to **v0.62.0** via `xcaddy build --replace`, eliminating a HIGH severity Denial of Service vulnerability in `golang.org/x/net/html` caused by crafted HTML input. Verified with Trivy (0 HIGH, 0 CRITICAL).
+
+### Changed
+
+- **Version Alignment**: OCI `LABEL version` → **3.6.4** in `Dockerfile`.
+
 ## [3.6.3] - 2026-11-04
 
 ### Security
@@ -322,6 +332,10 @@ Format: [Keep a Changelog](https://keepachangelog.com/) · Versioning: [SemVer](
 - README.md and README.es.md with setup instructions.
 
 <!-- Version links for Keep a Changelog -->
+[3.6.4]: https://github.com/Developmi/caddy-waf/compare/v3.6.3...v3.6.4
+[3.6.3]: https://github.com/Developmi/caddy-waf/compare/v3.6.2...v3.6.3
+[3.6.2]: https://github.com/Developmi/caddy-waf/compare/v3.6.1...v3.6.2
+[3.6.1]: https://github.com/Developmi/caddy-waf/compare/v3.6.0...v3.6.1
 [3.6.0]: https://github.com/Developmi/caddy-waf/compare/v3.5.5...v3.6.0
 [3.5.5]: https://github.com/Developmi/caddy-waf/compare/v3.5.4...v3.5.5
 [3.5.4]: https://github.com/Developmi/caddy-waf/compare/v3.5.2...v3.5.4

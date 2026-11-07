@@ -47,6 +47,9 @@ _Hardened Caddy web server distribution with Coraza WAF and OWASP CRS v4 - teste
 
 Starting from v3.0.0, the image ships with updated Caddy 2.11.7, official upstream rate limiting and DNS plugins, and native security header support - giving the project full control over maintenance cadence, security patches, and feature development.
 
+> [!NOTE]
+> **Independent Distribution:** This repository (`developmi/caddy-waf`) is an independent open-source distribution engineered around OWASP Coraza WAF, OWASP CRS v4, and automated container hardening. It is unaffiliated with and distinct from other community projects with similar naming (such as `fabriziosalmi/caddy-waf`).
+
 ### ✨ Features
 
 #### 🔒 Security First
@@ -81,7 +84,7 @@ Starting from v3.0.0, the image ships with updated Caddy 2.11.7, official upstre
 
 ### 1. Pull the Image
 ```bash
-docker pull ghcr.io/developmi/caddy-waf:v3.6.3
+docker pull ghcr.io/developmi/caddy-waf:v3.6.4
 ```
 
 ### 2. Create Environment File
@@ -229,7 +232,7 @@ volumes:
 ### Environment Variables
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `CADDY_WAF_IMAGE` | `ghcr.io/developmi/caddy-waf:v3.6.3` | Caddy WAF image reference |
+| `CADDY_WAF_IMAGE` | `ghcr.io/developmi/caddy-waf:v3.6.4` | Caddy WAF image reference |
 | `EXAMPLE_APP_IMAGE` | `containous/whoami:latest` | Demo backend image |
 | `SITE_ADDRESS` | `localhost` | Site address/server name used by Caddy |
 | `BACKEND_UPSTREAM` | `example-app:80` | Reverse proxy backend upstream |
@@ -315,10 +318,10 @@ curl -I https://yourdomain.com
 ### Security Scanning
 ```bash
 # Scan image with Trivy
-docker run --rm aquasec/trivy image ghcr.io/developmi/caddy-waf:v3.6.3
+docker run --rm aquasec/trivy image ghcr.io/developmi/caddy-waf:v3.6.4
 
 # Scan with Docker Scout
-docker scout quickview ghcr.io/developmi/caddy-waf:v3.6.3
+docker scout quickview ghcr.io/developmi/caddy-waf:v3.6.4
 ```
 
 ### Integration Tests (go-ftw & Perimeter Hardening)
@@ -497,6 +500,7 @@ The project follows [Keep a Changelog](https://keepachangelog.com/) and [Semanti
 
 | Version | Date | Highlights |
 |---------|------|------------|
+| [3.6.4](./CHANGELOG.md#364---2026-11-07) | 2026-11-07 | Upstream golang.org/x/net to v0.62.0 (mitigating CVE-2026-78661) |
 | [3.6.3](./CHANGELOG.md#363---2026-11-04) | 2026-11-04 | Upstream go-jose/v4 to v4.1.8 (5 security advisories mitigated, ML-DSA support) |
 | [3.6.2](./CHANGELOG.md#362---2026-10-28) | 2026-10-28 | Mitigated CVE-2026-116587 (go-jose v4.1.6), Go 1.27.3 toolchain, Trivy 0.76.1, go-ftw 2.6.2 |
 | [3.6.1](./CHANGELOG.md#361---2026-10-11) | 2026-10-11 | Coraza WAF v3.8.1 (coraza-caddy v2.6.2, 6 GHSA advisories resolved), container kernel hardening asserts (`make test-kernel`) |
@@ -524,8 +528,8 @@ This project follows [Conventional Commits](https://www.conventionalcommits.org/
 - **Advanced configuration:** [TUNING.md](TUNING.md)
 - **Roadmap:** [ROADMAP.md](ROADMAP.md)
 
-### Commercial Support
-For commercial support, custom configurations, or security consulting:
+### Consulting & Engineering Support
+Developmi is an independent security engineering practice by Miguel Lozano (not a company). For architecture reviews, custom configurations, or specialized consulting:
 - **Website:** [developmi.com](https://developmi.com)
 - **Email:** miguel@developmi.com
 - **GitHub:** [developmi](https://github.com/developmi)

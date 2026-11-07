@@ -6,7 +6,7 @@
 |---------|-----------|
 | 3.6.x   | ✅ Yes (current) |
 | 3.5.x   | ❌ No - upgrade to 3.6.x |
-| 2.0.x   | ❌ No - migrated to Developmi, upgrade to 3.0.x |
+| 2.0.x   | ❌ No - migrated to Developmi, upgrade to 3.6.x |
 | 1.0.x   | ❌ No |
 
 Only the latest release line receives security updates.
@@ -279,6 +279,12 @@ The following advisories do not affect this project. Listed for transparency.
 | `CVE-2026-116587` | `github.com/go-jose/go-jose/v4` | HIGH | Mitigated: patched to `v4.1.8` via `xcaddy build --replace` in `Dockerfile` (incorporating upstream fixes for GHSA-r39w-98wm-9pp6, GHSA-27pc-rm86-68pq, GHSA-p9j4-2j95-j4rv, GHSA-v6h2-qj3f-2h6v, GHSA-c67m-wr4h-2ccg). |
 | `CVE-2026-116587` | `github.com/go-jose/go-jose/v3` | HIGH | Unpatched upstream (`v3.0.5` is latest; `first_patched_version` is null). Transitive dependency via `smallstep/crypto` in Caddy PKI. Untrusted JWKs are not parsed or accepted in standard WAF reverse-proxy deployment; temporarily suppressed in `.trivyignore`. |
 
+**Resolved in x/net v0.62.0 (2026-11-07)** — updating `golang.org/x/net` to `v0.62.0` in the builder stage resolved 1 HIGH vulnerability detected by Trivy in `usr/bin/caddy`:
+
+| Advisory | Component (before) | Fixed by |
+|----------|--------------------|----------|
+| `CVE-2026-78661` | `golang.org/x/net` v0.61.0 `golang.org/x/net/html` DoS via crafted HTML input | `golang.org/x/net` v0.62.0 replacement in `xcaddy build` |
+
 **Resolved in Go 1.27.2 & x/net v0.61.0 (2026-10-11)** — compiling Caddy with `GOTOOLCHAIN=go1.27.2` and updating `golang.org/x/net` to `v0.61.0` in the builder stage resolved 4 HIGH vulnerabilities detected by Trivy in `usr/bin/caddy`:
 
 | Advisory | Component (before) | Fixed by |
@@ -350,6 +356,7 @@ The following advisories do not affect this project. Listed for transparency.
 | **2026-10-11** | caddy-waf **v3.6.1** released - coraza-caddy v2.6.2 (Coraza v3.8.1 resolves 6 GHSAs), Go 1.27.2 toolchain, test-security gate |
 | **2026-10-28** | Routine tooling & toolchain upgrade - Go 1.27.3, Trivy v0.76.1, go-ftw v2.6.2; mitigated CVE-2026-116587 (go-jose/v4 to v4.1.6, suppressed unpatched v3) |
 | **2026-11-04** | caddy-waf **v3.6.3** released - Upgraded go-jose/v4 to v4.1.8 (mitigating 5 upstream security advisories) |
+| **2026-11-07** | caddy-waf **v3.6.4** released - Upgraded golang.org/x/net to v0.62.0 (mitigating CVE-2026-78661) |
 
 ---
 
