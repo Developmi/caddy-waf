@@ -6,7 +6,7 @@
 |---------|-----------|
 | 3.6.x   | ✅ Yes (current) |
 | 3.5.x   | ❌ No - upgrade to 3.6.x |
-| 2.0.x   | ❌ No - migrated to Developmi, upgrade to 3.0.x |
+| 2.0.x   | ❌ No - migrated to Developmi, upgrade to 3.6.x |
 | 1.0.x   | ❌ No |
 
 Only the latest release line receives security updates.
