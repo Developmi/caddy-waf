@@ -1,6 +1,6 @@
 # Build Stage
 # caddy:2.11.7-builder pinned to its multi-arch index digest (tag comment for readability)
-FROM caddy:2.11.7-builder@sha256:a576be4d0ba99e7259e98268cbac2e2c897feeab8b7b49885cd3cac5409523f8 AS builder
+FROM caddy:2.11.8-builder@sha256:d4eb070c36154bd2d4c94b40359a03c6168346d5af5404963c74691ab77fb63f AS builder
 
 ENV GOTOOLCHAIN=go1.27.3
 
@@ -22,7 +22,7 @@ RUN xcaddy build \
 
 # Final Stage
 # caddy:2.11.7 pinned to its multi-arch index digest (tag comment for readability)
-FROM caddy:2.11.7@sha256:d76116d819d5162f464b0f2cd09bd28c568a86148c7bc539ce17c33eb22d8bbb
+FROM caddy:2.11.8@sha256:4fcafa98afd1c2e642e353e3c5cf9ddbe892fcee14bc990e7ba2c5b78e51f9cf
 SHELL ["/bin/ash", "-eo", "pipefail", "-c"]
 
 # Container metadata
