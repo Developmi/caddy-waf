@@ -267,7 +267,7 @@ The following advisories do not affect this project. Listed for transparency.
 
 | Advisory | Severity | Description | Why not applicable |
 |----------|----------|-------------|--------------------|
-| `GHSA-wwhq-w58m-w29c` | High (no CVE) | Bypass of the CVE-2026-30852 fix - literal keys in `vars_regexp` (e.g. `tenant_id`) still double-expand and leak `{env.*}` / `{file.*}` placeholders | Affects Caddy <= 2.11.2 only (no patched release); caddy-waf ships Caddy 2.11.7 - out of affected range |
+| `GHSA-wwhq-w58m-w29c` | High (no CVE) | Bypass of the CVE-2026-30852 fix - literal keys in `vars_regexp` (e.g. `tenant_id`) still double-expand and leak `{env.*}` / `{file.*}` placeholders | Affects Caddy <= 2.11.2 only (no patched release); caddy-waf ships Caddy 2.11.9 - out of affected range |
 | `GHSA-gx7w-56w6-g48x` | Moderate | Remote admin authorization bypass on PKI endpoints via prefix-based path matching | Remote admin is not enabled in this project (admin listener is localhost-only) - not reachable. Re-verify before adopting roadmap item 6 (mTLS remote admin) |
 
 ---
@@ -276,8 +276,29 @@ The following advisories do not affect this project. Listed for transparency.
 
 | Advisory | Component | Severity | Status & Assessment |
 |----------|-----------|----------|---------------------|
-| `CVE-2026-116587` | `github.com/go-jose/go-jose/v4` | HIGH | Mitigated: patched to `v4.1.8` via `xcaddy build --replace` in `Dockerfile` (incorporating upstream fixes for GHSA-r39w-98wm-9pp6, GHSA-27pc-rm86-68pq, GHSA-p9j4-2j95-j4rv, GHSA-v6h2-qj3f-2h6v, GHSA-c67m-wr4h-2ccg). |
+| `CVE-2026-116587` | `github.com/go-jose/go-jose/v4` | HIGH | Mitigated: patched to `v4.1.9` via `xcaddy build --replace` in `Dockerfile` (incorporating upstream fixes for GHSA-r39w-98wm-9pp6, GHSA-27pc-rm86-68pq, GHSA-p9j4-2j95-j4rv, GHSA-v6h2-qj3f-2h6v, GHSA-c67m-wr4h-2ccg). |
 | `CVE-2026-116587` | `github.com/go-jose/go-jose/v3` | HIGH | Unpatched upstream (`v3.0.5` is latest; `first_patched_version` is null). Transitive dependency via `smallstep/crypto` in Caddy PKI. Untrusted JWKs are not parsed or accepted in standard WAF reverse-proxy deployment; temporarily suppressed in `.trivyignore`. |
+
+**Resolved in Caddy 2.11.9 (2026-11-16)** — upgrading the Caddy base image to `v2.11.9` resolved 7 security advisories in upstream Caddy:
+
+| Advisory | Component | Description / Impact | Fixed in |
+|----------|-----------|----------------------|----------|
+| `GHSA-r766-rf9f-588h` | `file_server` / `php_fastcgi` | Host and `:authority` values with dot segments or slashes escape `{host}`-based root | Caddy 2.11.9 |
+| `GHSA-f278-mgc7-46j3` | `php_fastcgi` | Authorization bypass via dot-segments in request path | Caddy 2.11.9 |
+| `GHSA-25cw-38mq-q7m6` | `file` matcher | Matcher resolves `/file/./` to regular file, bypassing suffix path rules | Caddy 2.11.9 |
+| `GHSA-69hv-5jfc-mvmv` | `rewrite` handler | Rewrite re-decodes `{http.matchers.file.remainder}`, bypassing path-based deny rules | Caddy 2.11.9 |
+| `GHSA-jf74-f69g-hcj9` | `file_server` | File server exposes private keys when data directory falls back to `./caddy` | Caddy 2.11.9 |
+| `GHSA-8qx7-j2v2-x6q5` | `reverse_proxy` | Hop-by-hop headers leak through during WebSocket upgrades (HTTP 101) | Caddy 2.11.9 |
+| `GHSA-q34h-28rj-5hjm` | `reverse_proxy/fastcgi` | Client-supplied request headers override configured `HTTP_*` environment variables | Caddy 2.11.9 |
+
+**Resolved in Go 1.27.4 (2026-11-16)** — compiling Caddy with `GOTOOLCHAIN=go1.27.4` addresses 4 security advisories in the Go toolchain and standard library:
+
+| Advisory | Component | Description / Impact | Fixed in |
+|----------|-----------|----------------------|----------|
+| `CVE-2026-97054` | Go stdlib `net/http` | Concurrent header write and MaxBytesReader close header race condition causing panic | Go 1.27.4 toolchain pin (`GOTOOLCHAIN=go1.27.4`) |
+| `CVE-2026-97043` | Go toolchain `cmd/go`, `cmd/compile` | Build-time arbitrary flag injection and code execution via escaped `#cgo LDFLAGS` quotes | Go 1.27.4 toolchain pin (`GOTOOLCHAIN=go1.27.4`) |
+| `CVE-2026-97042` | Go toolchain `cmd/cgo`, `cmd/compile`, `cmd/link` | Windows PE & cgo external linker argument injection via unvalidated DLL / library names | Go 1.27.4 toolchain pin (`GOTOOLCHAIN=go1.27.4`) |
+| `CVE-2026-97041` | Go toolchain `cmd/compile`, `cmd/link` | Arbitrary host linker flag injection on ELF platforms via unescaped commas in `//go:cgo_*` directives | Go 1.27.4 toolchain pin (`GOTOOLCHAIN=go1.27.4`) |
 
 **Resolved in x/net v0.62.0 (2026-11-07)** — updating `golang.org/x/net` to `v0.62.0` in the builder stage resolved 1 HIGH vulnerability detected by Trivy in `usr/bin/caddy`:
 
@@ -357,6 +378,8 @@ The following advisories do not affect this project. Listed for transparency.
 | **2026-10-28** | Routine tooling & toolchain upgrade - Go 1.27.3, Trivy v0.76.1, go-ftw v2.6.2; mitigated CVE-2026-116587 (go-jose/v4 to v4.1.6, suppressed unpatched v3) |
 | **2026-11-04** | caddy-waf **v3.6.3** released - Upgraded go-jose/v4 to v4.1.8 (mitigating 5 upstream security advisories) |
 | **2026-11-07** | caddy-waf **v3.6.4** released - Upgraded golang.org/x/net to v0.62.0 (mitigating CVE-2026-78661) |
+| **2026-11-16** | Caddy 2.11.9 released - fixes GHSA-r766-rf9f-588h, GHSA-f278-mgc7-46j3, GHSA-25cw-38mq-q7m6, GHSA-69hv-5jfc-mvmv, GHSA-jf74-f69g-hcj9, GHSA-8qx7-j2v2-x6q5, GHSA-q34h-28rj-5hjm |
+| **2026-11-16** | Go 1.27.4 toolchain adopted - fixes CVE-2026-97054, CVE-2026-97043, CVE-2026-97042, CVE-2026-97041; go-jose/v4 bumped to v4.1.9, Trivy v0.76.2 |
 
 ---
 
