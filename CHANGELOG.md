@@ -3,6 +3,21 @@
 All notable changes to this project will be documented in this file.
 Format: [Keep a Changelog](https://keepachangelog.com/) · Versioning: [SemVer](https://semver.org/)
 
+## [3.7.0] - 2026-11-16
+
+### Security
+
+- **Caddy v2.11.9 Upgrade**: Updated Caddy to **v2.11.9** (multi-arch digests: builder `sha256:29f98311e17e583811355fa62cc080f71d6f3aa19cf09a9e1494d30579f8bebf`, runtime `sha256:fc9cbc100585871d18d4e451cca7021785c90a7006087427ae5ceb3e4efe6424`), mitigating 7 security advisories (GHSA-r766-rf9f-588h, GHSA-f278-mgc7-46j3, GHSA-25cw-38mq-q7m6, GHSA-69hv-5jfc-mvmv, GHSA-jf74-f69g-hcj9, GHSA-8qx7-j2v2-x6q5, GHSA-q34h-28rj-5hjm).
+- **Go 1.27.4 Toolchain Adoption**: Enforced `GOTOOLCHAIN=go1.27.4` in builder stage, mitigating CVE-2026-97054, CVE-2026-97043, CVE-2026-97042, and CVE-2026-97041.
+- **go-jose v4.1.9 Upgrade**: Updated `github.com/go-jose/go-jose/v4` replacement to **v4.1.9** via `xcaddy build --replace`, fixing oversized RSA modulus and unsupported curve handling.
+
+### Changed
+
+- **Alpine Base Refresh & Package Pinning**: Updated pinned package versions to `wget=1.25.0-r3 tar=1.35-r5` to align with the Alpine 3.24 base in Caddy 2.11.9.
+- **Development Tooling**: Upgraded Trivy to **0.76.2** with verified multi-architecture SHA-256 digests in `tools/versions.mk`.
+- **CI Dependencies**: Updated GitHub Actions (`upload-sarif`, `login-action`) to latest pinned commit SHAs.
+- **Version Alignment**: OCI `LABEL version` → **3.7.0** in `Dockerfile`, default compose image to `v3.7.0`.
+
 ## [3.6.4] - 2026-11-07
 
 ### Security
@@ -332,6 +347,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/) · Versioning: [SemVer](
 - README.md and README.es.md with setup instructions.
 
 <!-- Version links for Keep a Changelog -->
+[3.7.0]: https://github.com/Developmi/caddy-waf/compare/v3.6.4...v3.7.0
 [3.6.4]: https://github.com/Developmi/caddy-waf/compare/v3.6.3...v3.6.4
 [3.6.3]: https://github.com/Developmi/caddy-waf/compare/v3.6.2...v3.6.3
 [3.6.2]: https://github.com/Developmi/caddy-waf/compare/v3.6.1...v3.6.2

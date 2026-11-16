@@ -42,6 +42,7 @@ Every completed item links to the exact commit or PR that delivered it — verif
 | 15. CVE-2026-116587 Mitigation & Toolchain Alignment | → `v3.6.2` | Mitigated CVE-2026-116587 (go-jose/v4 to v4.1.6, suppressed unpatched v3); updated Go toolchain to 1.27.3, Trivy to 0.76.1, and go-ftw to 2.6.2 |
 | 16. Upstream go-jose/v4 Security Bump | → `v3.6.3` | Upgraded `go-jose/v4` to `v4.1.8`, mitigating 5 additional upstream security advisories (GHSA-r39w-98wm-9pp6, etc.) and adding ML-DSA support |
 | 17. Upstream x/net Security Bump | → `v3.6.4` | Upgraded `golang.org/x/net` to `v0.62.0`, mitigating CVE-2026-78661 (DoS in html parser via crafted input) |
+| 18. Caddy 2.11.9 Core Security & Go 1.27.4 Bump | → `v3.7.0` | Upgraded Caddy core to 2.11.9 (7 GHSAs mitigated), go-jose/v4 to v4.1.9, Go toolchain to 1.27.4 (4 CVEs mitigated), and Alpine base packages to tar 1.35-r5 / wget 1.25.0-r3. |
 
 **Observability note:** The same `metrics/prometheus.yml` feeds both backends (VictoriaMetrics via `-promscrape.config`, Prometheus via `--config.file`) — Caddy's `/metrics` output needs no changes. Admin `:2019` remains internal-only.
 
