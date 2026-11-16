@@ -1,8 +1,8 @@
 # Build Stage
-# caddy:2.11.7-builder pinned to its multi-arch index digest (tag comment for readability)
-FROM caddy:2.11.7-builder@sha256:a576be4d0ba99e7259e98268cbac2e2c897feeab8b7b49885cd3cac5409523f8 AS builder
+# caddy:2.11.9-builder pinned to its multi-arch index digest (tag comment for readability)
+FROM caddy:2.11.9-builder@sha256:29f98311e17e583811355fa62cc080f71d6f3aa19cf09a9e1494d30579f8bebf AS builder
 
-ENV GOTOOLCHAIN=go1.27.3
+ENV GOTOOLCHAIN=go1.27.4
 
 # Build args for deterministic plugin references.
 # coraza-caddy: https://github.com/corazawaf/coraza-caddy/releases/tag/v2.6.2
@@ -18,11 +18,11 @@ RUN xcaddy build \
     --with github.com/mholt/caddy-ratelimit@${CADDY_RATELIMIT_REF} \
     --with github.com/caddy-dns/cloudflare@${CADDY_DNS_CLOUDFLARE_REF} \
     --replace golang.org/x/net=golang.org/x/net@v0.62.0 \
-    --replace github.com/go-jose/go-jose/v4=github.com/go-jose/go-jose/v4@v4.1.8
+    --replace github.com/go-jose/go-jose/v4=github.com/go-jose/go-jose/v4@v4.1.9
 
 # Final Stage
-# caddy:2.11.7 pinned to its multi-arch index digest (tag comment for readability)
-FROM caddy:2.11.7@sha256:d76116d819d5162f464b0f2cd09bd28c568a86148c7bc539ce17c33eb22d8bbb
+# caddy:2.11.9 pinned to its multi-arch index digest (tag comment for readability)
+FROM caddy:2.11.9@sha256:fc9cbc100585871d18d4e451cca7021785c90a7006087427ae5ceb3e4efe6424
 SHELL ["/bin/ash", "-eo", "pipefail", "-c"]
 
 # Container metadata
@@ -32,14 +32,14 @@ LABEL org.opencontainers.image.description="Production-ready Caddy web server wi
 LABEL org.opencontainers.image.licenses="MIT"
 LABEL maintainer="Miguel Lozano"
 LABEL vendor="Developmi"
-LABEL version="3.6.4"
+LABEL version="3.7.0"
 LABEL waf.coraza.version="2.6.2"
 LABEL waf.owasp-crs.version="4.30.0"
 
 # Copy the custom binary
 COPY --from=builder /usr/bin/caddy /usr/bin/caddy
 
-# Upgrade all base image packages - pulls current Alpine 3.23 security fixes
+# Upgrade all base image packages - pulls current Alpine 3.24 security fixes
 # (openssl/libssl, musl, busybox, zlib, ca-certificates, curl, c-ares, ...)
 RUN apk upgrade --no-cache
 
@@ -51,7 +51,7 @@ ARG CORAZA_CONF_SHA256=372f7fde584115d9192d46023e9debd4cd59b62c30e9ca0eddc59bc1d
 # Install dependencies, download CRS and configure WAF in a single layer
 RUN mkdir -p /etc/caddy/owasp-crs /tmp/downloads && \
     # Ensure wget and tar are available (Alpine base includes them)
-    apk add --no-cache wget=1.25.0-r2 tar=1.35-r4 && \
+    apk add --no-cache wget=1.25.0-r3 tar=1.35-r5 && \
     # Download OWASP CRS v4.30.0 source archive with SHA256 verification
     wget -q -O /tmp/downloads/coreruleset.tar.gz https://github.com/coreruleset/coreruleset/archive/refs/tags/v4.30.0.tar.gz && \
     # Verify SHA256 checksum
