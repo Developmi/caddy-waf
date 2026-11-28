@@ -43,6 +43,7 @@ Every completed item links to the exact commit or PR that delivered it — verif
 | 16. Upstream go-jose/v4 Security Bump | → `v3.6.3` | Upgraded `go-jose/v4` to `v4.1.8`, mitigating 5 additional upstream security advisories (GHSA-r39w-98wm-9pp6, etc.) and adding ML-DSA support |
 | 17. Upstream x/net Security Bump | → `v3.6.4` | Upgraded `golang.org/x/net` to `v0.62.0`, mitigating CVE-2026-78661 (DoS in html parser via crafted input) |
 | 18. Caddy 2.11.9 Core Security & Go 1.27.4 Bump | → `v3.7.0` | Upgraded Caddy core to 2.11.9 (7 GHSAs mitigated), go-jose/v4 to v4.1.9, Go toolchain to 1.27.4 (4 CVEs mitigated), and Alpine base packages to tar 1.35-r5 / wget 1.25.0-r3. |
+| 19. OWASP CRS v4.31.0, Base Digest & Stack Maintenance | → `v3.7.1` | Updated OWASP CRS to v4.31.0, refreshed `caddy:2.11.9` runtime multi-arch digest (`4851e54a...`), upgraded `go-ftw` to v2.7.0, and bumped observability stack images (VictoriaMetrics v1.157.0, Prometheus v3.16.0, Grafana 13.3.2). |
 
 **Observability note:** The same `metrics/prometheus.yml` feeds both backends (VictoriaMetrics via `-promscrape.config`, Prometheus via `--config.file`) — Caddy's `/metrics` output needs no changes. Admin `:2019` remains internal-only.
 

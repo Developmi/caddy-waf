@@ -1,7 +1,7 @@
 # Trivy ignore file — caddy-waf
 #
 # CVE-2026-116587 (HIGH): Go JOSE DoS when parsing JWKs with RSA keys.
-# Upstream released v4.1.6 (applied via --replace in Dockerfile), but v3 has no
+# Upstream released v4.1.6+ (v4.1.9 applied via --replace in Dockerfile), but v3 has no
 # patched release (first_patched_version is null). Pinned transitively via
 # smallstep/crypto in Caddy PKI. Untrusted JWKs are not parsed in standard WAF operation.
 CVE-2026-116587

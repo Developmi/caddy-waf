@@ -255,7 +255,7 @@ All CVEs listed below are resolved in **caddy-waf v3.0.0** (Caddy ≥ 2.11.4) an
 
 ### OWASP CRS - not affected
 
-The following CVEs affect older OWASP CRS versions. **caddy-waf v3.6.0+ ships CRS v4.30.0 and is not affected.** Listed for transparency.
+The following CVEs affect older OWASP CRS versions. **caddy-waf v3.7.0+ ships CRS v4.31.0 (v3.6.0+ shipped v4.30.0) and is not affected.** Listed for transparency.
 
 | CVE | CVSS | Fixed In | Description |
 |-----|------|----------|-------------|
