@@ -22,7 +22,7 @@ RUN xcaddy build \
 
 # Final Stage
 # caddy:2.11.9 pinned to its multi-arch index digest (tag comment for readability)
-FROM caddy:2.11.9@sha256:fc9cbc100585871d18d4e451cca7021785c90a7006087427ae5ceb3e4efe6424
+FROM caddy:2.11.9@sha256:4851e54a46b206517c574821bb5cc67f170d2156041e9fbc4c9193b45e84a75b
 SHELL ["/bin/ash", "-eo", "pipefail", "-c"]
 
 # Container metadata
