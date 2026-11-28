@@ -2,9 +2,9 @@
 
 ## Stack
 - **Type**: Docker infrastructure / deployment (no Go source code)
-- **Base image**: Caddy 2.11.7 (Alpine-based)
+- **Base image**: Caddy 2.11.9 (Alpine-based)
 - **WAF Engine**: Coraza WAF v3.8.1 (via coraza-caddy plugin v2.6.2)
-- **Rule Set**: OWASP CRS 4.30.0
+- **Rule Set**: OWASP CRS 4.31.0
 - **Additional plugins**: caddy-ratelimit (0.1.0, pinned 5625512), caddy-dns/cloudflare (0.2.4)
 - **Language**: Go (build-time only via xcaddy builder image)
 - **Orchestration**: Docker Compose
@@ -29,7 +29,7 @@
 - **User**: Non-root caddy (UID 1337)
 - **Hardening**: read_only rootfs, cap_drop ALL, no-new-privileges, tmpfs noexec
 - **Supply chain**: Cosign keyless signing, Trivy CRITICAL/HIGH gate, SBOM attestations
-- **SHA256 verification**: OWASP CRS tarball (v4.30.0) and coraza.conf (v3.8.1, via `CORAZA_CONF_SHA256` ARG) verified against pinned SHA256 checksums at build time
+- **SHA256 verification**: OWASP CRS tarball (v4.31.0) and coraza.conf (v3.8.1, via `CORAZA_CONF_SHA256` ARG) verified against pinned SHA256 checksums at build time
 - **CVEs resolved**: CVE-2026-27590 (9.1), CVE-2026-27587 (9.1), CVE-2026-27588 (8.8), CVE-2026-30851 (8.8), CVE-2026-52845 (8.1), CVE-2026-27586 (7.5), CVE-2026-52844 (7.5), CVE-2026-27585 (6.5), CVE-2026-27589 (6.1)
 - **Security validation rule**: always contrast the CURRENT date against registered security issues. Validate only OPEN/active advisories (`.trivyignore` entries, SECURITY.md pending sections, base image and dependency versions) — never historical/closed ones unless the user asks. Re-check open advisories on every session and whenever upstream versions move (e.g., pending HIGHs awaiting a newer Caddy release).
 
@@ -42,7 +42,7 @@
 
 ## Conventions
 - Commit style: Conventional Commits (`feat:`, `fix:`, `docs:`, `chore:`, `ci:`)
-- Versioning: Semantic Versioning (v3.7.0 current)
+- Versioning: Semantic Versioning (v3.7.1 current)
 - Branch naming: `feat/desc`, `fix/desc`, `docs/desc`, `chore/desc`, `ci/desc`
 - go-ftw integration tests via `make test-waf` (122 tests across 12 CRS families, baseline, false positives, perimeter hardening) + live header validation (CSP, HSTS, no banners) + active rate limit burst test + bare-boot regression + kernel asserts (`make test-kernel`)
 - WAF default: DetectionOnly (change to On after 7-14 day observation window)

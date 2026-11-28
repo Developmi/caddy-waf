@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 Format: [Keep a Changelog](https://keepachangelog.com/) · Versioning: [SemVer](https://semver.org/)
 
+## [3.7.1] - 2026-11-28
+
+### Changed
+
+- **OWASP CRS v4.31.0 Upgrade**: Upgraded OWASP Core Rule Set from `v4.30.0` to **v4.31.0** with verified SHA-256 checksum and updated OCI label (`waf.owasp-crs.version="4.31.0"`).
+- **Caddy 2.11.9 Runtime Digest Refresh**: Updated `caddy:2.11.9` runtime base multi-arch digest to `sha256:4851e54a46b206517c574821bb5cc67f170d2156041e9fbc4c9193b45e84a75b` (absorbing Dependabot PR #68).
+- **Development & Observability Tooling**: Upgraded `go-ftw` to **v2.7.0** with verified multi-architecture SHA-256 digests in `tools/versions.mk`, and bumped observability profile images in `docker-compose.yml` (`victoria-metrics:v1.157.0`, `prometheus:v3.16.0`, `grafana:13.3.2`).
+- **Documentation & Version Alignment**: OCI `LABEL version` → **3.7.1** in `Dockerfile`, default compose image to `v3.7.1`, and synced stale references in `README.md`, `SECURITY.md`, `AGENTS.md`, and `.trivyignore`.
+
 ## [3.7.0] - 2026-11-16
 
 ### Security
@@ -347,6 +356,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/) · Versioning: [SemVer](
 - README.md and README.es.md with setup instructions.
 
 <!-- Version links for Keep a Changelog -->
+[3.7.1]: https://github.com/Developmi/caddy-waf/compare/v3.7.0...v3.7.1
 [3.7.0]: https://github.com/Developmi/caddy-waf/compare/v3.6.4...v3.7.0
 [3.6.4]: https://github.com/Developmi/caddy-waf/compare/v3.6.3...v3.6.4
 [3.6.3]: https://github.com/Developmi/caddy-waf/compare/v3.6.2...v3.6.3
